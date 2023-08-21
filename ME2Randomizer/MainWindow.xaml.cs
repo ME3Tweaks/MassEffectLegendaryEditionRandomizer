@@ -40,13 +40,13 @@ namespace RandomizerUI
     public partial class MainWindow : MetroWindow
     {
 #if __GAME1__
-        private static string FaqLink = "https://me3tweaks.com/masseffectrandomizer/faq";
+        private static string FaqLink = "https://me3tweaks.com/masseffectlerandomizer/faq";
         public bool ShowGenerationSelector => true;
 #elif __GAME2__
-        private static string FaqLink = "https://me3tweaks.com/masseffect2randomizer/faq";
+        private static string FaqLink = "https://me3tweaks.com/masseffect2lerandomizer/faq";
         public bool ShowGenerationSelector => true;
 #elif __GAME3__
-        private static string FaqLink = "https://me3tweaks.com/masseffect3randomizer/faq";
+        private static string FaqLink = "https://me3tweaks.com/masseffect3lerandomizer/faq";
         public bool ShowGenerationSelector => false;
 #endif
 
@@ -183,13 +183,11 @@ namespace RandomizerUI
         internal List<string> GetContributorCredits()
         {
             var contributors = new List<string>();
+            contributors.Add("Kosh_Vader - Debugging");
+            contributors.Add("Khaar - 3D modeling");
+            contributors.Add("Clericofshadows - 3D modeling");
             contributors.Add("Mellin - 3D modeling");
-            contributors.Add("Jenya - 3D modeling, testing");
-            contributors.Add("Audemus - Textures");
-            contributors.Add("JadeBarker - Technical assistance");
-            contributors.Add("StrifeTheHistorian - Psychological profiles");
             contributors.Add("Not_Female - UwU Emoticons implementation");
-            contributors.Add("AdmiralKirk - Testing and feedback");
             contributors.Sort();
             return contributors;
         }
@@ -285,29 +283,17 @@ namespace RandomizerUI
             get
             {
 #if __GAME1__
-                if (SelectedTarget != null && SelectedTarget.Game.IsLEGame())
-                {
-                    return "/images/game1/lebackground.jpg";
-                }
-                return "/images/game1/otbackground.jpg";
+                return "/images/game1/lebackground.jpg";
 #elif __GAME2__
-                if (SelectedTarget != null && SelectedTarget.Game.IsLEGame())
-                {
-                    return "/images/game2/lebackground.jpg";
-                }
-                return "/images/game2/otbackground.jpg";
+                return "/images/game2/lebackground.jpg";
 #elif __GAME3__
-                if (SelectedTarget != null && SelectedTarget.Game.IsLEGame())
-                {
-                    return "/images/game3/lebackground.jpg";
-                }
-                return "/images/game3/otbackground.jpg";
+                return "/images/game3/lebackground.jpg";
 #endif
                 throw new Exception("NOT A VALID BUILD");
             }
         }
 
-        public string IntroTitleText => $"Welcome to {MERUtilities.GetGameUIName(true)} Randomizer";
+        public string IntroTitleText => $"Welcome to {MERUtilities.GetGameUIName(true)} Legendary Edition Randomizer";
         public string IntroTitleSubText => $"Please read the following information to help ensure you have the best experience\nwith {MERUtilities.GetGameUIName(true)} Randomizer ({MERUtilities.GetRandomizerShortName()}).";
 
 
@@ -358,10 +344,10 @@ namespace RandomizerUI
                         AffirmativeButtonText = "Quick restore",
                         NegativeButtonText = "No restore",
                         FirstAuxiliaryButtonText = "Cancel",
-                        DefaultButtonFocus = MessageDialogResult.Affirmative
+                        DefaultButtonFocus = MessageDialogResult.Affirmative,
                     };
                     var result = await this.ShowMessageAsync("Existing randomization already installed",
-                        "An existing randomization is already installed. It is highly recommended that you perform a quick restore before re-rolling so that basegame changes do not stack or are left installed if your new options do not include these changes.\n\nPerform a quick restore before randomization?",
+                        "An existing randomization is already installed. It is highly recommended that you perform a quick restore before re-rolling so that basegame changes do not stack or are left installed if your new options do not include these changes.\n\nQuick restore will restore basegame only files, such as SFXGame.pcc - changes to these files (including by other mods) will be reverted.\n\nPerform a quick restore before randomization?",
                         MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, settings);
                     if (result == MessageDialogResult.FirstAuxiliary)
                     {

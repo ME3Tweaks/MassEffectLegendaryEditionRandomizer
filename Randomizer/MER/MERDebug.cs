@@ -47,7 +47,7 @@ namespace Randomizer.MER
 
         public static void ReplaceGetUExport()
         {
-            var package = MEPackageHandler.OpenMEPackage(@"B:\SteamLibrary\steamapps\common\Mass Effect 2\BioGame\CookedPC\BioD_EndGm2_420CombatZone.pcc"); // ME2 file
+            var package = MEPackageHandler.OpenMEPackage(@"B:\SteamLibrary\steamapps\common\Mass Effect 2\BioGame\CookedPC\BioP_Char.pcc"); // ME2 file
             Application.Current.Dispatcher.Invoke(() =>
             {
 

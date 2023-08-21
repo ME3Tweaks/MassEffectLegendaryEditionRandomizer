@@ -73,5 +73,18 @@ namespace Randomizer.Randomizers.Handlers
             var sfxengine = engine.GetOrAddSection("SFXGame.SFXEngine");
             sfxengine.AddEntry(new CoalesceProperty("DynamicLoadMapping", new CoalesceValue(mapping.GetSeekFreeStructText(), CoalesceParseAction.AddUnique)));
         }
+
+#if __GAME2__ || __GAME3__
+        /// <summary>
+        /// Adds a bool to the plot table that is not saved to disk
+        /// </summary>
+        /// <param name="boolIdx"></param>
+        public static void AddMemoryBool(int boolIdx)
+        {
+            var game = CoalescedHandler.GetIniFile("BioGame");
+            var gvTable = game.GetOrAddSection("SFXGame.BioGlobalVariableTable");
+            gvTable.AddEntry(new CoalesceProperty("TimedPlotUnlocks", new CoalesceValue($"(PlotBool={boolIdx}, UnlockDay=0)", CoalesceParseAction.AddUnique)));
+        }
+#endif
     }
 }

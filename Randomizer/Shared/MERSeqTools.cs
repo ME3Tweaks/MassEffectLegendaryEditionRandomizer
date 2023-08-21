@@ -9,6 +9,7 @@ using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
@@ -250,7 +251,7 @@ namespace Randomizer.Shared
         }
 
         /// <summary>
-        /// Gets the next connected node from the specified kismet node. Does not do any error handling!
+        /// Gets the next connected node from the specified kismet node, as the first outlink Does not do any error handling!
         /// </summary>
         /// <param name="node"></param>
         /// <param name="outputLinkIdx"></param>
@@ -383,7 +384,7 @@ namespace Randomizer.Shared
         /// <param name="sequence"></param>
         /// <param name="delay"></param>
         /// <returns></returns>
-        public static ExportEntry AddDelay(ExportEntry sequence, float delay)
+        public static ExportEntry CreateDelay(ExportEntry sequence, float delay)
         {
             var newDelay = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqAct_Delay", MERCaches.GlobalCommonLookupCache);
             KismetHelper.AddObjectToSequence(newDelay, sequence);
@@ -497,7 +498,7 @@ namespace Randomizer.Shared
         /// <param name="objects"></param>
         /// <param name="sequence"></param>
         /// <returns></returns>
-        public static ExportEntry MakeSeqVarList(List<ExportEntry> objects, ExportEntry sequence)
+        public static ExportEntry CreateSeqVarList(ExportEntry sequence, params ExportEntry[] objects)
         {
             var list = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqVar_ObjectList", MERCaches.GlobalCommonLookupCache);
             KismetHelper.AddObjectToSequence(list, sequence);
@@ -510,22 +511,26 @@ namespace Randomizer.Shared
         }
 
         /// <summary>
-        /// Creates a new hostile squad and returns its object.
+        /// Creates a new hostile squad and returns its object. Optionally you can pass in a squad actor and it will use that instead
         /// </summary>
         /// <param name="sequence"></param>
         /// <returns></returns>
-        public static ExportEntry CreateNewSquadObject(ExportEntry sequence, string tag = null)
+        public static ExportEntry CreateNewSquadObject(ExportEntry sequence, string tag = null, ExportEntry squadActor = null)
         {
             var squadObj = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqVar_Object", MERCaches.GlobalCommonLookupCache);
             KismetHelper.AddObjectToSequence(squadObj, sequence);
 
-            var newSquad = ExportCreator.CreateExport(sequence.FileRef, "BioSquadCombat", "BioSquadCombat", sequence.FileRef.GetLevel());
+            if (squadActor == null)
+            {
+                squadActor = ExportCreator.CreateExport(sequence.FileRef, "BioSquadCombat", "BioSquadCombat",
+                    sequence.FileRef.GetLevel());
+                squadActor.WriteProperty(new IntProperty(2, "ObjVersion")); // Not sure this is required - LE2
+                squadActor.WriteProperty(new NameProperty(tag ?? "BioSquadCombat", "Tag"));
+                squadActor.FileRef.AddToLevelActorsIfNotThere(squadActor);
+            }
 
-            newSquad.WriteProperty(new IntProperty(2, "ObjVersion")); // Not sure this is required - LE2
-            newSquad.WriteProperty(new NameProperty(tag ?? "BioSquadCombat", "Tag"));
-            newSquad.FileRef.AddToLevelActorsIfNotThere(newSquad);
+            squadObj.WriteProperty(new ObjectProperty(squadActor, "ObjValue"));
 
-            squadObj.WriteProperty(new ObjectProperty(newSquad, "ObjValue"));
 
             return squadObj;
         }
@@ -544,6 +549,22 @@ namespace Randomizer.Shared
             fObj.WriteProperty(new FloatProperty(value, "FloatValue"));
 
             return fObj;
+        }
+
+        /// <summary>
+        /// Creates a new SeqVar_RandomFloat with the given value range in the given sequence
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateRandFloat(ExportEntry sequence, float minValue, float maxValue)
+        {
+            var fFloat = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqVar_RandomFloat", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(fFloat, sequence);
+
+            fFloat.WriteProperty(new FloatProperty(minValue, "Min"));
+            fFloat.WriteProperty(new FloatProperty(maxValue, "Max"));
+
+            return fFloat;
         }
 
         /// <summary>
@@ -593,6 +614,23 @@ namespace Randomizer.Shared
 
             return fObj;
         }
+
+        /// <summary>
+        /// Creates a new SeqEvent_Death with the given Originator
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="eventName"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateSeqEventDeath(ExportEntry sequence, ExportEntry originator)
+        {
+            var fObj = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqEvent_Death", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(fObj, sequence);
+
+            fObj.WriteProperty(new ObjectProperty(originator, "Originator"));
+
+            return fObj;
+        }
+
 
         /// <summary>
         /// Creates a new BioSeqVar_ObjectFindByTag with the given tag name and optionally searching unique tags
@@ -701,7 +739,7 @@ namespace Randomizer.Shared
                 Debugger.Break(); // The list should not be empty
             }
 
-            return MERSeqTools.MakeSeqVarList(bioPawnTypes, sequence);
+            return MERSeqTools.CreateSeqVarList(sequence, bioPawnTypes.ToArray());
         }
 
         /// <summary>
@@ -713,7 +751,8 @@ namespace Randomizer.Shared
         /// <param name="newDestIdx"></param>
         public static void RedirectInboundLinks(ExportEntry original, ExportEntry newDest, int inputIdxOriginal = 0, int newDestIdx = 0)
         {
-            var seqObjects = SeqTools.GetAllSequenceElements(original).OfType<ExportEntry>();
+            var parentSeq = SeqTools.GetParentSequence(original); // Use parent sequence. This ensures we can redirect on Sequence and SequenceReference
+            var seqObjects = SeqTools.GetAllSequenceElements(parentSeq).OfType<ExportEntry>();
             var outboundNodes = SeqTools.FindOutboundConnectionsToNode(original, seqObjects);
             foreach (var outboundNode in outboundNodes)
             {
@@ -732,6 +771,177 @@ namespace Randomizer.Shared
 
                 SeqTools.WriteOutboundLinksToNode(outboundNode, outboundLinks);
             }
+        }
+
+        /// <summary>
+        /// Creates a basic Gate object in the given sequence
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateGate(ExportEntry sequence)
+        {
+            var gate = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqAct_Gate", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(gate, sequence);
+            return gate;
+        }
+
+        /// <summary>
+        /// Creates an object of the specified class and adds it to the listed sequence
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="className"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateAndAddToSequence(ExportEntry sequence, string className)
+        {
+            var obj = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, className, MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(obj, sequence);
+            return obj;
+        }
+
+        /// <summary>
+        /// Creates a SeqAct_Log object
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateLog(ExportEntry seq, string comment)
+        {
+            // This is often used for hackjobbing things
+            var obj = CreateAndAddToSequence(seq, "SeqAct_Log");
+            KismetHelper.SetComment(obj, comment);
+            return obj;
+        }
+
+        /// <summary>
+        /// Removes incoming links to a sequence action object
+        /// </summary>
+        public static void RemoveLinksTo(ExportEntry seqNode)
+        {
+            var sequence = SeqTools.GetParentSequence(seqNode);
+            var nodes = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+            var inboundNodes = SeqTools.FindOutboundConnectionsToNode(seqNode, nodes);
+            foreach (var inbound in inboundNodes)
+            {
+                var outbound = SeqTools.GetOutboundLinksOfNode(inbound);
+                foreach (var ob in outbound)
+                {
+                    // Remove all items that link to our node
+                    ob.RemoveAll(x => x.LinkedOp == seqNode);
+                }
+
+                SeqTools.WriteOutboundLinksToNode(inbound, outbound);
+            }
+
+        }
+
+        /// <summary>
+        /// Creates a new delay with a SeqVar_RandomFloat in the specified range
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateRandomDelay(ExportEntry seq, float min, float max)
+        {
+            var newDelay = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqAct_Delay", MERCaches.GlobalCommonLookupCache);
+            var newRandFloat = CreateRandFloat(seq, min, max);
+            KismetHelper.AddObjectsToSequence(seq, false, newDelay, newRandFloat);
+            KismetHelper.CreateVariableLink(newDelay, "Duration", newRandFloat);
+            return newDelay;
+        }
+
+        /// <summary>
+        /// Creates a PMCheckState with the given index to check for
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static ExportEntry CreatePMCheckState(ExportEntry seq, int index)
+        {
+            var checkState = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "BioSeqAct_PMCheckState", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(checkState, seq);
+
+            checkState.WriteProperty(new IntProperty(index, "m_nIndex"));
+
+            return checkState;
+        }
+
+        /// <summary>
+        /// Creates a ModifyObjectList in the given sequence
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateModifyObjectList(ExportEntry seq)
+        {
+            var objListModifier = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqAct_ModifyObjectList", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(objListModifier, seq);
+            return objListModifier;
+        }
+
+        /// <summary>
+        /// Creates a new SeqVar_Named to find the name/class type combo in, in the given sequence
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="varName"></param>
+        /// <param name="expectedType"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateSeqVarNamed(ExportEntry seq, string varName, string expectedType)
+        {
+            var varNamed = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqVar_Named", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(varNamed, seq);
+            var expectedTypeClass = EntryImporter.EnsureClassIsInFile(seq.FileRef, expectedType, new RelinkerOptionsPackage(MERCaches.GlobalCommonLookupCache));
+            varNamed.WriteProperty(new NameProperty(varName, "FindVarName"));
+            varNamed.WriteProperty(new ObjectProperty(expectedTypeClass, "ExpectedType"));
+            return varNamed;
+        }
+
+        /// <summary>
+        /// Creates a WwisePostEvent action in the given sequence with the given event
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateWwisePostEvent(ExportEntry seq, IEntry wwiseEvent)
+        {
+            var postEvent = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqAct_WwisePostEvent", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(postEvent, seq);
+
+            postEvent.WriteProperty(new ObjectProperty(wwiseEvent, "WwiseObject"));
+
+            return postEvent;
+        }
+
+        /// <summary>
+        /// Inserts an object between another in a kismet graph. The object being inserted should not have any outlinks on the outlink name specified
+        /// </summary>
+        /// <param name="originalNode"></param>
+        /// <param name="outlinkName"></param>
+        /// <param name="mitmNode"></param>
+        /// <param name="mitmInputIdx"></param>
+        /// <param name="mitmOutlinkName"></param>
+        public static void InsertActionAfter(ExportEntry originalNode, string outlinkName, ExportEntry mitmNode, int mitmInputIdx, string mitmOutlinkName)
+        {
+            var outLinkIdxToRedirect = SeqTools.GetOutlinkNames(originalNode).IndexOf(outlinkName);
+            if (outLinkIdxToRedirect == -1)
+            {
+                // Outlink needs made
+                KismetHelper.CreateNewOutputLink(originalNode, outlinkName, null);
+                outLinkIdxToRedirect = SeqTools.GetOutlinkNames(originalNode).IndexOf(outlinkName);
+            }
+
+
+            var originalOutLinks = SeqTools.GetOutboundLinksOfNode(originalNode);
+            var newOutLinks = SeqTools.GetOutboundLinksOfNode(originalNode);
+
+            newOutLinks[outLinkIdxToRedirect].Clear();
+            newOutLinks[outLinkIdxToRedirect].Add(new SeqTools.OutboundLink() { InputLinkIdx = mitmInputIdx, LinkedOp = mitmNode }); // Point only to our new node
+            SeqTools.WriteOutboundLinksToNode(originalNode, newOutLinks);
+
+            var mitmOutLinks = SeqTools.GetOutboundLinksOfNode(mitmNode);
+            var mitmOutlinkIdxToUse = SeqTools.GetOutlinkNames(mitmNode).IndexOf(mitmOutlinkName);
+
+            mitmOutLinks[mitmOutlinkIdxToUse] = originalOutLinks[outLinkIdxToRedirect]; // Use the original outlinks as the output from this outlink
+
+            SeqTools.WriteOutboundLinksToNode(mitmNode, mitmOutLinks);
         }
     }
 }

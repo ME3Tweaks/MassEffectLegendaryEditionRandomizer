@@ -45,7 +45,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         private static SquadMate[] SquadmatePawnClasses = new[]
         {
             new SquadMate() {ClassName = "SFXPawn_Garrus", InternalName="Garrus",NamePrefix = "Gar"},
-            new SquadMate() {ClassName = "SFXPawn_Grunt", InternalName="Garrus",NamePrefix = "Gru"},
+            new SquadMate() {ClassName = "SFXPawn_Grunt", InternalName="Grunt",NamePrefix = "Gru"},
             new SquadMate() {ClassName = "SFXPawn_Jack", InternalName="Convict",IsFemale = true, NamePrefix = "Ja", SameGenderOnly = true}, // her neck is too smol
             new SquadMate() {ClassName = "SFXPawn_Jacob", InternalName="Leading",NamePrefix = "Jac"},
             new SquadMate() {ClassName = "SFXPawn_Legion", InternalName="Geth",NamePrefix = "Leg"}, // Is swappable?
@@ -278,6 +278,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 AssetPath = "BIOG_ASA_HED_PROMorph_R.Samara.ASA_HED_PROSamara_MDL",
                 NameSuffix = "ara",
                 IsSquadmateHead = true,
+                IsFemaleAsset = true,
             },
 
             new HeadAssetSource()
@@ -294,6 +295,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 AssetPath = "BIOG_HMF_HED_PROKasumi_R.Head.HMF_HED_PROKasumi_MDL",
                 NameSuffix = "umi",
                 IsSquadmateHead = true,
+                IsFemaleAsset = true,
                 IsUsable = false
             },
             new HeadAssetSource()
@@ -756,6 +758,11 @@ namespace Randomizer.Randomizers.Game2.Misc
             //}
         }
 
+        /// <summary>
+        /// Updates head mesh position based on the internal name
+        /// </summary>
+        /// <param name="squadmateInfo"></param>
+        /// <param name="newMdl"></param>
         private static void UpdateHeadMeshPosition(SquadMate squadmateInfo, ExportEntry newMdl)
         {
             if (squadmateInfo.InternalName == "Thief")
@@ -763,7 +770,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 var newBin = ObjectBinary.From<SkeletalMesh>(newMdl);
                 foreach (var lod in newBin.LODModels)
                 {
-                    lod.VertexBufferGPUSkin.MeshOrigin.Z -= 6; // Shift head down a bit for the hood
+                    lod.VertexBufferGPUSkin.MeshOrigin.Z -= 5; // Shift head down a bit for the hood
                 }
                 newMdl.WriteBinary(newBin);
             }

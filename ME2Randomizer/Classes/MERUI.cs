@@ -10,7 +10,7 @@ namespace RandomizerUI.Classes
         /// <returns></returns>
         public static string GetRandomizerName()
         {
-            return $"{MERUtilities.GetGameUIName(true)} Randomizer";
+            return $"{MERUtilities.GetGameUIName(false)} Randomizer";
         }
     }
 }

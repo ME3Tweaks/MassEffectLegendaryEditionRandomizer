@@ -183,6 +183,27 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 PawnClassPath = "MERGamePawns.SFXPawn_GethDestroyerFull",
             },
 
+            new PortablePawn()
+            {
+                PackageFilename = "SFXPawn_Kaidan.pcc",
+                BioPawnTypeIFP = "MERChar_Enemies.KaidanSpawnable",
+                AssetToPortIn = "MERChar_Enemies.KaidanSpawnable",
+                AssetPaths = new string[] {
+                    // Assets are already referenced by custom pawn
+                },
+                PawnClassPath = "MERGamePawns.SFXPawn_horcr1_kaidan",
+            },
+            new PortablePawn()
+            {
+                PackageFilename = "SFXPawn_Ashley.pcc",
+                BioPawnTypeIFP = "MERChar_Enemies.AshleySpawnable",
+                AssetToPortIn = "MERChar_Enemies.AshleySpawnable",
+                AssetPaths = new string[] {
+                    // Assets are already referenced by custom pawn
+                },
+                PawnClassPath = "MERGamePawns.SFXPawn_horcr1_ashley",
+            },
+
             //Geth Prime. AI doesn't let him climb over shit so he's pretty stationary
             // He's too strong given the other changes made in LE2R
             //new PortablePawn()

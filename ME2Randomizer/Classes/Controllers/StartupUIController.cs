@@ -217,7 +217,7 @@ namespace RandomizerUI.Classes.Controllers
                     },
                     cancellationTokenSource = ct,
                     ApplicationName = MERUI.GetRandomizerName(),
-                    RequestHeader = MERUI.GetRandomizerName().Replace(" ", ""),
+                    RequestHeader = MERUI.GetRandomizerName().Replace(" ", "").Replace("(", "").Replace(")", ""),
                     ForcedUpgradeMaxReleaseAge = 3
                 };
 

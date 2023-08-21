@@ -119,8 +119,8 @@ namespace Randomizer.Randomizers.Game2.Levels
         {
             var biop_charF = MERFileSystem.GetPackageFile(target, @"BioP_Char.pcc");
             var biop_char = MEPackageHandler.OpenMEPackage(biop_charF);
-            var maleFrontEndData = biop_char.GetUExport(18753);
-            var femaleFrontEndData = biop_char.GetUExport(18754);
+            var maleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Male");
+            var femaleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Female");
 
             var codeMapMale = CalculateCodeMap(maleFrontEndData);
             var codeMapFemale = CalculateCodeMap(femaleFrontEndData);
@@ -167,8 +167,8 @@ namespace Randomizer.Randomizers.Game2.Levels
 
 
             //Copy the final skeleton from female into male.
-            var femBase = biop_char.GetUExport(3480);
-            var maleBase = biop_char.GetUExport(3481);
+            var femBase = biop_char.FindExport("BIOG_MORPH_FACE.CharacterCreation_Base_Female");
+            var maleBase = biop_char.FindExport("BIOG_MORPH_FACE.CharacterCreation_Base_Male");
             maleBase.WriteProperty(femBase.GetProperty<ArrayProperty<StructProperty>>("m_aFinalSkeleton"));
 
             var randomizeColors = !option.HasSubOptionSelected(CharacterCreator.SUBOPTIONKEY_CHARCREATOR_NO_COLORS);
@@ -241,7 +241,7 @@ namespace Randomizer.Randomizers.Game2.Levels
         }
 
 
-        private static string unnotchedSliderCodeChars = "123456789ABCDEFGHIJKLMNOPQRSTUVW";
+        private static string unnotchedSliderCodeChars = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         /// <summary>
         /// Builds a map of position => allowable values (as a string)

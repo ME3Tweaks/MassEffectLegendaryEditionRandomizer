@@ -96,7 +96,8 @@ namespace Randomizer.Randomizers.Game2.Misc
                 SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
             }
 
-            KismetHelper.CreateOutputLink(randNextNode, "Out", export);
+            KismetHelper.CreateOutputLink(randNextNode, "Randomized", export);
+            // Cutscene does not use the Reset Input/output pins
             return true;
         }
 

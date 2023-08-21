@@ -272,6 +272,25 @@ namespace Randomizer.MER
         }
 
         /// <summary>
+        /// Saves a stream to a file in the DLC folder
+        /// </summary>
+        /// <param name="package">Package to save</param>
+        /// <returns>The path the package was saved to. Can be null if package was not saved</returns>
+        public static string SaveStreamToDLC(Stream stream, string forcedFileName)
+        {
+            var fname = Path.GetFileName(forcedFileName);
+            var newPath = Path.Combine(DLCModCookedPath, fname);
+            lock (openSavePackageSyncObj)
+            {
+                MERLog.Information($"Saving DLC file to {newPath}");
+                stream.WriteToFile(newPath);
+                return newPath;
+            }
+
+            return null; // Package was not saved
+        }
+
+        /// <summary>
         /// Creates the DLC_MOD_RANDOMIZER folder
         /// </summary>
         /// <param name="game"></param>
@@ -343,6 +362,15 @@ namespace Randomizer.MER
             {
                 package.CustomMetadata[PREVENT_SAVE_METADATA_NAME] = true;
             }
+        }
+
+        /// <summary>
+        /// Extracts the Packages/Game/Always_[name] from the assets directory to the DLC folder name
+        /// </summary>
+        /// <param name="alwaysName"></param>
+        public static void InstallAlways(string alwaysName)
+        {
+            MEREmbedded.ExtractEmbeddedBinaryFolder($"Packages.{Game}.Always_{alwaysName}");
         }
     }
 }

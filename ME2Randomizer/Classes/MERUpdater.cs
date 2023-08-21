@@ -15,11 +15,11 @@ namespace RandomizerUI.Classes
         public static string GetGithubAssetPrefix()
         {
 #if __GAME1__
-            return "MassEffectRandomizer";
+            return "LE1Randomizer";
 #elif __GAME2__
-            return "ME2Randomizer";
+            return "LE2Randomizer";
 #elif __GAME3__
-            return "ME3Randomizer";
+            return "LE3Randomizer";
 #else
             throw new Exception("GAME PREPROCESSOR DEFINITION NOT SET");
 #endif
@@ -32,11 +32,11 @@ namespace RandomizerUI.Classes
         public static string GetExpectedExeName()
         {
 #if __GAME1__
-            return "MassEffectRandomizer.exe";
+            return "LE1Randomizer.exe";
 #elif __GAME2__
-            return "ME2Randomizer.exe";
+            return "LE2Randomizer.exe";
 #elif __GAME3__
-            return "ME3Randomizer.exe";
+            return "LE3Randomizer.exe";
 #else
             throw new Exception("GAME PREPROCESSOR DEFINITION NOT SET");
 #endif
@@ -49,7 +49,7 @@ namespace RandomizerUI.Classes
 
         public static string GetGithubRepoName()
         {
-            return "MassEffect2Randomizer"; // CHANGE IN FUTURE FOR UNIFIED REPO
+            return "MassEffectLegendaryEditionRandomizer"; 
         }
     }
 }

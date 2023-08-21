@@ -47,6 +47,21 @@ namespace Randomizer.Randomizers.Utility
             return isSublevelPackage.IsMatch(pName);
         }
 
+        /// <summary>
+        /// Adds the specified entry to the object referencer in the package. If there is no object referencer already added then this does nothing.
+        /// </summary>
+        /// <param name="entry">The entry to add. It is not checked if it is already in the list</param>
+        /// <returns>If object reference was added</returns>
+        public static bool AddToObjectReferencer(IEntry entry)
+        {
+            var referencer = entry.FileRef.Exports.FirstOrDefault(x => x.ClassName == @"ObjectReferencer");
+            if (referencer == null) return false;
+            var refs = referencer.GetProperty<ArrayProperty<ObjectProperty>>(@"ReferencedObjects") ?? new ArrayProperty<ObjectProperty>(@"ReferencedObjects");
+            refs.Add(new ObjectProperty(entry));
+            referencer.WriteProperty(refs);
+            return true;
+        }
+
         public static List<IEntry> ReadObjectReferencer(this IMEPackage package)
         {
             var objReferencer = package.Exports.FirstOrDefault(x => x.idxLink == 0 && x.ObjectName == "ObjectReferencer");
@@ -195,6 +210,25 @@ namespace Randomizer.Randomizers.Utility
                 ObjectName = sourceExport.ObjectName,
                 PackageFile = "Core", //Risky...
                 ClassName = sourceExport.ClassName,
+                idxLink = parentObject?.UIndex ?? 0,
+            };
+            targetPackage.AddImport(imp);
+            return imp;
+        }
+
+        /// <summary>
+        /// Creates an ImportEntry
+        /// </summary>
+        /// <param name="sourceExport"></param>
+        /// <param name="targetPackage"></param>
+        /// <returns></returns>
+        public static ImportEntry CreateImport(IMEPackage targetPackage, NameReference objectName, string className, string packageFile, IEntry parentObject = null)
+        {
+            ImportEntry imp = new ImportEntry(targetPackage)
+            {
+                ObjectName = objectName,
+                PackageFile = packageFile,
+                ClassName = className,
                 idxLink = parentObject?.UIndex ?? 0,
             };
             targetPackage.AddImport(imp);

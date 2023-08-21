@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Misc;
+using ME3TweaksCore.Config;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.Game2FileFormats;
 using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Utility;
 using Serilog;
 
 namespace Randomizer.Randomizers.Game2.Misc
@@ -120,10 +121,17 @@ namespace Randomizer.Randomizers.Game2.Misc
 
         public static bool RandomizeWeapons(GameTarget target, RandomizationOption option)
         {
+            var sfxgame = SFXGame.GetSFXGame(target);
+            ScriptTools.InstallScriptToExport(sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
+            MERFileSystem.SavePackage(sfxgame);
+            return true;
+
+            // ME2R code
+#if false
             var me2rbioweapon = CoalescedHandler.GetIniFile("BIOWeapon.ini");
 
             // We must manually fetch game files cause MERFS will return the ini from the dlc mod instead.
-            ME2Coalesced me2basegamecoalesced = new ME2Coalesced(MERFileSystem.GetSpecificFile(target,@"BioGame\Config\PC\Cooked\Coalesced.ini"));
+            /ME2Coalesced me2basegamecoalesced = new ME2Coalesced(MERFileSystem.GetSpecificFile(target,@"BioGame\Config\PC\Cooked\Coalesced.ini
 
             MERLog.Information("Randomizing basegame weapon ini");
             var bioweapon = me2basegamecoalesced.Inis.FirstOrDefault(x => Path.GetFileName(x.Key) == "BIOWeapon.ini").Value;
@@ -144,7 +152,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 //    File.WriteAllText(wi, dlcWeapIni.ToString());
                 //}
             }
-
+#endif
             return true;
         }
 

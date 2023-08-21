@@ -34,7 +34,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
         }
 
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioConversation";
-        private static bool CanRandomizeSeqActStartConvo(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"SFXSeqAct_StartConversation";
+        private static bool CanRandomizeSeqActStartConvo(ExportEntry export) => !export.IsDefaultObject && export.ClassName is @"SFXSeqAct_StartConversation" or "BioSeqAct_StartConversation";
 
         private static string[] Localizations = new[] { "INT" }; // Add more later, maybe.
 
@@ -87,7 +87,8 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             if (!conversationStartExports.Any())
                 return false;
 
-            MERPackageCache localCache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
+            var nonNativeLookupClass = package.FindExport("MERGameContentKismet.MERSeqVar_ObjectFindByTagNonNative");
+
 
             foreach (var convStart in conversationStartExports)
             {
@@ -99,17 +100,18 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                 var sequence = SeqTools.GetParentSequence(convStart);
 
                 // Add our randomizer node
-                var randNextNode =
-                    SequenceObjectCreator.CreateSequenceObject(package, @"MERSeqAct_RandomizePawnsInNextNode");
+                var randNextNode = SequenceObjectCreator.CreateSequenceObject(package, @"MERSeqAct_RandomizePawnsInNextNode");
                 KismetHelper.AddObjectToSequence(randNextNode, sequence);
 
+                MERSeqTools.InsertActionAfter(convStart, "Out", randNextNode, 1, "Reset");
+
+
                 var sequenceObjects = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
-                var incomingExports =
-                    SeqTools.FindOutboundConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
+                var incomingExports = SeqTools.FindOutboundConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
 
                 foreach (var incoming in incomingExports)
                 {
-                    // Repoint to our randomization node
+                    // Repoint to our randomization node -> RandomizeNext input
                     var outboundsFromPrevNode = SeqTools.GetOutboundLinksOfNode(incoming);
                     foreach (var outLink in outboundsFromPrevNode)
                     {
@@ -126,11 +128,48 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
                 }
 
-                KismetHelper.CreateOutputLink(randNextNode, "Out", convStart);
+                KismetHelper.CreateOutputLink(randNextNode, "Randomized", convStart);
+                KismetHelper.CreateOutputLink(convStart, "Out", randNextNode, 1); // Reset
+                KismetHelper.CreateOutputLink(convStart, "Failed", randNextNode, 1); // Reset
+
+                // Change all dynamic lookups to non-native since native seems unreliable for some reason.
+
+                var varLinks = SeqTools.GetVariableLinksOfNode(convStart);
+                foreach (var v1 in varLinks)
+                {
+                    foreach (var v2 in v1.LinkedNodes.OfType<ExportEntry>())
+                    {
+                        // Change to our lookup object so we can randomize it easier
+                        if (v2.ClassName == "SeqVar_Object")
+                        {
+
+                            v2.ObjectName = new NameReference("MERSeqVar_ObjectFindByTagNonNative_SVO", v2.ObjectName.Number);
+                            if (nonNativeLookupClass == null)
+                            {
+                                nonNativeLookupClass = EntryImporter.EnsureClassIsInFile(v2.FileRef, "MERSeqVar_ObjectFindByTagNonNative", new RelinkerOptionsPackage()) as ExportEntry;
+                            }
+
+                            v2.Class = nonNativeLookupClass;
+                            continue;
+                        }
+
+                        if (v2.ClassName == "BioSeqVar_ObjectFindByTag")
+                        {
+                            v2.ObjectName = new NameReference("MERSeqVar_ObjectFindByTagNonNative_OFBT", v2.ObjectName.Number);
+                            if (nonNativeLookupClass == null)
+                            {
+                                nonNativeLookupClass = EntryImporter.EnsureClassIsInFile(v2.FileRef, "MERSeqVar_ObjectFindByTagNonNative", new RelinkerOptionsPackage()) as ExportEntry;
+                            }
+
+                            v2.Class = nonNativeLookupClass;
+                        }
+                    }
+                }
             }
             return true;
         }
 
+        /*
         public static bool RandomizePackageActorsInConversation(GameTarget target, IMEPackage package, RandomizationOption option)
         {
             var conversationStartExports = package.Exports.Where(CanRandomizeSeqActStartConvo).ToList();
@@ -435,6 +474,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
             return true;
         }
+        */
 
         private static bool CanRandomizeConversationStart(ExportEntry convStart)
         {
