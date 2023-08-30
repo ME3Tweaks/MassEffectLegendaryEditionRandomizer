@@ -787,9 +787,9 @@ namespace Randomizer.MER
         public static string GetGameUIName(bool originalTrilogy)
         {
 #if __GAME1__
-            return originalTrilogy ? "Mass Effect" : "Mass Effect (Legendary Editon)";
+            return originalTrilogy ? "Mass Effect" : "Mass Effect (Legendary Edition)";
 #elif __GAME2__
-            return originalTrilogy ? "Mass Effect 2" : "Mass Effect 2 (Legendary Editon)";
+            return originalTrilogy ? "Mass Effect 2" : "Mass Effect 2 Legendary Edition";
 #else
             return "Mass Effect 3 Legendary Edition"; // We don't support OT for MER.
 #endif

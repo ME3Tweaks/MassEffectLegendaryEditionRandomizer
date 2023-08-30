@@ -47,7 +47,8 @@ namespace Randomizer.MER
 
         public static void ReplaceGetUExport()
         {
-            var package = MEPackageHandler.OpenMEPackage(@"B:\SteamLibrary\steamapps\common\Mass Effect 2\BioGame\CookedPC\BioP_Char.pcc"); // ME2 file
+            var packF = MELoadedFiles.GetFilesLoadedInGame(MEGame.ME2)[@"BioA_Unc1Base4.pcc"];
+            var package = MEPackageHandler.OpenMEPackage(packF); // ME2 file
             Application.Current.Dispatcher.Invoke(() =>
             {
 
@@ -69,7 +70,7 @@ namespace Randomizer.MER
                 Clipboard.SetText(newText);
             });
         }
-        
+
         public static void BuildPowersBank(object sender, DoWorkEventArgs e)
         {
 #if DEBUG && __GAME2__
