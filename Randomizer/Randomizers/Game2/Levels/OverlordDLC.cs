@@ -90,16 +90,16 @@ namespace Randomizer.Randomizers.Game2.Levels
         private static void MakeGethCannonScary(IMEPackage package)
         {
             if (Path.GetFileName(package.FilePath) != @"BioD_Unc1Base3_100Entrance.pcc") return;
-            package.GetUExport(20446).WriteProperty(new FloatProperty(15000, "FloatValue")); // Damage
-            package.GetUExport(19749).WriteProperty(new FloatProperty(10, "PlayRate")); // Make cannon turn faster (not sure this does anything?)
-            package.GetUExport(19638).WriteProperty(new FloatProperty(1, "Duration")); // Min time between shots
-            package.GetUExport(19635).WriteProperty(new FloatProperty(2, "Duration")); // Wind up time for the cannon
+            package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Combat.The_Death_Cannon.The_Death_Cannon.SeqVar_Float_11").WriteProperty(new FloatProperty(15000, "FloatValue")); // Damage
+            package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Combat.The_Death_Cannon.The_Death_Cannon.SeqAct_Interp_0").WriteProperty(new FloatProperty(10, "PlayRate")); // Make cannon turn faster (not sure this does anything?)
+            package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Combat.The_Death_Cannon.The_Death_Cannon.SeqAct_Delay_6").WriteProperty(new FloatProperty(1, "Duration")); // Min time between shots
+            package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Combat.The_Death_Cannon.The_Death_Cannon.SeqAct_Delay_2").WriteProperty(new FloatProperty(2, "Duration")); // Wind up time for the cannon
         }
 
         private static void ChangeUNC4BaseColors(IMEPackage package)
         {
             if (Path.GetFileName(package.FilePath) != @"BioA_Unc1Base4.pcc") return;
-            var yellowToGreen = package.GetUExport(93);
+            var yellowToGreen = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.InterpData_0.InterpGroup_0");
             var color1 = MakeRandomColor(1.21f);
             var color2 = MakeRandomColor(1.21f);
             SetBaseColorInterpGroup(yellowToGreen, color1, color2);

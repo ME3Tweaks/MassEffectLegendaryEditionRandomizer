@@ -24,6 +24,16 @@ namespace Randomizer.Randomizers.Game2.Misc
             return null;
         }
 
+        private static IMEPackage GetEngine(GameTarget target)
+        {
+            var engine = Path.Combine(target.TargetPath, "BioGame", "CookedPCConsole", "Engine.pcc");
+            if (File.Exists(engine))
+            {
+                return MEPackageHandler.OpenMEPackage(engine);
+            }
+
+            return null;
+        }
 
         public static bool MakeShepardRagdollable(GameTarget target, RandomizationOption option)
         {

@@ -1,6 +1,10 @@
 ﻿using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
+using Randomizer.MER;
+using Randomizer.Randomizers.Game2;
+using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared
@@ -21,7 +25,8 @@ namespace Randomizer.Randomizers.Shared
                     locS.X = ThreadSafeRandom.NextFloat(-100000, 100000);
                     locS.Y = ThreadSafeRandom.NextFloat(-100000, 100000);
                     locS.Z = ThreadSafeRandom.NextFloat(-100000, 100000);
-                } else
+                }
+                else
                 {
                     // Fuzz it
                     locS.X *= ThreadSafeRandom.NextFloat(.25, 1.75);
@@ -33,6 +38,13 @@ namespace Randomizer.Randomizers.Shared
                 return true;
             }
             return false;
+        }
+
+        public static bool RandomizeBioPawnLookatController(GameTarget target, RandomizationOption arg2)
+        {
+            MERControl.InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bPawnLookatRandomizer");
+            return true;
         }
     }
 

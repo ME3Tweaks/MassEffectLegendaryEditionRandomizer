@@ -12,36 +12,19 @@ namespace Randomizer.Randomizers.Game2.Misc
 {
     public class PawnMovementSpeed
     {
-        private static bool InstalledMovementSpeedModifier = false;
-        private static void InstallMovementSpeedModifier(GameTarget target)
-        {
-            if (!InstalledMovementSpeedModifier)
-            {
-                var sfxgame = SFXGame.GetSFXGame(target);
-                ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioPawn.PostBeginPlay"),
-                    "BioPawn.PostBeginPlay.uc");
-                MERFileSystem.SavePackage(sfxgame);
-                InstalledMovementSpeedModifier = true;
-            }
-        }
-
-        public static void ResetClass()
-        {
-            InstalledMovementSpeedModifier = false;
-        }
         public static bool RandomizeNonPlayerMovementSpeed(GameTarget target, RandomizationOption option)
         {
-            InstallMovementSpeedModifier(target);
-            CoalescedHandler.AddMemoryBool(1350039); // Non Player
+            MERControl.InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bNPCMovementSpeedRandomizer"); // Non Player
             return true;
         }
 
         public static bool RandomizePlayerMovementSpeed(GameTarget target, RandomizationOption option)
         {
-            InstallMovementSpeedModifier(target);
-            CoalescedHandler.AddMemoryBool(1350038); // Player
+            MERControl.InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bPlayerMovementSpeedRandomizer"); 
 
-
+            // Todo: Put into BioPawn randomizer
             var biogame = CoalescedHandler.GetIniFile("BIOGame.ini");
             var sfxgame = biogame.GetOrAddSection("SFXGame.SFXGame");
             sfxgame.SetSingleEntry("StormStamina", ThreadSafeRandom.NextFloat(1.5f, 12));

@@ -51,7 +51,7 @@ namespace Randomizer.Randomizers.Handlers
             var tfcStream = MEREmbedded.GetEmbeddedAsset("Binary", $"Textures.{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc");
             tfcStream.WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, $"{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc")); // Write the embedded TFC out to the DLC folder
 #endif
-            // PremadeTexturePackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(MERFileSystem.Game, @"Textures.PremadeImages.pcc"), @"PremadeImages.pcc");
+            PremadeTexturePackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(MERFileSystem.Game, @"Textures.PremadeImages.pcc"), @"PremadeImages.pcc");
         }
 
         /// <summary>
@@ -97,6 +97,21 @@ namespace Randomizer.Randomizers.Handlers
             EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.ReplaceSingularWithRelink, sourceTexToCopy, export.FileRef, export, true, new RelinkerOptionsPackage(), out _);
         }
 
+        /// <summary>
+        /// Installs a new premade texture export to the specified package
+        /// </summary>
+        public static ExportEntry InstallNewTexture(IMEPackage package, string textureName, IEntry parent = null)
+        {
+            var sourceTexToCopy = PremadeTexturePackage.FindExport(textureName);
+#if DEBUG
+            if (sourceTexToCopy == null)
+            {
+                Debugger.Break();
+            }
+#endif
+            EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.AddSingularAsChild, sourceTexToCopy, package, parent, true, new RelinkerOptionsPackage(), out var newEntry);
+            return newEntry as ExportEntry;
+        }
 
         public static void EndHandler(GameTarget target)
         {

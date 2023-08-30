@@ -8,6 +8,16 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 {
     class RBioMorphFace
     {
+        public static bool RandomizeBioMorphFace2(GameTarget target, RandomizationOption option)
+        {
+            MERControl.InstallBioPawnMERControl(target);
+            MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+            MERControl.InstallBioMorphFaceRandomizerClasses(target);
+
+            return true;
+        }
+
+
         private static RandomizationOption henchFaceOption = new RandomizationOption() { SliderValue = .3f };
 
         private static string[] SquadmateMorphHeadPaths =

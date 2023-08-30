@@ -199,8 +199,8 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
                         "HoloScreensAmazon",
                     },
                     // PreMountTexture = true
-                },
-            //    new RTexture2D
+                }
+                //    new RTexture2D
             //    {
             //        // The graphs that scroll by, line and bar rchargs (H_Graphs3_5)
             //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_Graphs2",

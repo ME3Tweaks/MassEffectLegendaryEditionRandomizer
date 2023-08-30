@@ -8,6 +8,13 @@ namespace Randomizer.Randomizers.Game2.Misc
     {
         public static bool PerformRandomization(GameTarget target, RandomizationOption option)
         {
+            // Due to how hammerhead is set up, it would not be very easy to do 
+            // at runtime without having to make extensive changes to the game
+            // HammerHead is a pretty lame thing anyways so nobody is going to care
+            // if it is randomized IMO
+            // Note: Hammerhead only has methods that either fully override or 
+            // call Super() into SVehicle so there is no SFXGame method that can be hijacked for use
+            // like PostBeginPlay() or Tick()
             var ini = CoalescedHandler.GetIniFile("BioGame.ini");
 
             var section = ini.GetOrAddSection("SFXGame.SFXVehicleHover");

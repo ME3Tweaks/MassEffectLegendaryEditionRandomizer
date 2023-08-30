@@ -16,7 +16,6 @@ namespace Randomizer.Randomizers.Game2.Misc
             var props = export.GetProperties();
             if (export.ObjectName.Name.Contains("SFXPower"))
             {
-
                 props.AddOrReplaceProp(new BoolProperty(true, "bCustomDroneColor"));
                 props.AddOrReplaceProp(new BoolProperty(true, "bCustomDroneColor2"));
             }

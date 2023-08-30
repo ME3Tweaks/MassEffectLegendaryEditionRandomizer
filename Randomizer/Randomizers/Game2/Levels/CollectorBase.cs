@@ -572,7 +572,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             KismetHelper.CreateVariableLink(atmoHandler, "HealthPercent", healthPercent);
 
             // Add the fog, ash, and lightning
-            foreach (var actor in sequenceSupportPackage.Exports.Where(x => x.idxLink == 0 && x.ClassName is "Emitter" or "HeightFog"))
+            foreach (var actor in sequenceSupportPackage.Exports.Where(x => x.idxLink == 0 && x.ClassName is "Emitter" or "RollingHeightFog"))
             {
                 EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, actor,
                     finalFightPackage, finalFightPackage.GetLevel(), true, new RelinkerOptionsPackage(),
@@ -725,23 +725,27 @@ namespace Randomizer.Randomizers.Game2.Levels
                     }
                 }
 
-                // Set ragdolls on pawns standing on platforms as they are destroyed
+                // Change player check to all pawns check
                 var checkIfInVolume = seqObjs.FirstOrDefault(x => x.ClassName == "BioSeqAct_CheckIfInVolume");
+                var doActionInVolume = MERSeqTools.CreateAndAddToSequence(sequence, "BioSeqAct_DoActionInVolume");
+                MERSeqTools.RedirectInboundLinks(checkIfInVolume, doActionInVolume);
+
+                // Hookup vars to new check
+                var volume = SeqTools.GetVariableLinksOfNode(checkIfInVolume)[1].LinkedNodes[0] as ExportEntry; // ooo spicy (Volume)
+                var currentObj = MERSeqTools.CreateObject(sequence, null);
+
+                KismetHelper.CreateVariableLink(doActionInVolume, "Volume", volume);
+                KismetHelper.CreateVariableLink(doActionInVolume, "CurrentObject", currentObj);
+
                 var attachEffect =
                     seqObjs.FirstOrDefault(x =>
                         x.ObjectName.Instanced ==
                         "BioSeqAct_AttachVisualEffect_0"); // This is very specific and depends on compile order of file!
-
-                KismetHelper.RemoveOutputLinks(checkIfInVolume); // remove teleport and get nearest point logic
-
-                var signalRagdolled = MERSeqTools.CreateActivateRemoteEvent(sequence, "PlayerEnteredRagdoll");
-
-
-                var newSeq = MERSeqTools.InstallSequenceChained(sequenceSupportPackage.FindExport("RagdollIntoAir"),
-                    reaperFightPackage, sequence, signalRagdolled, 0);
-                KismetHelper.CreateOutputLink(checkIfInVolume, "In Volume", newSeq); // Connect input
-                KismetHelper.CreateVariableLink(newSeq, "Pawn", MERSeqTools.CreatePlayerObject(sequence, true));
-                KismetHelper.CreateOutputLink(signalRagdolled, "Out", attachEffect); // Finish chain
+                var ragdollIntoAir = MERSeqTools.InstallSequenceStandalone(sequenceSupportPackage.FindExport("RagdollIntoAir"), reaperFightPackage, sequence);
+                KismetHelper.CreateVariableLink(ragdollIntoAir, "Pawn", currentObj);
+                KismetHelper.CreateOutputLink(doActionInVolume, "Next", ragdollIntoAir); // Connect input
+                KismetHelper.CreateOutputLink(ragdollIntoAir, "Out", doActionInVolume, 1); // Continue
+                KismetHelper.CreateVariableLink(doActionInVolume, "Finished", attachEffect);
             }
 
             // Install sequence that handles choosing the next platform to destroy

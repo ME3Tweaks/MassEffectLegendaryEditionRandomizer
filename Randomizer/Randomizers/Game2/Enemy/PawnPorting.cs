@@ -82,7 +82,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_Bombination",
                 Classification = EPortablePawnClassification.Mook,
-                IsCorrectedPackage = false
+                IsCorrectedPackage = true
             },
             // Bombinatiton - Suicide version (faster cast on the power to fix flying bug)
             new PortablePawn()
@@ -96,7 +96,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_BombinationSuicide",
                 Classification = EPortablePawnClassification.Mook,
-                IsCorrectedPackage = false
+                IsCorrectedPackage = true
             },
 
             // Husk
@@ -126,7 +126,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_ChargingHusk",
                 Classification = EPortablePawnClassification.Mook,
-                IsCorrectedPackage = false
+                IsCorrectedPackage = true
             },
 
             // Klixen
@@ -140,6 +140,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     "EffectsMaterials.Users.Creatures.CBT_SPD_NKD_MAT_1a_USER",
                 },
                 PawnClassPath = "SFXGamePawns.SFXPawn_Spider",
+                IsCorrectedPackage = true
             },
 
             // Scion
@@ -154,6 +155,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     "BIOG_SCI_ARM_NKD_R.NKDa.SCI_ARM_NKDa_MAT_1a",
                 },
                 PawnClassPath = "SFXGamePawns.SFXPawn_Scion",
+                IsCorrectedPackage = true
             },
 
             // Varren - they don't work properly when flown in
@@ -170,6 +172,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MAT_3b"
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_VarrenFull",
+                IsCorrectedPackage = true
             },
 
             new PortablePawn()
@@ -181,6 +184,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     // Assets are already referenced by custom pawn
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_GethDestroyerFull",
+                IsCorrectedPackage = true
             },
 
             new PortablePawn()
@@ -192,6 +196,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     // Assets are already referenced by custom pawn
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_horcr1_kaidan",
+                IsCorrectedPackage = true
             },
             new PortablePawn()
             {
@@ -202,55 +207,8 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     // Assets are already referenced by custom pawn
                 },
                 PawnClassPath = "MERGamePawns.SFXPawn_horcr1_ashley",
+                IsCorrectedPackage = true
             },
-
-            //Geth Prime. AI doesn't let him climb over shit so he's pretty stationary
-            // He's too strong given the other changes made in LE2R
-            //new PortablePawn()
-            //{
-            //    PackageFilename = "BioPawn_GethPrime.pcc",
-            //    BioPawnTypeIFP = "BioChar_Geth.Geth.SUB_GethPrime",
-            //    AssetToPortIn = "BioChar_Geth.Geth.SUB_GethPrime",
-            //    AssetPaths = new[] {
-            //        "BIOG_GTH_STP_NKD_R.NKDa.GTH_STP_NKDa_MDL", //Body
-            //        "BIOG_GTH_STP_NKD_R.NKDa.GTH_STP_NKDa_MAT_2a", //Material
-            //    },
-            //    //PawnClassPath = "SFXGamePawns.", // not used for this class
-            //},
-
-
-            // Flamethrower Vorcha
-            //new PortablePawn()
-            //{
-            //    PackageFilename = "SFXPawn_VorchaFlamethrower.pcc",
-            //    BioPawnTypeIFP = "MERChar_EndGm2.Soldiers.FlamethrowerVorcha",
-            //    AssetToPortIn = "MERChar_EndGm2.Soldiers.FlamethrowerVorcha",
-            //    AssetPaths = new[] {
-            //        "BIOG_HMM_ARM_HVY_R.HVYa.HMM_ARM_HVYa_MAT_18a",
-            //        "BIOG_HMM_HGR_HVY_R.HVYa.HMM_HGR_HVYa_MAT_18a",
-            //        "BIOG_HMM_ARM_HVY_R.HVYa.HMM_ARM_HVYa_MDL",
-            //        "BIOG_HMM_HGR_HVY_R.HVYa.HMM_HGR_HVYa_MDL",
-            //        "BIOG_HMM_HGR_HVY_R.HVYa.HMM_VSR_HVYa_MDL",
-            //        "BIOG_HMM_HGR_HVY_R.HVYa.HMM_VSR_HVYa_MAT_1a",
-            //        "BIOG_HMM_HGR_HVY_R.BRT.HMM_BTR_HVY_MDL",
-            //        "BIOG_HMM_HGR_HVY_R.BRT.HMM_BTR_HVY_MAT_1a",
-            //        "BIOG_BAT_HED_PROMorph_R.PROBase.BAT_HED_PROBase_MDL",
-            //        "BIOG_BAT_HED_PROMorph_R.PROBase.BAT_HED_PROMorph_MAT_1a"
-            //    },
-            //    //PawnClassPath = "SFXGamePawns.", // not used for this class
-            //},
-
-            // Krogan
-            //new PortablePawn()
-            //{
-            //    PackageFilename = "SFXPawn_CollectorKrogan",
-            //    BioPawnTypeIFP = "BioChar_Geth.Geth.SUB_GethPrime",
-            //    AssetToPortIn = "BioChar_Geth.Geth.SUB_GethPrime",
-            //    AssetPaths = new[] {
-            //        "BIOG_GTH_STP_NKD_R.NKDa.GTH_STP_NKDa_MDL", //Body
-            //        "BIOG_GTH_STP_NKD_R.NKDa.GTH_STP_NKDa_MAT_2a", //Material
-            //    },
-            //}
         };
 
         public static void ResetClass()
@@ -294,30 +252,15 @@ namespace Randomizer.Randomizers.Game2.Enemy
             }
 
             IMEPackage pawnPackage = null;
-            if (pawn.IsCorrectedPackage)
+            var pF = MERFileSystem.GetPackageFile(target, pawn.PackageFilename);
+            if (pF != null)
             {
-                // DEBUG
-                //if (pawn.PackageFilename == "BioPawn_Collector_Batarian.pcc")
-                //{
-                //    pawnPackage = MEPackageHandler.OpenMEPackage(@"C:\Users\mgame\source\repos\ME2Randomizer\ME2Randomizer\staticfiles\binary\correctedpawns\" + pawn.PackageFilename);
-                //}
-                //else
-                //{
-                var correctedPawnData = MEREmbedded.GetEmbeddedPackage(target.Game, $"correctedpawns.{pawn.PackageFilename}");
-                pawnPackage = MEPackageHandler.OpenMEPackageFromStream(correctedPawnData);
-                //}
+                pawnPackage = MERFileSystem.OpenMEPackage(pF);
             }
             else
             {
-                var pF = MERFileSystem.GetPackageFile(target, pawn.PackageFilename);
-                if (pF != null)
-                {
-                    pawnPackage = MERFileSystem.OpenMEPackage(pF);
-                }
-                else
-                {
-                    Debug.WriteLine($"Pawn package not found: {pawn.PackageFilename}");
-                }
+                Debug.WriteLine($"Pawn package not found: {pawn.PackageFilename}");
+                Debugger.Break();
             }
 
             if (pawnPackage != null)

@@ -111,10 +111,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControl.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControlEngine.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERSeqAct_RandomizeProbe.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXLoadoutDataMER.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\playerweaponifps.txt" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GetPhysicsLevel.uc" />
@@ -122,10 +125,13 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Powers\BasePowerIFPs.txt" />
 		<None Remove="Randomizers\Game2\Assets\Text\Powers\EvolvedHenchPowerIFPs.txt" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\IsFriendlyBlockingFireLine.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\Light.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\PlayerOnPowersLoaded.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXGame.ModifyDamage.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXPawn_Reaper.TakeDamage.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSkeletalMeshActorMAT.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXWeapon.PostBeginPlay.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SKM_RandomizeMorphHead.uc" />
 		<None Remove="Randomizers\Game3\Assets\Starterkit\le3starterkit.zip" />
 		<None Remove="Randomizers\Game3\Assets\Text\imagecredits.txt" />
 		<None Remove="Randomizers\Game3\Assets\Text\Scripts\Debug\BioCheatManager.ProfilePower.uc" />

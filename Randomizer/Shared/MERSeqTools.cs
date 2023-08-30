@@ -943,5 +943,29 @@ namespace Randomizer.Shared
 
             SeqTools.WriteOutboundLinksToNode(mitmNode, mitmOutLinks);
         }
+
+        /// <summary>
+        /// Creates a SeqCond_CompareObject action in the given sequence with the given objects, if any
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="seqObjA"></param>
+        /// <param name="seqObjB"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateCompareObject(ExportEntry seq, ExportEntry seqObjA = null, ExportEntry seqObjB = null)
+        {
+            var seqCond = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqCond_CompareObject", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(seqCond, seq);
+
+            if (seqObjA != null)
+            {
+                KismetHelper.CreateVariableLink(seqCond, "A", seqObjA);
+            }
+            if (seqObjB != null)
+            {
+                KismetHelper.CreateVariableLink(seqCond, "B", seqObjB);
+            }
+
+            return seqCond;
+        }
     }
 }

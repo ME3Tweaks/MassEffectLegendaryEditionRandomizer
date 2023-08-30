@@ -1,6 +1,9 @@
 ﻿using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
+using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared
@@ -10,6 +13,15 @@ namespace Randomizer.Randomizers.Shared
     /// </summary>
     class RSharedLighting
     {
+        public static bool InstallDynamicLightingRandomizer(GameTarget target, RandomizationOption option)
+        {
+            var engine = Engine.GetEngine(target);
+            ScriptTools.AddToClassInPackage(target, engine, "Light.PostBeginPlay", "Light");
+            MERFileSystem.SavePackage(engine);
+            CoalescedHandler.EnableFeatureFlag("bLightRandomizer");
+            return true;
+        }
+
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject &&
             (export.ClassName == @"SpotLightComponent" ||
              export.ClassName == @"PointLightComponent" ||

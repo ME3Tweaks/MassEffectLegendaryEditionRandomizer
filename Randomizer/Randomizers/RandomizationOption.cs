@@ -198,6 +198,15 @@ namespace Randomizer.Randomizers
         /// If this randomization option requires extracting the audio folder.
         /// </summary>
         public bool RequiresAudio { get; set; }
+        /// <summary>
+        /// If this randomizer can be turned on or off via config flag
+        /// </summary>
+        public bool IsConfigControlled { get; set; }
+        /// <summary>
+        /// If this randomizer will produce different results every time
+        /// </summary>
+        public bool IsRuntimeRandomizer { get; set; }
+
         #endregion
 
         /// <summary>

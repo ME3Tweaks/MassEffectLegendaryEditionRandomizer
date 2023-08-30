@@ -152,6 +152,9 @@ namespace Randomizer.Randomizers.Game2
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
+                // Install MERControl as many things will depend on it
+                MERControl.InstallMERControl(SelectedOptions.RandomizationTarget);
+
                 // Prepare the textures
                 LE2Textures.SetupLE2Textures(SelectedOptions.RandomizationTarget);
 
@@ -233,8 +236,8 @@ namespace Randomizer.Randomizers.Game2
                         //&& false //uncomment to disable filtering
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
                         //&& !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
-                        // && !file.Contains("CitHub", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("CitHub", StringComparison.InvariantCultureIgnoreCase)
+                        && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -338,7 +341,7 @@ namespace Randomizer.Randomizers.Game2
             SquadmateHead.ResetClass();
             PawnPorting.ResetClass();
             NPCHair.ResetClass();
-            PawnMovementSpeed.ResetClass();
+            MERControl.ResetClass();
         }
 
 
@@ -394,14 +397,16 @@ namespace Randomizer.Randomizers.Game2
                         MutualExclusiveSet = "SquadHead",
                         IsRecommended = true
                     },
-                    new RandomizationOption() {HumanName = "Squadmate faces",
-                        Description = "Only works on Wilson and Jacob, unfortunately. Other squadmates are fully modeled",
-                        PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeSquadmateFaces,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        MutualExclusiveSet = "SquadHead",
-                        StateChangingDelegate=optionChangingDelegate,
-                    },
+                    //new RandomizationOption() {HumanName = "Squadmate faces",
+                    //    Description = "Only works on Wilson and Jacob, unfortunately. Other squadmates are fully modeled",
+                    //    PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeSquadmateFaces,
+                    //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                    //    MutualExclusiveSet = "SquadHead",
+                    //    StateChangingDelegate=optionChangingDelegate,
+                    //},
 
+                    // Non-dynamic
+                    /*
                     new RandomizationOption()
                     {
                         HumanName = "NPC faces",
@@ -414,7 +419,22 @@ namespace Randomizer.Randomizers.Game2
                         PerformRandomizationOnExportDelegate = RBioMorphFace.RandomizeExportNonHench,
                         Description="Changes the BioFaceMorph used by some pawns",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                    },*/
+
+                    new RandomizationOption()
+                    {
+                        HumanName = "NPC faces",
+                        Ticks = "0.25,0.5,1.0,1.5,2.0",
+                        HasSliderOption = true,
+                        IsRecommended = true,
+                        SliderTooltip = "Higher settings yield more ridiculous faces for characters that use the BioFaceMorph system. Default value is 1.0.",
+                        SliderToTextConverter = rSetting => $"Randomization amount: {rSetting}",
+                        SliderValue = 1.0, // This must come after the converter
+                        PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeBioMorphFace2,
+                        Description="Changes the BioFaceMorph used by most pawns (non-modeled faces only)",
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                     },
+
                     // Sadly not used by anything but shepard
                     // For some reason data is embedded into files even though it's never used there
                     //new RandomizationOption()
@@ -427,8 +447,9 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption() {HumanName = "Eyes (excluding Illusive Man)",
                         Description="Changes the colors of eyes",
                         IsRecommended = true,
-                        PerformSpecificRandomizationDelegate = RSharedEyes.Init,
-                        PerformRandomizationOnExportDelegate = RSharedEyes.RandomizeExport2,
+                        //PerformSpecificRandomizationDelegate = RSharedEyes.Init,
+                        //PerformRandomizationOnExportDelegate = RSharedEyes.RandomizeExport2,
+                        PerformSpecificRandomizationDelegate = RSharedEyes.InstallEyeRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                     },
                     new RandomizationOption() {HumanName = "Illusive Man eyes",
@@ -459,24 +480,32 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption() {HumanName = "NPC colors", Description="Changes NPC colors such as skin tone, hair, etc",
                         PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "NPC hair", Description="Randomizes the hair on NPCs that have a hair mesh",
+                    new RandomizationOption() {
+                        HumanName = "NPC hair", 
+                        Description="Randomizes the hair on NPCs that have a hair mesh",
                         PerformRandomizationOnExportDelegate = NPCHair.RandomizeExport,
                         PerformSpecificRandomizationDelegate = NPCHair.Init,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
+                    },
                     new RandomizationOption() {
                         HumanName = "Romance",
                         Description="Randomizes which romance you will get",
+                        IsRuntimeRandomizer = true,
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true},
+                    // This is not very interesting tbh
+                    //new RandomizationOption() {
+                    //    HumanName = "Look At Targets",
+                    //    Description="Maps have designated areas where pawns may look; this changes those po where pawns look",
+                    //    PerformRandomizationOnExportDelegate = RSharedBioLookAtTarget.RandomizeExport,
+                    //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    //},
                     new RandomizationOption() {
-                        HumanName = "Look At Definitions",
-                        Description="Changes how pawns look at things",
-                        PerformRandomizationOnExportDelegate = RSharedBioLookAtDefinition.RandomizeExport,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {
-                        HumanName = "Look At Targets",
-                        Description="Changes where pawns look",
-                        PerformRandomizationOnExportDelegate = RSharedBioLookAtTarget.RandomizeExport,
+                        HumanName = "LookAt system",
+                        Description="Changes how pawns look things, such as turning eyes, chest, neck",
+                        IsConfigControlled = true,
+                        IsRuntimeRandomizer = true,
+                        PerformSpecificRandomizationDelegate = RSharedBioLookAtTarget.RandomizeBioPawnLookatController,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                     },
                 }
@@ -777,8 +806,8 @@ namespace Randomizer.Randomizers.Game2
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
                     new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true, PerformRandomizationOnExportDelegate = RSharedHeightFogComponent.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
                     new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
-                    new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting",
-                        PerformRandomizationOnExportDelegate = RSharedLighting.RandomizeExport,
+                    new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
+                        PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
                     new RandomizationOption() {HumanName = "Mission rewards", Description = "Randomizes the tech and weapons given to you at the end of a mission. You can still get all the tech and weapons if you complete all the missions that award them.",

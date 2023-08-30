@@ -5,10 +5,13 @@ using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.BinaryConverters;
+using LegendaryExplorerCore.Unreal.Classes;
 using ME3TweaksCore.Objects;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.ExportTypes;
+using Randomizer.Randomizers.Game2.TextureAssets.LE2;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared.Classes;
 using Randomizer.Randomizers.Utility;
@@ -176,10 +179,63 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             // Implement once gesture system is reimplemented
             //RandomizeShepDance(target);
-            InstallPackingHeat(target);
+            // InstallPackingHeat(target);
 
-            // MakeAdsCreepy(target);
+            //MakeAdsCreepy(target);
+            InstallBorgar(target);
             return true;
+        }
+
+        private static void InstallBorgar(GameTarget target)
+        {
+            var biopCitHubF = MERFileSystem.GetPackageFile(target, "BioP_CitHub.pcc");
+            if (biopCitHubF != null)
+            {
+                var biopCitHubP = MERFileSystem.OpenMEPackage(biopCitHubF);
+
+                // Install texture
+                var parent = biopCitHubP.FindExport("BioVFX_Env_Hologram.Textures");
+                var newTex = TextureHandler.InstallNewTexture(biopCitHubP, "BorgarBC7", parent);
+                var cursedTex = TextureHandler.InstallNewTexture(biopCitHubP, "CursedBC7", parent);
+
+                // Repoint materials to use this one
+                var kbOrange = biopCitHubP.FindExport("BioVFX_Env_Hologram.Instances.Hologram_Keyboard_Orange");
+                var kbCyan = biopCitHubP.FindExport("BioVFX_Env_Hologram.Instances.Hologram_Keyboard_Cyan");
+
+                // Swap names so imports get our modified one but particle system screens get our version (person next to bailey)
+                var kbCyanCloneForImports = EntryCloner.CloneEntry(kbCyan);
+                kbCyan.ObjectName = "Hologram_Keyboard_Cyan_Orig"; // Rename so only this file uses it
+                kbCyanCloneForImports.ObjectName = "Hologram_Keyboard_Cyan"; // Keep same name as original
+
+                var mats = new[] { kbCyanCloneForImports, kbOrange };
+                bool cursed = false;
+                foreach (var mat in mats)
+                {
+                    var matConst = ObjectBinary.From<MaterialInstance>(mat);
+                    if (!cursed)
+                    {
+                        matConst.SM3StaticPermutationResource.UniformExpressionTextures[3] = newTex.UIndex;
+                        cursed = true;
+                    }
+                    else
+                    {
+                        matConst.SM3StaticPermutationResource.UniformExpressionTextures[3] = cursedTex.UIndex;
+                    }
+                    mat.WriteBinary(matConst);
+
+                    var parms = VectorParameter.GetVectorParameters(mat);
+                    foreach (var p in parms)
+                    {
+                        p.ParameterValue.W = 1;
+                        p.ParameterValue.X = 1;
+                        p.ParameterValue.Y = 1;
+                        p.ParameterValue.Z = 1;
+                    }
+                    VectorParameter.WriteVectorParameters(mat, parms);
+                }
+
+                MERFileSystem.SavePackage(biopCitHubP);
+            }
         }
 
         private static void MakeAdsCreepy(GameTarget target)
@@ -327,32 +383,51 @@ namespace Randomizer.Randomizers.Game2.Levels
         private static void InstallPackingHeat(GameTarget target)
         {
             // Files required for modification:
-            // BioD_CitHub.pcc -> Adds a hackjob reverse triggerstream to stream out the 311PackingHeat file
-            // BioD_CitHub_300UpperWing.pcc -> When this file is loaded in, PackingHeat is streamed in via a console command on the LevelLoaded event
+            // BioP_CitHub.pcc -> Adds LevelStreamingKismet for BioD_CitHub_311PackingHeat
+            // BioD_CitHub.pcc -> Adds a global triggerstream with states for the BioD_CitHub_311PackingHeat file
+            // BioD_CitHub_300UpperWing.pcc -> When this file is loaded in, PackingHeat is loaded and then set to visible
             //        -> It also triggers a remote event when the reporter conversation wraps up to trigger logic in 311PackingHeat
             // BioD_CitHub_311PackingHeat.pcc -> New package file, has all the logic for packing heat
             //        -> Localizations for SFXVocalizationBanks
 
-            #region BioD_Cithub.pcc
+            var sequenceSupportPackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "SeqPrefabs.PackingHeat.pcc"), "PackingHeat.pcc");
 
+
+            #region BioP_CitHub.pcc
+            {
+                var biopCitHubF = MERFileSystem.GetPackageFile(target, "BioP_CitHub.pcc");
+                if (biopCitHubF != null)
+                {
+                    var biopCitHubP = MERFileSystem.OpenMEPackage(biopCitHubF);
+                    MERLevelTools.AddLevelStreamingKismet(biopCitHubP, "BioD_CitHub_311PackingHeat");
+                    MERFileSystem.SavePackage(biopCitHubP);
+                }
+            }
+            #endregion
+
+            #region BioD_Cithub.pcc
             {
                 var biodCitHubF = MERFileSystem.GetPackageFile(target, "BioD_CitHub.pcc");
                 if (biodCitHubF != null)
                 {
                     var biodCitHubP = MERFileSystem.OpenMEPackage(biodCitHubF);
 
-                    // Port the trigger volume
+                    // Port the trigger volume (used for streaming out)
                     var mainSeq = biodCitHubP.FindExport("TheWorld.PersistentLevel.Main_Sequence");
-                    var fabP = MEPackageHandler.OpenMEPackageFromStream(
-                        MEREmbedded.GetEmbeddedPackage(target.Game, "SeqPrefabs.PackingHeat.pcc"), "PackingHeat.pcc");
-                    var brSeq = fabP.FindExport("TheWorld.PersistentLevel.Main_Sequence.BloodRageVolume");
+                    var brSeq = sequenceSupportPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.BloodRageVolume");
                     EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, brSeq,
                         biodCitHubP, mainSeq, true, new RelinkerOptionsPackage(), out var newSeq);
                     KismetHelper.AddObjectToSequence(newSeq as ExportEntry, mainSeq);
 
                     // This will have been ported in by the sequence
-                    var trigVol = fabP.FindExport("TheWorld.PersistentLevel.BioTriggerVolume_14");
-                    fabP.AddToLevelActorsIfNotThere(trigVol);
+                    var trigVol = biodCitHubP.FindExport("TheWorld.PersistentLevel.BioTriggerVolume_14");
+                    biodCitHubP.AddToLevelActorsIfNotThere(trigVol);
+
+                    // Add the BioTriggerStream
+                    var trigStream = sequenceSupportPackage.FindExport("TheWorld.PersistentLevel.BioTriggerStreamBloodRage");
+                    EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, trigStream,
+                        biodCitHubP, biodCitHubP.FindExport("TheWorld.PersistentLevel"), true, new RelinkerOptionsPackage(), out var bloodRageTrigStream);
+                    biodCitHubP.AddToLevelActorsIfNotThere(bloodRageTrigStream as ExportEntry);
 
                     MERFileSystem.SavePackage(biodCitHubP);
                 }
@@ -367,12 +442,12 @@ namespace Randomizer.Randomizers.Game2.Levels
                 var biodCitHubUWP = MERFileSystem.OpenMEPackage(biodCitHubUWF);
 
                 // Stream the file in when the package loads
-                var levelLoaded = biodCitHubUWP.FindExport("TheWorld.PersistentLevel.Main_Sequence.RP_Plot_5_Logic.SeqEvent_LevelLoaded_0");
                 var rp5Seq = biodCitHubUWP.FindExport("TheWorld.PersistentLevel.Main_Sequence.RP_Plot_5_Logic");
-                var cc = MERSeqTools.CreateConsoleCommandObject(rp5Seq, "streamlevelin BioD_CitHub_311PackingHeat");
-                KismetHelper.CreateOutputLink(levelLoaded, "Loaded and Visible", cc);
+                var levelLoaded = biodCitHubUWP.FindExport("TheWorld.PersistentLevel.Main_Sequence.RP_Plot_5_Logic.SeqEvent_LevelLoaded_0");
+                var sibr = MERSeqTools.CreateActivateRemoteEvent(rp5Seq, "StreamInBloodRage");
+                KismetHelper.CreateOutputLink(levelLoaded, "Loaded and Visible", sibr);
 
-                // Signal the remote event when the conversation logic finishes
+                // Signal the remote event in 311PackingHeat when the conversation logic finishes
                 var saveGame = biodCitHubUWP.FindExport("TheWorld.PersistentLevel.Main_Sequence.RP_Plot_5_Logic.SFXSeqAct_SaveGame_0");
                 var brc = MERSeqTools.CreateActivateRemoteEvent(rp5Seq, "BloodRageCheck");
                 KismetHelper.CreateOutputLink(saveGame, "Out", brc);
@@ -383,7 +458,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             #region BioD_CitHub_311PackingHeat.pcc
             // Install the entire package set
-            MEREmbedded.ExtractEmbeddedBinaryFolder("Packages.LE2.PackingHeat");
+            MERFileSystem.InstallAlways("PackingHeat");
             #endregion
         }
 

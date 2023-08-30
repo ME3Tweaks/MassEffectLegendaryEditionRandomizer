@@ -182,13 +182,13 @@ namespace Randomizer.Randomizers.Utility
         /// </summary>
         /// <param name="target"></param>
         /// <param name="packageToInstallTo"></param>
-        /// <param name="scriptName"></param>
+        /// <param name="scriptName">Do not include .uc</param>
         /// <param name="classIFP"></param>
         /// <exception cref="Exception"></exception>
         public static void AddToClassInPackage(GameTarget target, IMEPackage packageToInstallTo, string scriptName, string classIFP)
         {
             var fl = new FileLib(packageToInstallTo);
-            bool initialized = fl.Initialize(gameRootPath: target.TargetPath);
+            bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
             if (!initialized)
             {
                 MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
@@ -203,6 +203,15 @@ namespace Randomizer.Randomizers.Utility
             var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptName}.uc");
             var classExp = packageToInstallTo.FindExport(classIFP);
             MessageLog log = UnrealScriptCompiler.AddOrReplaceInClass(classExp, scriptText, fl);
+            if (log.HasErrors)
+            {
+                Debugger.Break();
+            }
+        }
+
+        public static void InstallClassTextToPackage(GameTarget target, IMEPackage sfxgame, string mercontrol, string classMercontrol)
+        {
+            throw new NotImplementedException();
         }
     }
 }

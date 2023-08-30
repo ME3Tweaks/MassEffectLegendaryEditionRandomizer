@@ -119,52 +119,16 @@ namespace Randomizer.Randomizers.Game2.Levels
         {
             var biop_charF = MERFileSystem.GetPackageFile(target, @"BioP_Char.pcc");
             var biop_char = MEPackageHandler.OpenMEPackage(biop_charF);
+            
+            
+            ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
+            ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead"), "BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead.uc");
+
             var maleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Male");
             var femaleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Female");
 
-            var codeMapMale = CalculateCodeMap(maleFrontEndData);
-            var codeMapFemale = CalculateCodeMap(femaleFrontEndData);
-
-            var bioUI = CoalescedHandler.GetIniFile("BIOUI.ini");
-            var bgr = CoalescedHandler.GetIniFile("BIOGuiResources.ini");
-            var charCreatorPCS = bgr.GetOrAddSection("SFXGame.BioSFHandler_PCNewCharacter");
-            var charCreatorControllerS = bioUI.GetOrAddSection("SFXGame.BioSFHandler_NewCharacter");
-
-            charCreatorPCS.AddEntry(new CoalesceProperty("MalePregeneratedHeadCodes", new CoalesceValue("CLEAR", CoalesceParseAction.RemoveProperty)));
-            charCreatorControllerS.AddEntry(new CoalesceProperty("MalePregeneratedHeadCodes", new CoalesceValue("CLEAR", CoalesceParseAction.RemoveProperty)));
-
-            int numToMake = 20;
-            int i = 0;
-
-            // Male: 34 chars
-            while (i < numToMake)
-            {
-                i++;
-                charCreatorPCS.AddEntry(GenerateHeadCode(codeMapMale, false));
-                charCreatorControllerS.AddEntry(GenerateHeadCode(codeMapMale, false));
-            }
-
-
-
-            // Female: 36 chars
-            //charCreatorPCS.Entries.Add(new DuplicatingIni.IniEntry("")); //blank line
-            //charCreatorControllerS.Entries.Add(new DuplicatingIni.IniEntry("")); //blank line
-
-            charCreatorPCS.AddEntry(new CoalesceProperty("FemalePregeneratedHeadCodes", new CoalesceValue("CLEAR", CoalesceParseAction.RemoveProperty)));
-            charCreatorControllerS.AddEntry(new CoalesceProperty("FemalePregeneratedHeadCodes", new CoalesceValue("CLEAR", CoalesceParseAction.RemoveProperty)));
-
-            i = 0;
-            while (i < numToMake)
-            {
-                i++;
-                charCreatorPCS.AddEntry(GenerateHeadCode(codeMapFemale, true));
-                charCreatorControllerS.AddEntry(GenerateHeadCode(codeMapFemale, true));
-            }
-
-
             randomizeFrontEnd(maleFrontEndData);
             randomizeFrontEnd(femaleFrontEndData);
-
 
             //Copy the final skeleton from female into male.
             var femBase = biop_char.FindExport("BIOG_MORPH_FACE.CharacterCreation_Base_Female");

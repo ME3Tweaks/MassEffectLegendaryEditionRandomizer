@@ -85,6 +85,17 @@ namespace Randomizer.Randomizers.Handlers
             var gvTable = game.GetOrAddSection("SFXGame.BioGlobalVariableTable");
             gvTable.AddEntry(new CoalesceProperty("TimedPlotUnlocks", new CoalesceValue($"(PlotBool={boolIdx}, UnlockDay=0)", CoalesceParseAction.AddUnique)));
         }
+
+        /// <summary>
+        /// Adds a bool to the plot table that is not saved to disk
+        /// </summary>
+        /// <param name="boolIdx"></param>
+        public static void EnableFeatureFlag(string featureFlagName)
+        {
+            var game = CoalescedHandler.GetIniFile("BioEngine");
+            var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
+            controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue("true", CoalesceParseAction.AddUnique)));
+        }
 #endif
     }
 }

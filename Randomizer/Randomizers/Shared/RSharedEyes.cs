@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
+using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.ObjectInfo;
+using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared
@@ -28,6 +33,63 @@ namespace Randomizer.Randomizers.Shared
             return true;
         }
 
+        public static bool InstallEyeRandomizer(GameTarget target, RandomizationOption option)
+        {
+            MERControl.InstallBioPawnMERControl(target);
+            MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+            AddEyeSeekFree(target);
+            CoalescedHandler.EnableFeatureFlag("bEyeRandomizer");
+            return true;
+        }
+
+        class EyeDefinition
+        {
+            public string DiffIFP { get; set; }
+            public string MaskIFP { get; set; }
+            public string IrisNormIFP { get; set; }
+            public string LensNormIFP { get; set; }
+
+            public override string ToString()
+            {
+                var dict = new Dictionary<string, string>();
+                if (IrisNormIFP != null)
+                {
+                    dict["IrisNormIFP"] = IrisNormIFP;
+                }
+                if (MaskIFP != null)
+                {
+                    dict["MaskIFP"] = MaskIFP;
+                }
+                if (DiffIFP != null)
+                {
+                    dict["DiffIFP"] = DiffIFP;
+                }
+                if (LensNormIFP != null)
+                {
+                    dict["LensNormIFP"] = LensNormIFP;
+                }
+                return StringStructParser.BuildCommaSeparatedSplitValueList(dict);
+            }
+        }
+
+        private static void AddEyeSeekFree(GameTarget target)
+        {
+            MERFileSystem.InstallAlways("MEREyes"); // Add MEREyes packages
+            var bioengine = CoalescedHandler.GetIniFile("BioEngine.ini");
+            var mercontrol = bioengine.GetOrAddSection("Engine.MERControlEngine");
+
+            var merEyesP = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BIOG_MEREyes.pcc"));
+            foreach (var mat in merEyesP.Exports.Where(x => x.IsA("MaterialInstance") && x.idxLink == 0))
+            {
+
+                // Add the dynamic load mappings
+                CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo(mat));
+
+                // Add the IFP
+                mercontrol.AddEntryIfUnique(new CoalesceProperty("MEREyeIFPs", 
+                    new CoalesceValue(mat.InstancedFullPath, CoalesceParseAction.AddUnique)));
+            }
+        }
 
 
         // LE2 specific!!
