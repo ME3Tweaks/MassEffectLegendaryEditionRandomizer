@@ -35,11 +35,24 @@ var config array<MorphRandomizationAlgorithm> SharedMorphAlgorithms;
 // Functions
 private static final function bool GetRandomAlgorithm(Class<CustomMorphTargetSet> targetSet, out MorphRandomizationAlgorithm algorithm)
 {
-    if (Rand(4) == 0 && default.SharedMorphAlgorithms.Length > 0)
+    local MorphRandomizationAlgorithm generatedAlgo;
+    local int I;
+    local int NumToDo;
+    
+    generatedAlgo.AlgoName = "Generated";
+    generatedAlgo.Randomizations.Length = targetSet.default.BaseMorphTargets.Length;
+    for (I = 0; I < targetSet.default.BaseMorphTargets.Length; I++)
     {
-        algorithm = default.SharedMorphAlgorithms[Rand(default.SharedMorphAlgorithms.Length)];
-        return TRUE;
+        LogInternal((("Add feature to algo: " $ targetSet.default.BaseMorphTargets[I].TargetName) $ "for ") $ targetSet, );
+        generatedAlgo.Randomizations[I].Feature = string(targetSet.default.BaseMorphTargets[I].TargetName);
+        generatedAlgo.Randomizations[I].Min = -Class'MERControlEngine'.default.fBioMorphFaceRandomization;
+        generatedAlgo.Randomizations[I].Max = Class'MERControlEngine'.default.fBioMorphFaceRandomization;
+        generatedAlgo.Randomizations[I].MergeMode = Rand(5) == 0 ? EBMFFeatureMergeMode.Multiplicative : EBMFFeatureMergeMode.Exact;
+        generatedAlgo.Randomizations[I].AddIfNotFound = TRUE;
     }
+    algorithm = generatedAlgo;
+    return TRUE;
+    LogInternal("The following is currently unused", );
     if (targetSet == Class'HMM_BaseMorphSet' && default.HMMMorphAlgorithms.Length > 0)
     {
         algorithm = default.HMMMorphAlgorithms[Rand(default.HMMMorphAlgorithms.Length)];
@@ -84,8 +97,9 @@ public static function RandomizeBioMorphFace(BioMorphFace BMF)
         return;
     }
     hasAlgorithm = GetRandomAlgorithm(MorphTargetSet, algorithm);
-    if (!hasAlgorithm){
-        LogInternal("Could not find algorithm for "$MorphTargetSet);
+    if (!hasAlgorithm)
+    {
+        LogInternal("Could not find algorithm for " $ MorphTargetSet, );
         return;
     }
     if (MorphTargetSet != None && hasAlgorithm)
@@ -116,6 +130,7 @@ public static function RandomizeBioMorphFace(BioMorphFace BMF)
         if (modified)
         {
             Class'MorphTargetUtility'.static.UpdateMeshAndSkeleton(BMF, MorphTargetSet);
+            Class'MERControlEngine'.static.MarkObjectModified(BMF);
         }
     }
 }
@@ -137,28 +152,40 @@ private static final function MorphFeature RandomizeMorphTarget(MorphFeature MT,
 }
 private static final function Class<CustomMorphTargetSet> GetMorphTargetSet(BioMorphFace BMF)
 {
-    local Name basename;
+    local Name BaseName;
     
-    basename = BMF.m_oBaseHead.Name;
-    if (InStr(string(basename), "hmf_", , TRUE, ) >= 0)
+    BaseName = BMF.m_oBaseHead.Name;
+    if (InStr(string(BaseName), "hmf_", , TRUE, ) >= 0)
     {
         return Class'HMF_BaseMorphSet';
     }
-    if (InStr(string(basename), "hmm_", , TRUE, ) >= 0)
+    if (InStr(string(BaseName), "hmm_", , TRUE, ) >= 0)
     {
         return Class'HMM_BaseMorphSet';
     }
-    if (InStr(string(basename), "kro_", , TRUE, ) >= 0)
+    if (InStr(string(BaseName), "kro_", , TRUE, ) >= 0)
     {
         return Class'KRO_baseMorphSet';
     }
-    if (InStr(string(basename), "asa_", , TRUE, ) >= 0)
+    if (InStr(string(BaseName), "asa_", , TRUE, ) >= 0)
     {
         return Class'ASA_BaseMorphSet';
     }
-    if (InStr(string(basename), "sal_", , TRUE, ) >= 0)
+    if (InStr(string(BaseName), "sal_", , TRUE, ) >= 0)
     {
         return Class'SAL_BaseMorphSet';
+    }
+    if (InStr(string(BaseName), "tur_", , TRUE, ) >= 0)
+    {
+        return Class'TUR_BaseMorphSet';
+    }
+    if (InStr(string(BaseName), "bat_", , TRUE, ) >= 0)
+    {
+        return Class'BAT_BaseMorphSet';
+    }
+    if (InStr(string(BaseName), "aln_", , TRUE, ) >= 0)
+    {
+        LogInternal("not implemented", );
     }
     return None;
 }
@@ -233,6 +260,12 @@ defaultproperties
                           {
                            AlgoName = "EyesPoppinOut", 
                            Randomizations = ({Feature = "eyes_ballforward", Min = -1.5, Max = 4.69999981, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
+                                            )
+                          }
+                         )
+    ASAMorphAlgorithms = ({
+                           AlgoName = "LargeTentacles", 
+                           Randomizations = ({Feature = "tentacle_Large", Min = -2.0, Max = 3.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
                                             )
                           }
                          )

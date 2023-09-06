@@ -424,12 +424,12 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption()
                     {
                         HumanName = "NPC faces",
-                        Ticks = "0.25,0.5,1.0,1.5,2.0",
+                        Ticks = "0.5,1.0,2.0,3.0,4.0,5.0",
                         HasSliderOption = true,
                         IsRecommended = true,
-                        SliderTooltip = "Higher settings yield more ridiculous faces for characters that use the BioFaceMorph system. Default value is 1.0.",
-                        SliderToTextConverter = rSetting => $"Randomization amount: {rSetting}",
-                        SliderValue = 1.0, // This must come after the converter
+                        SliderTooltip = "Higher settings yield more ridiculous faces for characters that use the BioFaceMorph system. Default value is 2.0.",
+                        SliderToTextConverter = rSetting => $"Randomization window: -{rSetting} to {rSetting}",
+                        SliderValue = 2.0, // This must come after the converter
                         PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeBioMorphFace2,
                         Description="Changes the BioFaceMorph used by most pawns (non-modeled faces only)",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,

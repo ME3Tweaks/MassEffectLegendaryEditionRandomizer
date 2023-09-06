@@ -7,7 +7,7 @@
         BMF = BioPawnType(SKM.ActorType).m_oMorphFace;
     }
     LogInternal("SFXSKM Morph head: " $ BMF, );
-    if (BMF != None)
+    if (BMF != None && class'MERControlEngine'.static.IsObjectModified(BMF) == FALSE)
     {
         Class'MERBioMorphUtility'.static.RandomizeBioMorphFace(BMF);
     }

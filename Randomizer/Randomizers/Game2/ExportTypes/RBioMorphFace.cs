@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
 
 namespace Randomizer.Randomizers.Game2.ExportTypes
@@ -13,7 +15,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             MERControl.InstallBioPawnMERControl(target);
             MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
             MERControl.InstallBioMorphFaceRandomizerClasses(target);
-
+            MERControl.SetVariable("fBioMorphFaceRandomization", option.SliderValue, CoalesceParseAction.Add);
             return true;
         }
 

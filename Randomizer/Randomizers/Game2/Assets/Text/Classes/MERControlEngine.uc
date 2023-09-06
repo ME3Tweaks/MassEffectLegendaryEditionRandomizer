@@ -1,4 +1,5 @@
 ﻿Class MERControlEngine
+    abstract
     config(Engine);
 
 // Variables
@@ -9,6 +10,7 @@ var config bool bPawnLookatRandomizer;
 var config bool bEyeRandomizer;
 var config bool bIllusiveEyeRandomizer;
 var config array<string> MEREyeIFPs;
+var config float fBioMorphFaceRandomization;
 
 // Functions
 public static function float RandFloat(float minf, float maxf)
@@ -33,6 +35,14 @@ public static function LinearColor RandLinearColor(float MinR, float MaxR, float
     LC.B = RandFloat(MinB, MaxB);
     LC.A = RandFloat(mina, maxa);
     return LC;
+}
+public static function MarkObjectModified(Object Obj)
+{
+    Obj.ObjectFlags.B  = Obj.ObjectFlags.B | 0x8;
+}
+public static function bool IsObjectModified(Object Obj)
+{
+    return (Obj.ObjectFlags.B & 0x8) == 0x8;
 }
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.

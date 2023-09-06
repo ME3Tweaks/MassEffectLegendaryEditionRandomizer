@@ -1,9 +1,11 @@
 ﻿using System.Linq;
+using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2
@@ -86,6 +88,13 @@ namespace Randomizer.Randomizers.Game2
             InstalledBioPawnMERControl = false;
             InstalledBioMorphFaceClass = false;
             InstalledSFXSkeletalMeshActorMATMERControl = false;
+        }
+
+        public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.AddUnique)
+        {
+            var bioEngine = CoalescedHandler.GetIniFile("BIOEngine.ini");
+            var section = bioEngine.GetOrAddSection("Engine.MERControlEngine");
+            section.AddEntryIfUnique(new CoalesceProperty(key, new CoalesceValue(value.ToString(), parseAction)));
         }
     }
 }

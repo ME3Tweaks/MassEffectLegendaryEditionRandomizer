@@ -7,7 +7,7 @@
         BMF = BioPawnType(BP.ActorType).m_oMorphFace;
     }
     LogInternal("BioPawn Morph head: " $ BMF, );
-    if (BMF != None)
+    if (BMF != None && class'MERControlEngine'.static.IsObjectModified(BMF) == FALSE)
     {
         Class'MERBioMorphUtility'.static.RandomizeBioMorphFace(BMF);
     }
