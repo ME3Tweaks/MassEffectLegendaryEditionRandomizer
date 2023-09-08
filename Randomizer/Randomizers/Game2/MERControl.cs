@@ -67,6 +67,7 @@ namespace Randomizer.Randomizers.Game2
 
                 MERFileSystem.SavePackage(sfxgame);
                 InstalledBioMorphFaceClass = true;
+                MERCaches.ReInit(target);
             }
         }
 
@@ -74,12 +75,13 @@ namespace Randomizer.Randomizers.Game2
         {
             // Engine class
             var engine = Engine.GetEngine(target);
-            ScriptTools.InstallClassToPackage(target, engine, "MERControlEngine");
+            ScriptTools.InstallClassToPackage(target, engine, "MERControlEngine", useCache: false);
             MERFileSystem.SavePackage(engine);
 
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.InstallClassToPackage(target, sfxgame, "MERControl");
+            ScriptTools.InstallClassToPackage(target, sfxgame, "MERControl", useCache: false);
             MERFileSystem.SavePackage(sfxgame);
+            MERCaches.ReInit(target); // Update the cache
             return true;
         }
 
