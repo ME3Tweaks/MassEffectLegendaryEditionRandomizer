@@ -87,14 +87,14 @@ namespace Randomizer.Randomizers.Handlers
         }
 
         /// <summary>
-        /// Adds a bool to the plot table that is not saved to disk
+        /// Adds a bool to config with Type 2 to enable/disable runtime randomizers
         /// </summary>
         /// <param name="boolIdx"></param>
         public static void EnableFeatureFlag(string featureFlagName)
         {
             var game = CoalescedHandler.GetIniFile("BioEngine");
             var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
-            controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue("true", CoalesceParseAction.AddUnique)));
+            controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue("TRUE", CoalesceParseAction.Add)));
         }
 #endif
     }

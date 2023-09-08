@@ -236,8 +236,8 @@ namespace Randomizer.Randomizers.Game2
                         //&& false //uncomment to disable filtering
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
                         //&& !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
-                         && !file.Contains("CitHub", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("JnkKga", StringComparison.InvariantCultureIgnoreCase)
+                        && !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -424,12 +424,12 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption()
                     {
                         HumanName = "NPC faces",
-                        Ticks = "0.5,1.0,2.0,3.0,4.0,5.0",
+                        Ticks = "0.5,1.0,1.5,2.0,3.0,4.0",
                         HasSliderOption = true,
                         IsRecommended = true,
-                        SliderTooltip = "Higher settings yield more ridiculous faces for characters that use the BioFaceMorph system. Default value is 2.0.",
+                        SliderTooltip = "Higher settings yield more ridiculous faces for characters that use the BioFaceMorph system. Default value is 1.5, which provides moderate facial randomization.",
                         SliderToTextConverter = rSetting => $"Randomization window: -{rSetting} to {rSetting}",
-                        SliderValue = 2.0, // This must come after the converter
+                        SliderValue = 1.5, // This must come after the converter
                         PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeBioMorphFace2,
                         Description="Changes the BioFaceMorph used by most pawns (non-modeled faces only)",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
@@ -444,19 +444,19 @@ namespace Randomizer.Randomizers.Game2
                     //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                     //    PerformRandomizationOnExportDelegate = RMorphTarget.RandomizeGlobalExport
                     //},
-                    new RandomizationOption() {HumanName = "Eyes (excluding Illusive Man)",
-                        Description="Changes the colors of eyes",
+                    new RandomizationOption() {HumanName = "Eyes",
+                        Description="Changes the types and colors of eyes",
                         IsRecommended = true,
                         //PerformSpecificRandomizationDelegate = RSharedEyes.Init,
                         //PerformRandomizationOnExportDelegate = RSharedEyes.RandomizeExport2,
                         PerformSpecificRandomizationDelegate = RSharedEyes.InstallEyeRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                     },
-                    new RandomizationOption() {HumanName = "Illusive Man eyes",
-                        Description="Changes the Illusive Man's eye color",
-                        IsRecommended = true, PerformRandomizationOnExportDelegate = RIllusiveEyes.RandomizeExport,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
-                    },
+                    //new RandomizationOption() {HumanName = "Illusive Man eyes",
+                    //    Description="Changes the Illusive Man's eye color",
+                    //    IsRecommended = true, PerformRandomizationOnExportDelegate = RIllusiveEyes.RandomizeExport,
+                    //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    //},
                 }
             });
 
@@ -481,7 +481,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
                     new RandomizationOption() {
-                        HumanName = "NPC hair", 
+                        HumanName = "NPC hair",
                         Description="Randomizes the hair on NPCs that have a hair mesh",
                         PerformRandomizationOnExportDelegate = NPCHair.RandomizeExport,
                         PerformSpecificRandomizationDelegate = NPCHair.Init,
@@ -664,7 +664,7 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption()
                     {
-                        HumanName = "Enemy powers", Description = "Gives enemies different powers", PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport, PerformSpecificRandomizationDelegate = EnemyPowerChanger.Init, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true,
+                        HumanName = "Enemy powers", Description = "Gives enemies different powers", PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport, PerformSpecificRandomizationDelegate = EnemyPowerChanger.Init2, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true,
                         // Debug stuff.
 #if DEBUG
                         //HasSliderOption = true,
@@ -804,7 +804,10 @@ namespace Randomizer.Randomizers.Game2
                 {
                     // Doesn't seem to work
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
-                    new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true, PerformRandomizationOnExportDelegate = RSharedHeightFogComponent.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                    new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true,
+                        PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
+                        IsRuntimeRandomizer = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
                     new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
                     new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
                         PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,

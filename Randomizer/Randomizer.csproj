@@ -121,6 +121,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GetPhysicsLevel.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\HeightFog.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\InitializeHenchman.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Powers\BasePowerIFPs.txt" />
 		<None Remove="Randomizers\Game2\Assets\Text\Powers\EvolvedHenchPowerIFPs.txt" />
