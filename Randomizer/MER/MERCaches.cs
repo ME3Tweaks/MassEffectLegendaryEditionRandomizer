@@ -16,7 +16,6 @@ namespace Randomizer.MER
         public static void Init(GameTarget target)
         {
             Debug.WriteLine("Loading global lookup cache");
-
             _globalCommonLookupCache = new MERPackageCache(target, null, true);
             foreach (var fullySafeFile in EntryImporter.FilesSafeToImportFrom(target.Game))
             {
@@ -31,6 +30,16 @@ namespace Randomizer.MER
         {
             _globalCommonLookupCache?.Dispose();
             _globalCommonLookupCache = null;
+        }
+
+        /// <summary>
+        /// Re-initializes the cache - can be used if you add things to Engine, SFXGame, etc
+        /// </summary>
+        /// <param name="target"></param>
+        public static void ReInit(GameTarget target)
+        {
+            Cleanup();
+            Init(target);
         }
 
         private static MERPackageCache _globalCommonLookupCache;
