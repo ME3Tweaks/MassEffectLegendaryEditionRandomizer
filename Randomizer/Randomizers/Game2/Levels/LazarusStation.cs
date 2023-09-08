@@ -112,14 +112,21 @@ namespace Randomizer.Randomizers.Game2.Levels
 
                 // Get all the biopawns in the level
                 var actors = proCerP.Exports.Where(x => x.InstancedFullPath.StartsWith("TheWorld.PersistentLevel") && x.ClassName is @"BioPawn" or "SFXSkeletalMeshActor" or "SFXSkeletalMeshActorMAT").ToList();
-
                 if (actors.Any())
                 {
                     var newSeq = MERSeqTools.InstallSequenceStandalone(creepySeq, proCerP);
                     var objListIFP = newSeq.InstancedFullPath + ".SeqVar_ObjectList_0";
                     var objList = proCerP.FindExport(objListIFP);
                     var list = objList.GetProperty<ArrayProperty<ObjectProperty>>("ObjList");
-                    list.AddRange(actors.Select(x => new ObjectProperty(x.UIndex))); // Add the items to the list
+                    foreach (var a in actors)
+                    {
+                        var tag = a.GetProperty<NameProperty>("Tag");
+                        if (tag == null || (tag.Value != "procer_miranda" && tag.Value != "procer_wilson"))
+                        {
+                            // Do not add miranda or wilson or it conflicts with the MER lore
+                            list.Add(new ObjectProperty(a));
+                        }
+                    }
                     objList.WriteProperty(list);
                 }
 
