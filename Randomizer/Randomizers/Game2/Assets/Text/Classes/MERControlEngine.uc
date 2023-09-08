@@ -4,11 +4,14 @@
 
 // Variables
 var config bool bLightRandomizer;
+var config bool bFogRandomizer;
 var config bool bPlayerMovementSpeedRandomizer;
 var config bool bNPCMovementSpeedRandomizer;
 var config bool bPawnLookatRandomizer;
 var config bool bEyeRandomizer;
-var config bool bIllusiveEyeRandomizer;
+var config bool bEnemyWeaponRandomizer;
+var config bool bEnemyPowerRandomizer;
+var config bool bEnemyPowerRandomizer_EnforceMinPowerCount;
 var config array<string> MEREyeIFPs;
 var config float fBioMorphFaceRandomization;
 
@@ -38,11 +41,15 @@ public static function LinearColor RandLinearColor(float MinR, float MaxR, float
 }
 public static function MarkObjectModified(Object Obj)
 {
-    Obj.ObjectFlags.B  = Obj.ObjectFlags.B | 0x8;
+    Obj.ObjectFlags.B = Obj.ObjectFlags.B | 8;
 }
 public static function bool IsObjectModified(Object Obj)
 {
-    return (Obj.ObjectFlags.B & 0x8) == 0x8;
+    return (Obj.ObjectFlags.B & 8) == 8;
+}
+public static function bool IsStringCapitalized(string Str)
+{
+    return "a" > Str;
 }
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.

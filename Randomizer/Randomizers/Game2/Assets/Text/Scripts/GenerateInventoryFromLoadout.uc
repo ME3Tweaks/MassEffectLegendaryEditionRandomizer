@@ -6,12 +6,12 @@
     
     if (oLoadout != None)
     {
+        if (SFXLoadoutDataMER(oLoadout) != None)
+        {
+            SFXLoadoutDataMER(oLoadout).Randomize(bShouldSpawnWeapons);
+        }
         if (bShouldSpawnWeapons)
         {
-            if (SFXLoadoutDataMER(oLoadout) != None)
-            {
-                SFXLoadoutDataMER(oLoadout).RandomizeWeapons();
-            }
             CreateWeapons(oLoadout);
         }
         foreach oLoadout.ShieldLoadouts(ShieldLoadout, )

@@ -102,7 +102,9 @@ private static final function RandomizeEyeParams(BioMaterialInstanceConstant Bio
     local array<Name> ScalarParams;
     local array<Name> VectorParams;
     local float defaultFloat;
+    local float NewFloat;
     local LinearColor defaultVector;
+    local LinearColor NewValue;
     
     BioMat.ScalarParameterValues.Length = 0;
     BioMat.VectorParameterValues.Length = 0;
@@ -115,7 +117,17 @@ private static final function RandomizeEyeParams(BioMaterialInstanceConstant Bio
         {
             defaultFloat = 0.5;
         }
-        BioMat.SetScalarParameterValue(ScalarParams[J], RandFloat(0.0, defaultFloat * 2.0));
+        if (ScalarParams[J] == 'Emis_Scalar')
+        {
+            NewFloat = RandFloat(0.25, 2.0);
+            NewFloat = 2.0;
+        }
+        else
+        {
+            NewFloat = RandFloat(0.0, defaultFloat * 2.0);
+        }
+        BioMat.SetScalarParameterValue(ScalarParams[J], NewFloat);
+        LogInternal((("Setting parameter: " $ ScalarParams[J]) $ " to ") $ NewFloat, );
     }
     for (J = 0; J < VectorParams.Length; J++)
     {
@@ -136,7 +148,10 @@ private static final function RandomizeEyeParams(BioMaterialInstanceConstant Bio
         {
             defaultVector.A = 0.5;
         }
-        BioMat.SetVectorParameterValue(VectorParams[J], RandLinearColor(0.0, defaultVector.R * 2.0, 0.0, defaultVector.G * 2.0, 0.0, defaultVector.B * 2.0, 0.5, defaultVector.A * 2.0));
+        NewValue = RandLinearColor(0.0, defaultVector.R * 2.0, 0.0, defaultVector.G * 2.0, 0.0, defaultVector.B * 2.0, 0.5, defaultVector.A * 2.0);
+        NewValue.A = 1.0;
+        LogInternal((((((((("Setting parameter: " $ VectorParams[J]) $ " to ") $ NewValue.R) $ ",") $ NewValue.B) $ ",") $ NewValue.B) $ ",") $ NewValue.A, );
+        BioMat.SetVectorParameterValue(VectorParams[J], NewValue);
     }
 }
 public static function Name GetMatName(Object matObj)
@@ -163,6 +178,34 @@ public static function Name GetMatName(Object matObj)
     }
     return matObj.Name;
 }
+public static function Name GetMatName2(Object matObj)
+{
+    local Object Parent;
+    
+    if (matObj == None)
+    {
+        return 'None';
+    }
+    if (MaterialInstanceConstant(matObj) != None)
+    {
+        Parent = MaterialInstanceConstant(matObj).Parent;
+        if (Parent != None)
+        {
+            return GetMatName2(Parent);
+        }
+        return 'None';
+    }
+    else if (RvrEffectsMaterialUser(matObj) != None)
+    {
+        return GetMatName2(RvrEffectsMaterialUser(matObj).m_pBaseMaterial);
+    }
+    else if (Material(matObj) != None)
+    {
+        return matObj.Name;
+    }
+    LogInternal((("Unhandled case for object " $ matObj) $ " with class ") $ matObj.Class, );
+    return 'None';
+}
 public static function SetEyeParent(MaterialInstanceConstant MIC, MaterialInterface DefaultParent)
 {
     local MaterialInterface MI;
@@ -183,7 +226,7 @@ public static function SetEyeParent(MaterialInstanceConstant MIC, MaterialInterf
     }
     MIC.SetParent(DefaultParent);
 }
-public static function Pawn_RandomizeEyes2(BioPawn BP)
+public static function BioPawn_RandomizeEyes(BioPawn BP)
 {
     local int I;
     local int J;
@@ -193,7 +236,7 @@ public static function Pawn_RandomizeEyes2(BioPawn BP)
     local MaterialInstanceConstant MatConstant;
     local Material Mat;
     
-    if (!Class'MERControlEngine'.default.bIllusiveEyeRandomizer && !Class'MERControlEngine'.default.bEyeRandomizer)
+    if (!Class'MERControlEngine'.default.bEyeRandomizer)
     {
         return;
     }
@@ -205,10 +248,6 @@ public static function Pawn_RandomizeEyes2(BioPawn BP)
     {
         return;
     }
-    if ((BP.HeadMesh.SkeletalMesh != None && BP.HeadMesh.SkeletalMesh.Name == 'HMM_HED_PROIllusiveMan_MDL') && !Class'MERControlEngine'.default.bIllusiveEyeRandomizer)
-    {
-        return;
-    }
     LogInternal("Eye randomizer on " $ BP.Tag, );
     for (I = 0; I < BP.HeadMesh.Materials.Length; I++)
     {
@@ -216,7 +255,7 @@ public static function Pawn_RandomizeEyes2(BioPawn BP)
         {
             continue;
         }
-        matName = GetMatName(BP.HeadMesh.Materials[I]);
+        matName = GetMatName2(BP.HeadMesh.Materials[I]);
         LogInternal("Mat: " $ matName, );
         if (InStr(string(matName), "EYE", , , ) >= 0)
         {
@@ -444,7 +483,7 @@ public static function InitBioPawn(BioPawn BP)
     LogInternal(("InitBioPawn on: " $ BP.Tag) $ "--------------------------------", );
     BioPawn_RandomizeSpeed(BP);
     BioPawn_RandomizeLookAt(BP);
-    Pawn_RandomizeEyes2(BP);
+    BioPawn_RandomizeEyes(BP);
     BioPawn_RandomizeMorphHead(BP);
 }
 public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActorMAT BP)
@@ -457,7 +496,7 @@ public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActo
     local MaterialInstanceConstant MatConstant;
     local Material Mat;
     
-    if (!Class'MERControlEngine'.default.bIllusiveEyeRandomizer && !Class'MERControlEngine'.default.bEyeRandomizer)
+    if (!Class'MERControlEngine'.default.bEyeRandomizer)
     {
         return;
     }
@@ -469,10 +508,6 @@ public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActo
     {
         return;
     }
-    if ((BP.HeadMesh.SkeletalMesh != None && BP.HeadMesh.SkeletalMesh.Name == 'HMM_HED_PROIllusiveMan_MDL') && !Class'MERControlEngine'.default.bIllusiveEyeRandomizer)
-    {
-        return;
-    }
     LogInternal("Eye randomizer on " $ BP.Tag, );
     for (I = 0; I < BP.HeadMesh.Materials.Length; I++)
     {
@@ -480,7 +515,7 @@ public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActo
         {
             continue;
         }
-        matName = GetMatName(BP.HeadMesh.Materials[I]);
+        matName = GetMatName2(BP.HeadMesh.Materials[I]);
         LogInternal("Mat: " $ matName, );
         if (InStr(string(matName), "EYE", , , ) >= 0)
         {
@@ -517,20 +552,15 @@ public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActo
     }
 }
 public static function InitSFXSkeletalMeshActorMAT(SFXSkeletalMeshActorMAT SKM)
-{
-    local BioMorphFace BMF;
-    
+{    
     SFXSkeletalMeshActorMAT_RandomizeEyes(SKM);
     SFXSkeletalMeshActorMAT_RandomizeMorphHead(SKM);
 }
-
-public static function SFXSkeletalMeshActorMAT_RandomizeMorphHead(SFXSkeletalMeshActorMAT SKM) {
-    // Patched in when feature is chosen
+public static function SFXSkeletalMeshActorMAT_RandomizeMorphHead(SFXSkeletalMeshActorMAT SKM)
+{
 }
-
-
-public static function BioPawn_RandomizeMorphHead(BioPawn BP) {
-    // Patched in when feature is chosen
+public static function BioPawn_RandomizeMorphHead(BioPawn BP)
+{
 }
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.

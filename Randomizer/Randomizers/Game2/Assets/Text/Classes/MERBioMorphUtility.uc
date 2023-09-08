@@ -43,11 +43,24 @@ private static final function bool GetRandomAlgorithm(Class<CustomMorphTargetSet
     generatedAlgo.Randomizations.Length = targetSet.default.BaseMorphTargets.Length;
     for (I = 0; I < targetSet.default.BaseMorphTargets.Length; I++)
     {
-        LogInternal((("Add feature to algo: " $ targetSet.default.BaseMorphTargets[I].TargetName) $ "for ") $ targetSet, );
         generatedAlgo.Randomizations[I].Feature = string(targetSet.default.BaseMorphTargets[I].TargetName);
         generatedAlgo.Randomizations[I].Min = -Class'MERControlEngine'.default.fBioMorphFaceRandomization;
         generatedAlgo.Randomizations[I].Max = Class'MERControlEngine'.default.fBioMorphFaceRandomization;
         generatedAlgo.Randomizations[I].MergeMode = Rand(5) == 0 ? EBMFFeatureMergeMode.Multiplicative : EBMFFeatureMergeMode.Exact;
+        if (FALSE)
+        {
+            LogInternal((((((("Add feature to algo: " $ targetSet.default.BaseMorphTargets[I].TargetName) $ "(") $ generatedAlgo.Randomizations[I].Min) $ ",") $ generatedAlgo.Randomizations[I].Max) $ ") for ") $ targetSet, );
+        }
+        if (targetSet == Class'HMM_BaseMorphSet')
+        {
+            generatedAlgo.Randomizations[I].AddIfNotFound = Class'MERControlEngine'.static.IsStringCapitalized(generatedAlgo.Randomizations[I].Feature) ? Rand(4) == 0 : TRUE;
+            continue;
+        }
+        if (targetSet == Class'HMF_BaseMorphSet')
+        {
+            generatedAlgo.Randomizations[I].AddIfNotFound = Class'MERControlEngine'.static.IsStringCapitalized(generatedAlgo.Randomizations[I].Feature) ? Rand(3) > 0 : TRUE;
+            continue;
+        }
         generatedAlgo.Randomizations[I].AddIfNotFound = TRUE;
     }
     algorithm = generatedAlgo;
@@ -102,36 +115,42 @@ public static function RandomizeBioMorphFace(BioMorphFace BMF)
         LogInternal("Could not find algorithm for " $ MorphTargetSet, );
         return;
     }
-    if (MorphTargetSet != None && hasAlgorithm)
+    LogInternal("Algorithm: " $ algorithm.Randomizations.Length, );
+    for (J = 0; J < algorithm.Randomizations.Length; J++)
     {
-        for (J = 0; J < algorithm.Randomizations.Length; J++)
+        found = FALSE;
+        for (I = 0; I < BMF.m_aMorphFeatures.Length; I++)
         {
-            found = FALSE;
-            for (I = 0; I < BMF.m_aMorphFeatures.Length; I++)
+            if (InStr(string(BMF.m_aMorphFeatures[I].sFeatureName), algorithm.Randomizations[J].Feature, , TRUE, ) >= 0)
             {
-                if (InStr(string(BMF.m_aMorphFeatures[I].sFeatureName), algorithm.Randomizations[J].Feature, , TRUE, ) >= 0)
+                if (FALSE)
                 {
                     LogInternal("Updating morph feature: " $ BMF.m_aMorphFeatures[I].sFeatureName, );
-                    BMF.m_aMorphFeatures[I] = RandomizeMorphTarget(BMF.m_aMorphFeatures[I], algorithm.Randomizations[J]);
-                    modified = TRUE;
-                    found = TRUE;
-                    break;
                 }
-            }
-            if (!found && algorithm.Randomizations[J].AddIfNotFound)
-            {
-                LogInternal("Adding morph feature: " $ algorithm.Randomizations[J].Feature, );
-                BMF.m_aMorphFeatures[BMF.m_aMorphFeatures.Length] = MakeNewMorphFeature(algorithm.Randomizations[J]);
+                BMF.m_aMorphFeatures[I] = RandomizeMorphTarget(BMF.m_aMorphFeatures[I], algorithm.Randomizations[J]);
                 modified = TRUE;
                 found = TRUE;
                 break;
             }
         }
-        if (modified)
+        if (!found && algorithm.Randomizations[J].AddIfNotFound)
         {
-            Class'MorphTargetUtility'.static.UpdateMeshAndSkeleton(BMF, MorphTargetSet);
-            Class'MERControlEngine'.static.MarkObjectModified(BMF);
+            if (FALSE)
+            {
+                LogInternal("Adding morph feature: " $ algorithm.Randomizations[J].Feature, );
+            }
+            BMF.m_aMorphFeatures[BMF.m_aMorphFeatures.Length] = MakeNewMorphFeature(algorithm.Randomizations[J]);
+            modified = TRUE;
         }
+    }
+    if (modified)
+    {
+        Class'MorphTargetUtility'.static.UpdateMeshAndSkeleton(BMF, MorphTargetSet);
+        Class'MERControlEngine'.static.MarkObjectModified(BMF);
+    }
+    else
+    {
+        LogInternal("Not modified: " $ BMF, );
     }
 }
 private static final function MorphFeature RandomizeMorphTarget(MorphFeature MT, BMFFeatureRandomization falgorithm)
@@ -186,6 +205,11 @@ private static final function Class<CustomMorphTargetSet> GetMorphTargetSet(BioM
     if (InStr(string(BaseName), "aln_", , TRUE, ) >= 0)
     {
         LogInternal("not implemented", );
+    }
+    if (InStr(string(BaseName), "drl_", , TRUE, ) >= 0)
+    {
+        // Drells are all male
+        return Class'HMM_BaseMorphSet';
     }
     return None;
 }
