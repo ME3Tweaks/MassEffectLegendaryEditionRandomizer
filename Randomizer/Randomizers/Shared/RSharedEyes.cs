@@ -81,12 +81,15 @@ namespace Randomizer.Randomizers.Shared
             var merEyesP = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BIOG_MEREyes.pcc"));
             foreach (var mat in merEyesP.Exports.Where(x => x.IsA("MaterialInstance") && x.idxLink == 0))
             {
+                // Debugging specific eyes
+                //if (!mat.ObjectName.Name.Contains("VI"))
+                //    continue;
 
                 // Add the dynamic load mappings
                 CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo(mat));
 
                 // Add the IFP
-                mercontrol.AddEntryIfUnique(new CoalesceProperty("MEREyeIFPs", 
+                mercontrol.AddEntryIfUnique(new CoalesceProperty("MEREyeIFPs",
                     new CoalesceValue(mat.InstancedFullPath, CoalesceParseAction.AddUnique)));
             }
         }
