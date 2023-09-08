@@ -77,15 +77,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
             MERLog.Information(@"Preloading weapon data");
             LoadGuns(target);
 
-            var sfxGame = SFXGame.GetSFXGame(target);
-
-            // Add SFXLoadoutDataMER subclass
-            var classText = MEREmbedded.GetEmbeddedTextAsset(@"Classes.SFXLoadoutDataMER.uc");
-            PackageTools.CreateNewClass(sfxGame, @"SFXLoadoutDataMER", classText);
-
-            // Patch the loadout generation method
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc", false, new MERPackageCache(target, null, false));
-
+            var sfxGame = SFXGame.CreateAndSetupMERLoadoutClass(target);
             MERFileSystem.SavePackage(sfxGame);
 
             var bioWeapon = CoalescedHandler.GetIniFile(@"BioWeapon.ini");
@@ -110,7 +102,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
             // Add corrected weapons here
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContentMER.SFXHeavyWeapon_Blackstorm_MER", SeekFreePackage = @"SFXHeavyWeapon_Blackstorm_MER" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXWeapon_GethMiniGun", SeekFreePackage = @"SFXWeapon_GethMiniGun" });
-            
+
             // Add animations
             MERLog.Information(@"Installing weapon animations startup package");
             WeaponAnimsPackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(MEGame.LE2, @"Weapons.Startup_LE2R_WeaponAnims.pcc"), @"Startup_LE2R_WeaponAnims.pcc");

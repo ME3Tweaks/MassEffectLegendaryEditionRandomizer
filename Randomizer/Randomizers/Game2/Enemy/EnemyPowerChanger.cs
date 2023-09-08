@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
@@ -10,9 +11,12 @@ using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
+using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Newtonsoft.Json;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Enemy
@@ -71,7 +75,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     new string[] { "\r\n", "\r", "\n" },
                     StringSplitOptions.None
                 ).ToList();
-                
+
                 // Inventory the powerlist for use
                 Powers = new List<PowerInfo>();
                 foreach (var exp in whitelistedPowers)
@@ -87,31 +91,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     }
                 }
             }
-
-
-            //foreach (var powerInfo in powermanifest)
-            //{
-            //    var powerFilePath = MERFileSystem.GetPackageFile(target, powerInfo.PackageFileName, false);
-            //    if (powerInfo.IsCorrectedPackage || (powerFilePath != null && File.Exists(powerFilePath)))
-            //    {
-            //        // This can probably be removed; DLC is included in LE2
-            //        if (powerInfo.FileDependency != null && MERFileSystem.GetPackageFile(target, powerInfo.FileDependency, false) == null)
-            //        {
-            //            MERLog.Information($@"Dependency file {powerInfo.FileDependency} not found, not adding {powerInfo.PowerName} to power selection pool");
-            //            continue; // Dependency not met
-            //        }
-            //        // End removal area
-
-
-            //        MERLog.Information($@"Adding {powerInfo.PowerName} to power selection pool");
-            //        Powers.Add(powerInfo);
-            //    }
-
-            //    if (!powerInfo.IsCorrectedPackage && powerFilePath == null)
-            //    {
-            //        MERLog.Information($@"{powerInfo.PowerName} package file not found ({powerInfo.PackageFileName}), power not added to power randomization pools");
-            //    }
-            //}
         }
 
         /// <summary>
@@ -123,6 +102,68 @@ namespace Randomizer.Randomizers.Game2.Enemy
         {
             MERLog.Information(@"Preloading power data");
             LoadPowers(target);
+            return true;
+        }
+
+        internal class PowerInfo2
+        {
+            public string PowerIFP;
+            public string BasePowerName;
+
+            public string ToConfigValue()
+            {
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                dict[@"PowerIFP"] = PowerIFP;
+                if (BasePowerName != null)
+                {
+                    dict[@"BasePowerName"] = BasePowerName;
+                }
+
+                return StringStructParser.BuildCommaSeparatedSplitValueList(dict, @"PowerIFP", @"BasePowerName");
+            }
+        }
+
+        private static string GetBaseName(ExportEntry exp)
+        {
+            var baseName = exp.GetProperty<NameProperty>("BaseName");
+            if (baseName == null && exp.SuperClass != null && exp.SuperClass.IsA("SFXPower") && exp.SuperClass is ExportEntry sExp)
+            {
+                return GetBaseName(sExp);
+            }
+
+            if (baseName != null)
+            {
+                return baseName.Value;
+            }
+
+            return null;
+        }
+
+        public static bool Init2(GameTarget target, RandomizationOption option)
+        {
+            MERFileSystem.InstallAlways("EnemyPowerRandomizer");
+            MERFileSystem.SavePackage(SFXGame.CreateAndSetupMERLoadoutClass(target));
+            SharedLE2Fixes.InstallPowerUsageFixes(); // Fixes collector ai
+
+            using var pb = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "EnemyPowersBank.pcc"));
+
+            var bioWeapon = CoalescedHandler.GetIniFile("BioWeapon.ini");
+            var section = bioWeapon.GetOrAddSection("SFXGame.SFXLoadoutDataMER");
+
+            foreach (var powExp in pb.Exports.Where(x => x.IsClass && x.InheritsFrom("SFXPower")))
+            {
+                var powInfo = new PowerInfo2()
+                {
+                    PowerIFP = powExp.InstancedFullPath,
+                    BasePowerName = GetBaseName(powExp)
+                };
+
+                CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo(powExp));
+                section.AddEntry(new CoalesceProperty("RandomPowerOptions", new CoalesceValue(powInfo.ToConfigValue(), CoalesceParseAction.AddUnique)));
+            }
+
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer");
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount"); // Todo: Set to suboption
             return true;
         }
 
@@ -338,57 +379,57 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
             //if (sourcePackage != null)
             //{
-                var sourceExport = powerInfo.PowerExport;
-                if (!sourceExport.InheritsFrom("SFXPower") || sourceExport.IsDefaultObject)
-                {
-                    throw new Exception("Wrong setup!");
-                }
-                if (sourceExport.Parent != null && sourceExport.Parent.ClassName != "Package")
-                {
-                    throw new Exception("Cannot port power - parent object is not Package!");
-                }
+            var sourceExport = powerInfo.PowerExport;
+            if (!sourceExport.InheritsFrom("SFXPower") || sourceExport.IsDefaultObject)
+            {
+                throw new Exception("Wrong setup!");
+            }
+            if (sourceExport.Parent != null && sourceExport.Parent.ClassName != "Package")
+            {
+                throw new Exception("Cannot port power - parent object is not Package!");
+            }
 
-                var newParent = EntryExporter.PortParents(sourceExport, targetPackage);
-                IEntry newEntry;
+            var newParent = EntryExporter.PortParents(sourceExport, targetPackage);
+            IEntry newEntry;
 #if DEBUG
-                // DEBUG ONLY-----------------------------------
-                //var defaults = sourceExport.GetDefaults();
-                //defaults.RemoveProperty("VFX");
-                //var vfx = defaults.GetProperty<ObjectProperty>("VFX").ResolveToEntry(sourcePackage) as ExportEntry;
-                //vxx.RemoveProperty("PlayerCrust");
-                //vfx.FileRef.GetUExport(1544).RemoveProperty("oPrefab");
+            // DEBUG ONLY-----------------------------------
+            //var defaults = sourceExport.GetDefaults();
+            //defaults.RemoveProperty("VFX");
+            //var vfx = defaults.GetProperty<ObjectProperty>("VFX").ResolveToEntry(sourcePackage) as ExportEntry;
+            //vxx.RemoveProperty("PlayerCrust");
+            //vfx.FileRef.GetUExport(1544).RemoveProperty("oPrefab");
 
-                ////vfx = defaults.FileRef.GetUExport(6211); // Prefab
-                ////vfx.RemoveProperty("WorldImpactVisualEffect");
-                //MERPackageCache cached = new MERPackageCache();
-                //EntryExporter.ExportExportToPackage(vfx, targetPackage, out newEntry, cached);
-                //PackageTools.AddReferencesToWorld(targetPackage, new [] {newEntry as ExportEntry});
+            ////vfx = defaults.FileRef.GetUExport(6211); // Prefab
+            ////vfx.RemoveProperty("WorldImpactVisualEffect");
+            //MERPackageCache cached = new MERPackageCache();
+            //EntryExporter.ExportExportToPackage(vfx, targetPackage, out newEntry, cached);
+            //PackageTools.AddReferencesToWorld(targetPackage, new [] {newEntry as ExportEntry});
 
-                //return null;
+            //return null;
 
 
-                // END DEBUG ONLY--------------------------------
+            // END DEBUG ONLY--------------------------------
 #endif
-                List<EntryStringPair> relinkResults = null;
-                //if ((powerInfo.IsCorrectedPackage || (PackageTools.IsPersistentPackage(powerInfo.PackageFileName) && MERFileSystem.GetPackageFile(target, powerInfo.PackageFileName.ToLocalizedFilename()) == null)))
-                //{
-                    // Faster this way, without having to check imports
-                    relinkResults = EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, sourceExport, targetPackage,
-                        newParent, true, new RelinkerOptionsPackage(), out newEntry); // TODO: CACHE?
-                //}
-                //else
-                //{
-                //    // MEMORY SAFE (resolve imports to exports)
-                //    MERPackageCache cache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
-                //    relinkResults = EntryExporter.ExportExportToPackage(sourceExport, targetPackage, out newEntry, cache);
-                //}
+            List<EntryStringPair> relinkResults = null;
+            //if ((powerInfo.IsCorrectedPackage || (PackageTools.IsPersistentPackage(powerInfo.PackageFileName) && MERFileSystem.GetPackageFile(target, powerInfo.PackageFileName.ToLocalizedFilename()) == null)))
+            //{
+            // Faster this way, without having to check imports
+            relinkResults = EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, sourceExport, targetPackage,
+                newParent, true, new RelinkerOptionsPackage(), out newEntry); // TODO: CACHE?
+                                                                              //}
+                                                                              //else
+                                                                              //{
+                                                                              //    // MEMORY SAFE (resolve imports to exports)
+                                                                              //    MERPackageCache cache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
+                                                                              //    relinkResults = EntryExporter.ExportExportToPackage(sourceExport, targetPackage, out newEntry, cache);
+                                                                              //}
 
-                if (relinkResults.Any())
-                {
-                    Debugger.Break();
-                }
+            if (relinkResults.Any())
+            {
+                Debugger.Break();
+            }
 
-                return newEntry;
+            return newEntry;
             //}
             //return null; // No package was found
         }
@@ -407,6 +448,12 @@ namespace Randomizer.Randomizers.Game2.Enemy
             //if (!export.ObjectName.Name.Contains("HeavyWeaponMech"))
             //    return false;
 #endif
+
+            // Set to class that will be randomized
+            SharedLoadout.ConfigureLoadoutForRandomization(export);
+            return true;
+
+            // old ME2R compile time randomizer
 
             var powers = export.GetProperty<ArrayProperty<ObjectProperty>>("Powers");
 
@@ -598,6 +645,32 @@ namespace Randomizer.Randomizers.Game2.Enemy
             }
 
             return true;
+        }
+    }
+
+    internal static class SharedLoadout
+    {
+
+
+        public static void ConfigureLoadoutForRandomization(GameTarget target, ExportEntry export)
+        {
+            IEntry classRef = export.FileRef.FindImport("SFXGame.SFXLoadoutDataMER");
+            if (classRef == null)
+            {
+                classRef = EntryImporter.EnsureClassIsInFile(export.FileRef, "SFXLoadoutDataMER", new RelinkerOptionsPackage(), target.TargetPath);
+            }
+
+            export.Class = classRef;
+
+            // Some pawns should not be randomized
+            var objName = export.ObjectName.Name;
+            if (objName.Contains("Husk", StringComparison.InvariantCultureIgnoreCase) // Husks don't have AI to use powers
+                || objName.Contains("omination", StringComparison.InvariantCultureIgnoreCase)) // LE2R abominations (suicide + cover jumping) - YES ITS omination, not abomination, as other loadouts are named bomination
+            {
+                export.WriteProperty(new BoolProperty(true, "bPreventPowerRandomization"));
+                export.WriteProperty(new BoolProperty(true, "bPreventWeaponRandomization"));
+                export.WriteProperty(new BoolProperty(true, "bIgnoreOverride")); // We do not allow MER override flags to work for these
+            }
         }
     }
 }
