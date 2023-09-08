@@ -141,5 +141,27 @@ namespace Randomizer.Randomizers.Game2.Misc
 
             return props;
         }
+
+        /// <summary>
+        /// Creates the loadoutdatamer class, and returns the unsaved package
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static IMEPackage CreateAndSetupMERLoadoutClass(GameTarget target)
+        {
+            var sfxGame = SFXGame.GetSFXGame(target);
+
+            if (sfxGame.FindExport("SFXLoadoutDataMER") == null)
+            {
+                // Add SFXLoadoutDataMER subclass
+                var classText = MEREmbedded.GetEmbeddedTextAsset(@"Classes.SFXLoadoutDataMER.uc");
+                PackageTools.CreateNewClass(sfxGame, @"SFXLoadoutDataMER", classText);
+
+                // Patch the loadout generation method
+                ScriptTools.InstallScriptToExport(sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc", false, new MERPackageCache(target, null, false));
+            }
+
+            return sfxGame;
+        }
     }
 }
