@@ -129,10 +129,11 @@ namespace Randomizer.Randomizers.Utility
         /// <param name="packageToInstallTo">The package to install the class into</param>
         /// <param name="embeddedClassName">The name of the embedded class file - the class name must match the filename. DO NOT PUT .uc here, it will be added automatically</param>
         /// <param name="rootPackageName">The IFP of the root package, null if you want the class created at the root of the file</param>
-        public static ExportEntry InstallClassToPackage(GameTarget target, IMEPackage packageToInstallTo, string embeddedClassName, string rootPackageName = null)
+        /// <param name="useCache">If the MERCommonCache should be used. If you are adding things to basegame files you probably don't want to use this as it will be a mix of stale data and current until the cache is refreshed</param>
+        public static ExportEntry InstallClassToPackage(GameTarget target, IMEPackage packageToInstallTo, string embeddedClassName, string rootPackageName = null, bool useCache = true)
         {
             var fl = new FileLib(packageToInstallTo);
-            bool initialized = fl.Initialize(gameRootPath: target.TargetPath);
+            bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: useCache ? MERCaches.GlobalCommonLookupCache : null);
             if (!initialized)
             {
                 MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
