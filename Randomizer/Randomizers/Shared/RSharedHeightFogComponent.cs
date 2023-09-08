@@ -1,11 +1,27 @@
 ﻿using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
+using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared
 {
     class RSharedHeightFogComponent
     {
+
+        public static bool InstallDynamicHeightFogRandomizer(GameTarget target, RandomizationOption option)
+        {
+            var engine = Engine.GetEngine(target);
+            ScriptTools.AddToClassInPackage(target, engine, "HeightFog.PostBeginPlay", "HeightFog");
+            MERFileSystem.SavePackage(engine);
+            CoalescedHandler.EnableFeatureFlag("bFogRandomizer");
+            return true;
+        }
+
+
+        // Old ME2R code
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"HeightFogComponent";
         public static bool RandomizeExport(GameTarget target, ExportEntry export,RandomizationOption option)
         {
