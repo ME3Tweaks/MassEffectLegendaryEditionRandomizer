@@ -9,7 +9,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 {
 
     /// <summary>
-    /// Illusive Man Eye randomizer
+    /// Illusive Man Eye randomizer - No longer used
     /// </summary>
     class RIllusiveEyes
     {
