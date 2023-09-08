@@ -125,10 +125,8 @@ namespace RandomizerUI.Classes.Controllers
 
                 // Initialize core libraries
                 ME3TweaksCoreLib.Initialize(package);
-                LegendaryExplorerCoreLibSettings.Instance.SCCanModifyConst = true; // Randomizer needs this feature
-                //ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry, $"Mass Effect 2 Randomizer {App.AppVersion} starting up", false);
-                // Logger is now available
 
+                // Logger is now available
 
                 // Setup the InteropPackage for the update check
                 #region Update interop
@@ -223,8 +221,6 @@ namespace RandomizerUI.Classes.Controllers
                 };
 
                 #endregion
-
-
 
                 pd.SetMessage("Checking for application updates");
                 pd.Canceled += (sender, args) =>
