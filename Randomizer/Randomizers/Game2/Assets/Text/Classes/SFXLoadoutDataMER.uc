@@ -115,6 +115,12 @@ private final function RandomizePowers(BioPawn BP)
     
     while (I < Powers.Length)
     {
+        if (Powers[I].default.PowerName == 'PraetorianDeathChoir') {
+            // Changing this will break praetorian AI
+            I++;
+            continue;
+        }
+
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
         if (AddedBasePowers.Find(PowerInfo.BasePowerName) < 0)
         {
