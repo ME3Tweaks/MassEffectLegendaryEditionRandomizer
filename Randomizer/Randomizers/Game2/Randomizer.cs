@@ -14,6 +14,7 @@ using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Helpers;
@@ -318,6 +319,9 @@ namespace Randomizer.Randomizers.Game2
             CleanupInstallTimeOnlyFiles(installTimeOnlyPackages);
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
+
+            // Create TOC
+            TOCCreator.CreateTOCForGame(SelectedOptions.RandomizationTarget.Game, gameRootOverride: SelectedOptions.RandomizationTarget.TargetPath);
 
             // Re-throw the unhandled exception after MERFS has closed
             if (rethrowException != null)
@@ -711,7 +715,7 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = "Enemy powers",
                         Description = "Gives enemies different powers. May make some enemies very difficult to kill. Enemies that can softlock the game and custom made enemeis for this randomzier will not be randomized",
                         IsRuntimeRandomizer = true,
-                        PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport,
+                        PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport2,
                         PerformSpecificRandomizationDelegate = EnemyPowerChanger.InitLE2R,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,

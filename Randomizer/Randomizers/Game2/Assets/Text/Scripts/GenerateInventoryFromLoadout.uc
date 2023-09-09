@@ -8,7 +8,7 @@
     {
         if (SFXLoadoutDataMER(oLoadout) != None)
         {
-            SFXLoadoutDataMER(oLoadout).Randomize(bShouldSpawnWeapons);
+            SFXLoadoutDataMER(oLoadout).Randomize(Self, bShouldSpawnWeapons);
         }
         if (bShouldSpawnWeapons)
         {

@@ -81,8 +81,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
             MERLog.Information(@"Preloading weapon data");
             LoadGuns(target);
 
-            var sfxGame = SFXGame.CreateAndSetupMERLoadoutClass(target);
-            MERFileSystem.SavePackage(sfxGame);
+            MERFileSystem.SavePackage(SFXGame.CreateAndSetupMERLoadoutClass(target));
 
             var bioWeapon = CoalescedHandler.GetIniFile(@"BioWeapon.ini");
             var sfxLoadoutDataMER = bioWeapon.GetOrAddSection(@"SFXGame.SFXLoadoutDataMER");
@@ -95,17 +94,28 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 // we can force specific lines
                 if (!ew.StartsWith("//"))
                 {
-                    sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"RandomWeaponOptions",
-                        new CoalesceValue(ew, CoalesceParseAction.AddUnique)));
+                    sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"RandomWeaponOptions", new CoalesceValue(ew, CoalesceParseAction.AddUnique)));
                 }
             }
 
             // Extract all weapon randomizer packages
             MEREmbedded.ExtractEmbeddedBinaryFolder(@"Packages.LE2.Weapons");
+            MEREmbedded.ExtractEmbeddedBinaryFolder(@"Packages.LE2.InvisibleWeapons");
 
             // Add corrected weapons here
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContentMER.SFXHeavyWeapon_Blackstorm_MER", SeekFreePackage = @"SFXHeavyWeapon_Blackstorm_MER" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXWeapon_GethMiniGun", SeekFreePackage = @"SFXWeapon_GethMiniGun" });
+            CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_FlameThrower", SeekFreePackage = @"SFXHeavyWeapon_FlameThrower" });
+            CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_ScionGun", SeekFreePackage = @"SFXHeavyWeapon_ScionGun" });
+
+            // Invisible weapons
+            CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_ReaperMIRV", SeekFreePackage = @"SFXHeavyWeapon_ReaperMIRV" });
+            CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_OculusParticleBeam", SeekFreePackage = @"SFXHeavyWeapon_OculusParticleBeam" });
+
+            sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"InvisibleRandomWeaponOptions", new CoalesceValue(@"SFXGameContent_Inventory.SFXHeavyWeapon_ReaperMIRV", CoalesceParseAction.AddUnique)));
+            sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"InvisibleRandomWeaponOptions", new CoalesceValue(@"SFXGameContent_Inventory.SFXHeavyWeapon_OculusParticleBeam", CoalesceParseAction.AddUnique)));
+
+
 
             // Add animations
             MERLog.Information(@"Installing weapon animations startup package");
@@ -113,6 +123,12 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
             // Add animation to startup
             ThreadSafeDLCStartupPackage.AddStartupPackage(@"Startup_LE2R_WeaponAnims"); // Make it referencable via imports
+
+            // Set runtime feature flags
+            CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer");
+            CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_Force", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_FORCERANDOMIZER));
+            CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_AllowInvisible", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_ALLOWINVISIBLE));
+            CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_OneTime", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE));
 
             WeaponAnimationsArrayProp = WeaponAnimsPackage.FindExport("WeaponAnimData").GetProperty<ArrayProperty<StructProperty>>("WeaponAnimSpecs");
             return true;

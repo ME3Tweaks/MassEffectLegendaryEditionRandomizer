@@ -158,7 +158,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 PackageTools.CreateNewClass(sfxGame, @"SFXLoadoutDataMER", classText);
 
                 // Patch the loadout generation method
-                ScriptTools.InstallScriptToExport(sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc", false, new MERPackageCache(target, null, false));
+                ScriptTools.InstallScriptToExport(sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc");
             }
 
             return sfxGame;

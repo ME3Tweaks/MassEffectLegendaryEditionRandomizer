@@ -321,7 +321,7 @@ namespace Randomizer.MER
         [Conditional("DEBUG")]
         public static void BuildPowerInfo(ExportEntry powerExport, IMEPackage powerBank, bool isCorrectedPackage)
         {
-#if __GAME2__
+#if __GAME2_DISABLED__
             // See if power is fully defined in package?
             var classInfo = ObjectBinary.From<UClass>(powerExport);
             if (classInfo.ClassFlags.Has(UnrealFlags.EClassFlags.Abstract))

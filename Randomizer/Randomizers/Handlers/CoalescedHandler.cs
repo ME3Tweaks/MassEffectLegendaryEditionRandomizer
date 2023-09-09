@@ -90,11 +90,11 @@ namespace Randomizer.Randomizers.Handlers
         /// Adds a bool to config with Type 2 to enable/disable runtime randomizers
         /// </summary>
         /// <param name="boolIdx"></param>
-        public static void EnableFeatureFlag(string featureFlagName)
+        public static void EnableFeatureFlag(string featureFlagName, bool enabled = true)
         {
             var game = CoalescedHandler.GetIniFile("BioEngine");
             var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
-            controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue("TRUE", CoalesceParseAction.Add)));
+            controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue(enabled ? "TRUE" : "FALSE", CoalesceParseAction.Add)));
         }
 #endif
     }

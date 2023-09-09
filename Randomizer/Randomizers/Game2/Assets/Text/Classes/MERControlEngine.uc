@@ -9,9 +9,17 @@ var config bool bPlayerMovementSpeedRandomizer;
 var config bool bNPCMovementSpeedRandomizer;
 var config bool bPawnLookatRandomizer;
 var config bool bEyeRandomizer;
+
 var config bool bEnemyWeaponRandomizer;
+var config bool bEnemyWeaponRandomizer_Force;
+var config bool bEnemyWeaponRandomizer_AllowInvisible;
+var config bool bEnemyWeaponRandomizer_OneTime;
+
 var config bool bEnemyPowerRandomizer;
+var config bool bEnemyPowerRandomizer_Force;
 var config bool bEnemyPowerRandomizer_EnforceMinPowerCount;
+var config bool bEnemyPowerRandomizer_OneTime;
+
 var config array<string> MEREyeIFPs;
 var config float fBioMorphFaceRandomization;
 

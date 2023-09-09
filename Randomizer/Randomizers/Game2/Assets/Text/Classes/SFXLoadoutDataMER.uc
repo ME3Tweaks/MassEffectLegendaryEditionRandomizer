@@ -11,41 +11,63 @@ struct PowerOption
 
 // Variables
 var config array<string> RandomWeaponOptions;
+var config array<string> InvisibleRandomWeaponOptions;
 var config array<PowerOption> RandomPowerOptions;
-var array<Object> OldReferences;
+var array<Object> OldReferences; // Used to ensure imports stay resolving
+
+// Power randomizer vars
 var bool bPreventPowerRandomization;
-var bool bPreventWeaponRandomization;
 var bool bForcePreventPowerRandomization;
+var bool bPowerRandomizerHasRunAtLeastOnce;
+
+// Weapon randomzier vars
+var bool bPreventWeaponRandomization;
 var bool bForcePreventWeaponRandomization;
+var bool bWeaponRandomizerHasRunAtLeastOnce;
 
 // Functions
-public function Randomize(bool willSpawnWeapons)
+public function Randomize(BioPawn BP, bool willSpawnWeapons)
 {
     if (willSpawnWeapons)
     {
-        RandomizeWeapons();
+        RandomizeWeapons(BP);
     }
-    RandomizePowers();
+    RandomizePowers(BP);
 }
-private final function RandomizeWeapons()
+private final function RandomizeWeapons(BioPawn BP)
 {
     local array<string> newWeapons;
     local string weaponIFP;
     local int existingIndex;
     local int I;
     local Class<SFXWeapon> NewWeapon;
-    
-    if (!Class'MERControlEngine'.default.bEnemyWeaponRandomizer || RandomWeaponOptions.Length < Weapons.Length)
+    local int WeaponIDX;
+    local int ChoiceCount;
+
+    if (bForcePreventWeaponRandomization || !Class'MERControlEngine'.default.bEnemyWeaponRandomizer || RandomWeaponOptions.Length < Weapons.Length)
     {
         return;
     }
-    if (bPreventWeaponRandomization || bForcePreventWeaponRandomization){
+    if (bPreventWeaponRandomization && !Class'MERControlEngine'.default.bEnemyWeaponRandomizer_Force){
         return;
+    }
+    if (bWeaponRandomizerHasRunAtLeastOnce && Class'MERControlEngine'.default.bEnemyWeaponRandomizer_OneTime){
+        return;
+    }
+
+    ChoiceCount = RandomWeaponOptions.Length;
+    if ((SFXPawn(BP) != None && !SFXPawn(BP).bSupportsVisibleWeapons) || Class'MERControlEngine'.default.bEnemyWeaponRandomizer_AllowInvisible) {
+        ChoiceCount += InvisibleRandomWeaponOptions.Length;
     }
     
     while (I < Weapons.Length)
     {
-        weaponIFP = RandomWeaponOptions[Rand(RandomWeaponOptions.Length)];
+        WeaponIDX = Rand(ChoiceCount);
+        if (WeaponIDX < RandomWeaponOptions.Length){
+            weaponIFP = RandomWeaponOptions[WeaponIDX];
+        } else {
+            weaponIFP = InvisibleRandomWeaponOptions[WeaponIDX - RandomWeaponOptions.Length];
+        }
         if (newWeapons.Find(weaponIFP) < 0)
         {
             NewWeapon = Class<SFXWeapon>(Class'SFXEngine'.static.LoadSeekFreeObject(weaponIFP, Class'Class'));
@@ -63,9 +85,10 @@ private final function RandomizeWeapons()
         }
         continue;
     }
+    bWeaponRandomizerHasRunAtLeastOnce = true;
     LogInternal("Randomized loadout weapons", );
 }
-private final function RandomizePowers()
+private final function RandomizePowers(BioPawn BP)
 {
     local int existingIndex;
     local int I;
@@ -74,14 +97,14 @@ private final function RandomizePowers()
     local array<string> AddedBasePowers;
     local array<Name> ValidatedBasePowers;
     
-    if (!Class'MERControlEngine'.default.bEnemyPowerRandomizer || RandomPowerOptions.Length == 0)
+    if (bForcePreventPowerRandomization || !Class'MERControlEngine'.default.bEnemyPowerRandomizer || RandomPowerOptions.Length == 0)
     {
         return;
     }
-    if (bForcePreventPowerRandomization){
+    if (bPreventPowerRandomization && !Class'MERControlEngine'.default.bEnemyPowerRandomizer_Force) {
         return;
-    } 
-    if (bPreventPowerRandomization && !Class'MERControlEngine'.default.bForceEnemyPowerRandomizer) {
+    }
+    if (bPowerRandomizerHasRunAtLeastOnce && Class'MERControlEngine'.default.bEnemyPowerRandomizer_OneTime) {
         return;
     }
     if (Class'MERControlEngine'.default.bEnemyPowerRandomizer_EnforceMinPowerCount && RandomPowerOptions.Length >= 5)
@@ -116,7 +139,6 @@ private final function RandomizePowers()
     I = Powers.Length - 1;
     while (I >= 0)
     {
-        LogInternal("Validating power index " $ I, );
         if (ValidatedBasePowers.Find(Powers[I].default.BaseName) >= 0)
         {
             Powers.RemoveItem(Powers[I]);
@@ -126,7 +148,7 @@ private final function RandomizePowers()
         ValidatedBasePowers.AddItem(Powers[I].default.BaseName);
         I--;
     }
-    LogInternal("Randomized loadout", );
+    bPowerRandomizerHasRunAtLeastOnce = true;
 }
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.

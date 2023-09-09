@@ -53,62 +53,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
             "SFXPower_BioticChargeLong_AsariSpectre",
         };
 
-        /// <summary>
-        /// List of loadouts that have all their powers locked for randomization due to their AI. Add more powers so their AI behaves differently.
-        /// </summary>
-        public static string[] LoadoutsToAddPowersTo = new[]
-        {
-            "SUB_COL_Possessed",
-        };
 
-        public static List<PowerInfo> Powers;
-
-        /// <summary>
-        /// Bank package that contains all powers, this suppresses a lot of I/O and memory allocations and uses fixed size memory
-        /// </summary>
-        private static IMEPackage PowerBank;
-
-        public static void LoadPowers(GameTarget target)
-        {
-            if (Powers == null)
-            {
-                // Load the power bank
-                PowerBank = MEPackageHandler.OpenMEPackageFromStream(
-                    MEREmbedded.GetEmbeddedPackage(MEGame.LE2, @"Powers.EnemyPowersBank.pcc"), @"EnemyPowersBank.pcc");
-                string fileContents = MEREmbedded.GetEmbeddedTextAsset("powerlistle2.txt");
-                var whitelistedPowers = fileContents.Split(
-                    new string[] { "\r\n", "\r", "\n" },
-                    StringSplitOptions.None
-                ).ToList();
-
-                // Inventory the powerlist for use
-                Powers = new List<PowerInfo>();
-                foreach (var exp in whitelistedPowers)
-                {
-                    var pExp = PowerBank.FindExport(exp);
-                    if (pExp != null)
-                    {
-                        Powers.Add(new PowerInfo(pExp, false));
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"POWER ExP NOT FOUND: {exp}");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Hack to force power lists to load with only a single check
-        /// </summary>
-        /// <param name="option"></param>
-        /// <returns></returns>
-        public static bool Init(GameTarget target, RandomizationOption option)
-        {
-            MERLog.Information(@"Preloading power data");
-            LoadPowers(target);
-            return true;
-        }
 
         internal class PowerInfo2
         {
@@ -167,18 +112,94 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 section.AddEntry(new CoalesceProperty("RandomPowerOptions", new CoalesceValue(powInfo.ToConfigValue(), CoalesceParseAction.AddUnique)));
             }
 
+            // Set runtime feature flags
             CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer");
-            if (option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM))
-            {
-                CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount");
-            }
-            if (option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER))
-            {
-                CoalescedHandler.EnableFeatureFlag("bForceEnemyPowerRandomizer");
-            }
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_Force", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER));
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM));
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_OneTime", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE));
             return true;
         }
 
+
+        // This can probably be changed later
+        private static bool CanRandomize2(ExportEntry export) => !export.IsDefaultObject && export.ClassName == "SFXLoadoutData"
+            && !export.ObjectName.Name.Contains("Drone") // We don't modify drone powers
+            && !export.ObjectName.Name.Contains("NonCombat") // Non combat enemies won't use powers so this is just a waste of time
+            && export.ObjectName.Name != "Loadout_None" // Loadout_None has nothing, don't bother giving it anything
+            && Path.GetFileName(export.FileRef.FilePath).StartsWith("Bio"); // Must be part of a level, not a squadmate, player, etc
+
+        internal static bool RandomizeExport2(GameTarget target, ExportEntry export, RandomizationOption option)
+        {
+            if (!CanRandomize2(export)) return false;
+#if DEBUG
+            //if (!export.ObjectName.Name.Contains("HeavyWeaponMech"))
+            //    return false;
+#endif
+
+            // Set to class that will be randomized
+            SharedLoadout.ConfigureLoadoutForRandomization(target, export);
+            return true;
+        }
+
+#if FALSE
+        #region OLD ME2R code
+
+        /// <summary>
+        /// List of loadouts that have all their powers locked for randomization due to their AI. Add more powers so their AI behaves differently.
+        /// </summary>
+        public static string[] LoadoutsToAddPowersTo = new[]
+        {
+            "SUB_COL_Possessed",
+        };
+
+        public static List<PowerInfo> Powers;
+
+        /// <summary>
+        /// Bank package that contains all powers, this suppresses a lot of I/O and memory allocations and uses fixed size memory
+        /// </summary>
+        private static IMEPackage PowerBank;
+
+        public static void LoadPowers(GameTarget target)
+        {
+            if (Powers == null)
+            {
+                // Load the power bank
+                PowerBank = MEPackageHandler.OpenMEPackageFromStream(
+                    MEREmbedded.GetEmbeddedPackage(MEGame.LE2, @"Powers.EnemyPowersBank.pcc"), @"EnemyPowersBank.pcc");
+                string fileContents = MEREmbedded.GetEmbeddedTextAsset("powerlistle2.txt");
+                var whitelistedPowers = fileContents.Split(
+                    new string[] { "\r\n", "\r", "\n" },
+                    StringSplitOptions.None
+                ).ToList();
+
+                // Inventory the powerlist for use
+                Powers = new List<PowerInfo>();
+                foreach (var exp in whitelistedPowers)
+                {
+                    var pExp = PowerBank.FindExport(exp);
+                    if (pExp != null)
+                    {
+                        Powers.Add(new PowerInfo(pExp, false));
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"POWER ExP NOT FOUND: {exp}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hack to force power lists to load with only a single check
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static bool Init(GameTarget target, RandomizationOption option)
+        {
+            MERLog.Information(@"Preloading power data");
+            LoadPowers(target);
+            return true;
+        }
         public class PowerInfo
         {
             /// <summary>
@@ -658,12 +679,13 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
             return true;
         }
+
+#endregion
+#endif
     }
 
     internal static class SharedLoadout
     {
-
-
         public static void ConfigureLoadoutForRandomization(GameTarget target, ExportEntry export)
         {
             IEntry classRef = export.FileRef.FindImport("SFXGame.SFXLoadoutDataMER");
@@ -686,6 +708,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 return;
             }
 
+            // LE2R specific enemies
             if (objName.Contains("Kaidan", StringComparison.InvariantCultureIgnoreCase)
                 || objName.Contains("Ashley", StringComparison.InvariantCultureIgnoreCase))
             {

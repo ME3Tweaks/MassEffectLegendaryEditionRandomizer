@@ -1,4 +1,3 @@
-// Todo: Allow user to select these individually?
 SFXGameContent_Inventory.SFXHeavyWeapon_RocketLauncher
 SFXGameContent_Inventory.SFXHeavyWeapon_GrenadeLauncher
 SFXGameContent_Inventory.SFXHeavyWeapon_NukeLauncher
@@ -29,4 +28,6 @@ SFXGameContentDLC_MCR_02.SFXWeapon_GethShotgun
 SFXGameContentDLC_Desert.SFXWeapon_DesertAssaultRifle
 SFXGameContentDLC_HEN_MT.SFXWeapon_TacticalMachinePistol
 SFXGameContentMER.SFXHeavyWeapon_Blackstorm_MER
+SFXGameContent_Inventory.SFXHeavyWeapon_ScionGun
 SFXGameContent_Inventory.SFXWeapon_GethMiniGun
+SFXGameContent_Inventory.SFXHeavyWeapon_FlameThrower
