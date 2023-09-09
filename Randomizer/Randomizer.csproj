@@ -73,7 +73,6 @@
 		<EmbeddedResource Include="Randomizers\Game2\Dev\**\*.png" />
 		<EmbeddedResource Include="Randomizers\Game2\Dev\**\*.jpg" />
 		<EmbeddedResource Include="Randomizers\Game2\Dev\**\*.uc" />
-		<EmbeddedResource Include="Randomizers\Game2\Dev\**\*.afc" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
@@ -87,6 +86,7 @@
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.uc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.afc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
+		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
@@ -100,6 +100,7 @@
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.uc" />
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.afc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
+		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
 	</ItemGroup>
 
 	<ItemGroup>

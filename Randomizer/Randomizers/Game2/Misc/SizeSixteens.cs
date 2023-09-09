@@ -18,7 +18,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         
         private static void SetVeetorFootage(GameTarget target)
         {
-            var moviedata = RTextureMovie.GetTextureMovieAssetBinary(target.Game, "Veetor.size_mer.bik");
+            var moviedata = RTextureMovie.GetTextureMovieAssetBinary("Veetor.size_mer.bk2");
             var veetorFiles = MERFileSystem.LoadedFiles.Keys.Where(x => x.StartsWith("BioD_ProFre_501Veetor")).ToList();
             foreach (var v in veetorFiles)
             {

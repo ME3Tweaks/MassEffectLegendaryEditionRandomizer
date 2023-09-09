@@ -13,6 +13,10 @@ struct PowerOption
 var config array<string> RandomWeaponOptions;
 var config array<PowerOption> RandomPowerOptions;
 var array<Object> OldReferences;
+var bool bPreventPowerRandomization;
+var bool bPreventWeaponRandomization;
+var bool bForcePreventPowerRandomization;
+var bool bForcePreventWeaponRandomization;
 
 // Functions
 public function Randomize(bool willSpawnWeapons)
@@ -35,6 +39,10 @@ private final function RandomizeWeapons()
     {
         return;
     }
+    if (bPreventWeaponRandomization || bForcePreventWeaponRandomization){
+        return;
+    }
+    
     while (I < Weapons.Length)
     {
         weaponIFP = RandomWeaponOptions[Rand(RandomWeaponOptions.Length)];
@@ -70,10 +78,18 @@ private final function RandomizePowers()
     {
         return;
     }
+    if (bForcePreventPowerRandomization){
+        return;
+    } 
+    if (bPreventPowerRandomization && !Class'MERControlEngine'.default.bForceEnemyPowerRandomizer) {
+        return;
+    }
     if (Class'MERControlEngine'.default.bEnemyPowerRandomizer_EnforceMinPowerCount && RandomPowerOptions.Length >= 5)
     {
         Powers.Length = Clamp(Powers.Length, 2, 5);
     }
+
+    
     while (I < Powers.Length)
     {
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];

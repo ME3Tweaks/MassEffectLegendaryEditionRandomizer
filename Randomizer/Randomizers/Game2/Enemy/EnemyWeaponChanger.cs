@@ -22,6 +22,10 @@ namespace Randomizer.Randomizers.Game2.Enemy
 {
     class EnemyWeaponChanger
     {
+        public const string SUBOPTIONKEY_ENEMYWEAPONS_FORCERANDOMIZER = "SUBOPTIONKEY_ENEMYWEAPONS_FORCERANDOMIZER";
+        public const string SUBOPTIONKEY_ENEMYWEAPONS_ALLOWINVISIBLE = "SUBOPTIONKEY_ENEMYWEAPONS_ALLOWINVISIBLE";
+        public const string SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE = "SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE";
+
         // Animation info
         private static ArrayProperty<StructProperty> WeaponAnimationsArrayProp;
         private static IMEPackage WeaponAnimsPackage;
@@ -584,8 +588,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 if (gun.Value == 0) return false; // Null entry in weapons list
 
                 // Set to class that will be randomized
-                var classRef = EntryImporter.EnsureClassIsInFile(export.FileRef, "SFXLoadoutDataMER", new RelinkerOptionsPackage(), target.TargetPath);
-                export.Class = classRef;
+                SharedLoadout.ConfigureLoadoutForRandomization(target, export);
 
                 //var pName = Path.GetFileName(export.FileRef.FilePath);
                 //var isPersistentPackage = PackageTools.IsPersistentPackage(pName);

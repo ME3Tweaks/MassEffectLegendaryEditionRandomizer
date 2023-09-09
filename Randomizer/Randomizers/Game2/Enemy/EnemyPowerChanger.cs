@@ -23,6 +23,11 @@ namespace Randomizer.Randomizers.Game2.Enemy
 {
     public class EnemyPowerChanger
     {
+        public const string SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER = "SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER";
+        public const string SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM = "SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM";
+        public const string SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE = "SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE";
+
+        // ME2R - we have to put this into class changer code for LE2R
         private static string[] PowersToNotSwap = new[]
         {
             // Collector powers, used by it's AI
@@ -139,7 +144,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
             return null;
         }
 
-        public static bool Init2(GameTarget target, RandomizationOption option)
+        public static bool InitLE2R(GameTarget target, RandomizationOption option)
         {
             MERFileSystem.InstallAlways("EnemyPowerRandomizer");
             MERFileSystem.SavePackage(SFXGame.CreateAndSetupMERLoadoutClass(target));
@@ -163,7 +168,14 @@ namespace Randomizer.Randomizers.Game2.Enemy
             }
 
             CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer");
-            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount"); // Todo: Set to suboption
+            if (option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM))
+            {
+                CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount");
+            }
+            if (option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER))
+            {
+                CoalescedHandler.EnableFeatureFlag("bForceEnemyPowerRandomizer");
+            }
             return true;
         }
 
@@ -450,7 +462,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
 #endif
 
             // Set to class that will be randomized
-            SharedLoadout.ConfigureLoadoutForRandomization(export);
+            SharedLoadout.ConfigureLoadoutForRandomization(target, export);
             return true;
 
             // old ME2R compile time randomizer
@@ -669,7 +681,18 @@ namespace Randomizer.Randomizers.Game2.Enemy
             {
                 export.WriteProperty(new BoolProperty(true, "bPreventPowerRandomization"));
                 export.WriteProperty(new BoolProperty(true, "bPreventWeaponRandomization"));
-                export.WriteProperty(new BoolProperty(true, "bIgnoreOverride")); // We do not allow MER override flags to work for these
+                export.WriteProperty(new BoolProperty(true, "bIgnorePowerOverride")); // We do not allow MER override flags to work for these
+                export.WriteProperty(new BoolProperty(true, "bIgnoreWeaponOverride")); // We do not allow MER override flags to work for these
+                return;
+            }
+
+            if (objName.Contains("Kaidan", StringComparison.InvariantCultureIgnoreCase)
+                || objName.Contains("Ashley", StringComparison.InvariantCultureIgnoreCase))
+            {
+                export.WriteProperty(new BoolProperty(true, "bPreventPowerRandomization"));
+                export.WriteProperty(new BoolProperty(true, "bPreventWeaponRandomization"));
+                // You can override these but must opt in to do so
+                return;
             }
         }
     }
