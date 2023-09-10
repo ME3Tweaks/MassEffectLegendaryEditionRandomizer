@@ -119,6 +119,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\playerweaponifps.txt" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_AwardTreasure.Activated.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GetPhysicsLevel.uc" />

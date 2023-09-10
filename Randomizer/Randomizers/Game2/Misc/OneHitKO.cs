@@ -7,6 +7,8 @@ using Randomizer.Randomizers.Game2.Levels;
 
 namespace Randomizer.Randomizers.Game2.Misc
 {
+    // This feature will not be present in LE2R
+#if FALSE
     class OneHitKO
     {
         class OHKOAsset : IlliumHub.AssetSource
@@ -230,4 +232,5 @@ namespace Randomizer.Randomizers.Game2.Misc
             }
         }
     }
+#endif
 }
