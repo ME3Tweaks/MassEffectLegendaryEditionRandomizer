@@ -1584,6 +1584,12 @@ namespace Randomizer.Randomizers.Game2.Levels
             }
 
             var trigger = package.FindExport(hookupIFP);
+            if (trigger == null)
+            {
+                MERLog.Error($"Cannot find random spawn trigger IFP: {hookupIFP} in {package.FilePath}");
+                Debugger.Break();
+                return;
+            }
             var outputName = SeqTools.GetOutlinkNames(trigger)[hookupOutputIdx];
             var sequence = SeqTools.GetParentSequence(trigger);
 
