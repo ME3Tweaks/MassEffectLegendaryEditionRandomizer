@@ -3,8 +3,10 @@ using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
+using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.ExportTypes
 {
@@ -15,6 +17,13 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             MERControl.InstallBioPawnMERControl(target);
             MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
             MERControl.InstallBioMorphFaceRandomizerClasses(target);
+
+            // Patch in the stubs (I miss you Stubby Mo)
+            var sfxgame = SFXGame.GetSFXGame(target);
+            ScriptTools.AddToClassInPackage(target, sfxgame, "SKM_RandomizeMorphHead", "MERControl");
+            ScriptTools.AddToClassInPackage(target, sfxgame, "BioPawn_RandomizeMorphHead", "MERControl");
+            MERFileSystem.SavePackage(sfxgame);
+
             MERControl.SetVariable("fBioMorphFaceRandomization", option.SliderValue, CoalesceParseAction.Add);
             return true;
         }
@@ -51,9 +60,9 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             return true;
         }
 
-        private static bool CanRandomizeNonHench(ExportEntry export) => !export.IsDefaultObject 
-                                                                && export.ClassName == @"BioMorphFace" 
-                                                                && !export.ObjectName.Name.Contains("hench_leadingman") 
+        private static bool CanRandomizeNonHench(ExportEntry export) => !export.IsDefaultObject
+                                                                && export.ClassName == @"BioMorphFace"
+                                                                && !export.ObjectName.Name.Contains("hench_leadingman")
                                                                 && !export.ObjectName.Name.Contains("hench_wilson");
         public static bool RandomizeExportNonHench(GameTarget target, ExportEntry export, RandomizationOption option)
         {

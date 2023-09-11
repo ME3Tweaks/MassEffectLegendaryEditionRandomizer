@@ -33,7 +33,7 @@ var config array<MorphRandomizationAlgorithm> VORMorphAlgorithms;
 var config array<MorphRandomizationAlgorithm> SharedMorphAlgorithms;
 
 // Functions
-private static final function bool GetRandomAlgorithm(Class<CustomMorphTargetSet> targetSet, out MorphRandomizationAlgorithm algorithm)
+private static final function bool GetRandomAlgorithm(float randomizationLimit, Class<CustomMorphTargetSet> targetSet, out MorphRandomizationAlgorithm algorithm)
 {
     local MorphRandomizationAlgorithm generatedAlgo;
     local int I;
@@ -44,8 +44,8 @@ private static final function bool GetRandomAlgorithm(Class<CustomMorphTargetSet
     for (I = 0; I < targetSet.default.BaseMorphTargets.Length; I++)
     {
         generatedAlgo.Randomizations[I].Feature = string(targetSet.default.BaseMorphTargets[I].TargetName);
-        generatedAlgo.Randomizations[I].Min = -Class'MERControlEngine'.default.fBioMorphFaceRandomization;
-        generatedAlgo.Randomizations[I].Max = Class'MERControlEngine'.default.fBioMorphFaceRandomization;
+        generatedAlgo.Randomizations[I].Min = -randomizationLimit;
+        generatedAlgo.Randomizations[I].Max = randomizationLimit;
         generatedAlgo.Randomizations[I].MergeMode = Rand(5) == 0 ? EBMFFeatureMergeMode.Multiplicative : EBMFFeatureMergeMode.Exact;
         if (FALSE)
         {
@@ -93,7 +93,7 @@ private static final function bool GetRandomAlgorithm(Class<CustomMorphTargetSet
     }
     return FALSE;
 }
-public static function RandomizeBioMorphFace(BioMorphFace BMF)
+public static function RandomizeBioMorphFace(BioMorphFace BMF, float randomizationLimit)
 {
     local int I;
     local int J;
@@ -109,7 +109,7 @@ public static function RandomizeBioMorphFace(BioMorphFace BMF)
         LogInternal("COULD NOT FIND MORPH TARGET SET FOR: " $ BMF.m_oBaseHead, );
         return;
     }
-    hasAlgorithm = GetRandomAlgorithm(MorphTargetSet, algorithm);
+    hasAlgorithm = GetRandomAlgorithm(randomizationLimit, MorphTargetSet, algorithm);
     if (!hasAlgorithm)
     {
         LogInternal("Could not find algorithm for " $ MorphTargetSet, );
@@ -169,7 +169,7 @@ private static final function MorphFeature RandomizeMorphTarget(MorphFeature MT,
     }
     return MT;
 }
-private static final function Class<CustomMorphTargetSet> GetMorphTargetSet(BioMorphFace BMF)
+public static final function Class<CustomMorphTargetSet> GetMorphTargetSet(BioMorphFace BMF)
 {
     local Name BaseName;
     

@@ -120,6 +120,8 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_AwardTreasure.Activated.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_ShowCharacterCreation.Activated.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GetPhysicsLevel.uc" />
@@ -132,6 +134,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\PlayerOnPowersLoaded.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXGame.ModifyDamage.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXPawn_Reaper.TakeDamage.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSaveGame.LoadMorphHead.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSkeletalMeshActorMAT.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXWeapon.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SKM_RandomizeMorphHead.uc" />

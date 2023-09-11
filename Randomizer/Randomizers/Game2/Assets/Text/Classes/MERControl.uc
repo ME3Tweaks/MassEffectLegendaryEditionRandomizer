@@ -484,7 +484,10 @@ public static function InitBioPawn(BioPawn BP)
     BioPawn_RandomizeSpeed(BP);
     BioPawn_RandomizeLookAt(BP);
     BioPawn_RandomizeEyes(BP);
-    BioPawn_RandomizeMorphHead(BP);
+    if (SFXPawn_Player(BP) == None){
+        // These only run on non-player pawns
+       BioPawn_RandomizeMorphHead(BP); // Controlled elsewhere
+    }
 }
 public static function SFXSkeletalMeshActorMAT_RandomizeEyes(SFXSkeletalMeshActorMAT BP)
 {

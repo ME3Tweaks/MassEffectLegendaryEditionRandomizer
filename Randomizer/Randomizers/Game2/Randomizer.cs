@@ -540,36 +540,23 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption()
                     {
-                        HumanName = "Iconic FemShep face",
-                        Description="Changes the default FemShep face",
+                        HumanName = "Iconic faces",
+                        Description="Changes the 'iconic' player faces - Note, this only properly works if you pick 'Custom' character with the default appearance. This modification will not carry into LE3.",
+                        PerformSpecificRandomizationDelegate = CharacterCreator.InstallIconicRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        Ticks = "0.1,0.2,0.3,0.4,0.5,0.6,0.7",
+                        Ticks = "0.5,1.0,1.5,2.0,3.0,4.0",
                         HasSliderOption = true,
                         IsRecommended = true,
-                        SliderTooltip = "Higher settings yield more extreme facial changes. Default value is 0.3.",
-                        SliderToTextConverter = rSetting => $"Randomization amount: {rSetting}",
-                        SliderValue = .3, // This must come after the converter
-                        PerformSpecificRandomizationDelegate = CharacterCreator.RandomizeIconicFemShep
-                    },
-                    new RandomizationOption()
-                    {
-                        HumanName = "Iconic MaleShep face",
-                        Description="Changes the bones in default MaleShep face. Due to it being modeled, the changes only occur when the face moves",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        Ticks = "0.25,0.5,1.0,1.25,1.5,2.0",
-                        HasSliderOption = true,
-                        IsRecommended = true,
-                        SliderTooltip = "Higher settings yields further bone position shifting, which can sometimes be undesirable. Default value is 1.0.",
-                        SliderToTextConverter = rSetting => $"Randomization amount: {rSetting}",
-                        SliderValue = 1.0, // This must come after the converter
-                        PerformSpecificRandomizationDelegate = CharacterCreator.RandomizeIconicMaleShep,
+                        SliderTooltip = "Higher settings yield more ridiculous faces for characters. Default value is 1.5, which provides moderate facial randomization.",
+                        SliderToTextConverter = rSetting => $"Randomization window: -{rSetting} to {rSetting}",
+                        SliderValue = 1.5, // This must come after the converter
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
                             {
-                                SubOptionKey = CharacterCreator.SUBOPTIONKEY_MALESHEP_COLORS,
-                                HumanName = "Include colors",
-                                Description = "Also changes colors like skintone, eyes, scars",
+                                SubOptionKey = CharacterCreator.SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE,
+                                HumanName = "Keep face persistent",
+                                Description = "Selecting this option will make your face from the character creator persist through saves. You MUST keep your randomization installed for this to work.",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true
                             }

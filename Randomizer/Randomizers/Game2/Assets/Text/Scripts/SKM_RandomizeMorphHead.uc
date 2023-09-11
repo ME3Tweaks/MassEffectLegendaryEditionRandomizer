@@ -21,6 +21,6 @@
     LogInternal("SFXSKM Morph head: " $ BMF, );
     if (BMF != None && Class'MERControlEngine'.static.IsObjectModified(BMF) == FALSE)
     {
-        Class'MERBioMorphUtility'.static.RandomizeBioMorphFace(BMF);
+        Class'MERBioMorphUtility'.static.RandomizeBioMorphFace(BMF, Class'MERControlEngine'.default.fBioMorphFaceRandomization);
     }
 }

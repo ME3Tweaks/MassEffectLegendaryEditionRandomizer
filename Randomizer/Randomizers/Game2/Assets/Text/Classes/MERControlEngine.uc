@@ -20,8 +20,13 @@ var config bool bEnemyPowerRandomizer_Force;
 var config bool bEnemyPowerRandomizer_EnforceMinPowerCount;
 var config bool bEnemyPowerRandomizer_OneTime;
 
+var config bool bIconicRandomizer;
+var config bool bIconicRandomizer_Persistent;
+
 var config array<string> MEREyeIFPs;
+
 var config float fBioMorphFaceRandomization;
+var config float fIconicFaceRandomization;
 
 // Functions
 public static function float RandFloat(float minf, float maxf)
@@ -59,6 +64,28 @@ public static function bool IsStringCapitalized(string Str)
 {
     return "a" > Str;
 }
+
+public static function Actor FindActorByTag(Name m_sObjectTagToFind, optional bool m_bSearchUniqueTag = FALSE)
+{
+    local Actor ChkPawn;
+    
+    foreach Class'WorldInfo'.static.GetWorldInfo().AllActors(Class'Actor', ChkPawn, )
+    {
+        if (m_bSearchUniqueTag)
+        {
+            if (ChkPawn.UniqueTag == m_sObjectTagToFind)
+            {
+                return ChkPawn;
+            }
+        }
+        else if (ChkPawn.Tag == m_sObjectTagToFind)
+        {
+            return ChkPawn;
+        }
+    }
+    return None;
+}
+
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.
 defaultproperties

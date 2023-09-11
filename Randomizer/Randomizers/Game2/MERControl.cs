@@ -61,10 +61,6 @@ namespace Randomizer.Randomizers.Game2
                 // Install the utility class
                 ScriptTools.InstallClassToPackage(target, sfxgame, "MERBioMorphUtility");
 
-                // Patch in the stubs
-                ScriptTools.AddToClassInPackage(target, sfxgame, "SKM_RandomizeMorphHead", "MERControl");
-                ScriptTools.AddToClassInPackage(target, sfxgame, "BioPawn_RandomizeMorphHead", "MERControl");
-
                 MERFileSystem.SavePackage(sfxgame);
                 InstalledBioMorphFaceClass = true;
                 MERCaches.ReInit(target);

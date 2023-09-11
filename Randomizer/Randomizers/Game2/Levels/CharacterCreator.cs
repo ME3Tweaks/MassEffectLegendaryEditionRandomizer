@@ -25,7 +25,29 @@ namespace Randomizer.Randomizers.Game2.Levels
         private static RandomizationOption SuperRandomOption = new RandomizationOption() { SliderValue = 10 };
         public const string SUBOPTIONKEY_MALESHEP_COLORS = "SUBOPTION_MALESHEP_COLORS";
         public const string SUBOPTIONKEY_CHARCREATOR_NO_COLORS = "SUBOPTION_CHARCREATOR_COLORS";
+        public const string SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE = "SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE";
 
+        public static bool InstallIconicRandomizer(GameTarget target, RandomizationOption option)
+        {
+            MERControl.InstallBioMorphFaceRandomizerClasses(target);
+            var sfxgame = SFXGame.GetSFXGame(target);
+            ScriptTools.InstallScriptToExport(sfxgame.FindExport("SFXSaveGame.LoadMorphHead"), "SFXSaveGame.LoadMorphHead.uc");
+            ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
+            MERFileSystem.SavePackage(sfxgame);
+
+            // Patch BioP_Char to randomize face on load
+            var biop_char = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioP_Char.pcc"));
+            ScriptTools.InstallScriptToExport(biop_char.FindExport("SFXGameContent.BioSeqAct_ShowCharacterCreation.Activated"), "BioSeqAct_ShowCharacterCreation.Activated.uc");
+            MERFileSystem.SavePackage(biop_char);
+
+            // Set runtime feature flags
+            CoalescedHandler.EnableFeatureFlag("bIconicRandomizer");
+            CoalescedHandler.EnableFeatureFlag("bIconicRandomizer_Persistent", option.HasSubOptionSelected(SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE));
+            MERControl.SetVariable("fIconicFaceRandomization", option.SliderValue);
+           return true;
+        }
+
+#if ME2R
         public static bool RandomizeIconicFemShep(GameTarget target, RandomizationOption option)
         {
             // LE version
@@ -57,6 +79,33 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             return true;
         }
+
+
+
+
+
+        public static bool RandomizeIconicMaleShep(GameTarget target, RandomizationOption option)
+        {
+            var sfxgameP = SFXGame.GetSFXGame(target);
+            var shepMDL = sfxgameP.FindExport("BIOG_HMM_HED_PROMorph.Sheppard.HMM_HED_PROSheppard_MDL");
+            var objBin = RSharedSkeletalMesh.FuzzSkeleton(shepMDL, option);
+
+            if (option.HasSubOptionSelected(CharacterCreator.SUBOPTIONKEY_MALESHEP_COLORS))
+            {
+                Dictionary<string, CFVector4> vectors = new();
+                Dictionary<string, float> scalars = new();
+                var materials = objBin.Materials;
+                foreach (var mat in materials.Select(x => sfxgameP.GetUExport(x)))
+                {
+                    RMaterialInstance.RandomizeSubMatInst(mat, vectors, scalars);
+                }
+            }
+
+            MERFileSystem.SavePackage(sfxgameP);
+            return true;
+        }
+
+#endif
 
         public static bool RandomizePsychProfiles(GameTarget target, RandomizationOption option)
         {
@@ -94,33 +143,12 @@ namespace Randomizer.Randomizers.Game2.Levels
             return true;
         }
 
-        public static bool RandomizeIconicMaleShep(GameTarget target, RandomizationOption option)
-        {
-            var sfxgameP = SFXGame.GetSFXGame(target);
-            var shepMDL = sfxgameP.FindExport("BIOG_HMM_HED_PROMorph.Sheppard.HMM_HED_PROSheppard_MDL");
-            var objBin = RSharedSkeletalMesh.FuzzSkeleton(shepMDL, option);
-
-            if (option.HasSubOptionSelected(CharacterCreator.SUBOPTIONKEY_MALESHEP_COLORS))
-            {
-                Dictionary<string, CFVector4> vectors = new();
-                Dictionary<string, float> scalars = new();
-                var materials = objBin.Materials;
-                foreach (var mat in materials.Select(x => sfxgameP.GetUExport(x)))
-                {
-                    RMaterialInstance.RandomizeSubMatInst(mat, vectors, scalars);
-                }
-            }
-
-            MERFileSystem.SavePackage(sfxgameP);
-            return true;
-        }
-
         public static bool RandomizeCharacterCreator(GameTarget target, RandomizationOption option)
         {
             var biop_charF = MERFileSystem.GetPackageFile(target, @"BioP_Char.pcc");
             var biop_char = MEPackageHandler.OpenMEPackage(biop_charF);
-            
-            
+
+
             ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
             ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead"), "BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead.uc");
 
