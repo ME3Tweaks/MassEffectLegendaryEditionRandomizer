@@ -678,15 +678,6 @@ namespace Randomizer.Randomizers.Game2
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true
                             },
-                            new RandomizationOption()
-                            {
-                                SubOptionKey = EnemyWeaponChanger.SUBOPTIONKEY_ENEMYWEAPONS_ALLOWINVISIBLE,
-                                HumanName = "Allow invisible weapons",
-                                Description =
-                                    "Some enemies have invisible weapons (e.g. the scion). Select this option to allow enemies that have visible weapons to use invisible weapons",
-                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                IsOptionOnly = true
-                            }
                         }
                     }
 

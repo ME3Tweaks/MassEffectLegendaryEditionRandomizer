@@ -100,22 +100,14 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
             // Extract all weapon randomizer packages
             MEREmbedded.ExtractEmbeddedBinaryFolder(@"Packages.LE2.Weapons");
-            MEREmbedded.ExtractEmbeddedBinaryFolder(@"Packages.LE2.InvisibleWeapons");
 
-            // Add corrected weapons here
+            // Add corrected weapons here for dynamic load
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContentMER.SFXHeavyWeapon_Blackstorm_MER", SeekFreePackage = @"SFXHeavyWeapon_Blackstorm_MER" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXWeapon_GethMiniGun", SeekFreePackage = @"SFXWeapon_GethMiniGun" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_FlameThrower", SeekFreePackage = @"SFXHeavyWeapon_FlameThrower" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_ScionGun", SeekFreePackage = @"SFXHeavyWeapon_ScionGun" });
-
-            // Invisible weapons
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_ReaperMIRV", SeekFreePackage = @"SFXHeavyWeapon_ReaperMIRV" });
             CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo() { EntryPath = @"SFXGameContent_Inventory.SFXHeavyWeapon_OculusParticleBeam", SeekFreePackage = @"SFXHeavyWeapon_OculusParticleBeam" });
-
-            sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"InvisibleRandomWeaponOptions", new CoalesceValue(@"SFXGameContent_Inventory.SFXHeavyWeapon_ReaperMIRV", CoalesceParseAction.AddUnique)));
-            sfxLoadoutDataMER.AddEntryIfUnique(new CoalesceProperty(@"InvisibleRandomWeaponOptions", new CoalesceValue(@"SFXGameContent_Inventory.SFXHeavyWeapon_OculusParticleBeam", CoalesceParseAction.AddUnique)));
-
-
 
             // Add animations
             MERLog.Information(@"Installing weapon animations startup package");
@@ -127,7 +119,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
             // Set runtime feature flags
             CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer");
             CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_Force", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_FORCERANDOMIZER));
-            CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_AllowInvisible", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_ALLOWINVISIBLE));
             CoalescedHandler.EnableFeatureFlag("bEnemyWeaponRandomizer_OneTime", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE));
 
             WeaponAnimationsArrayProp = WeaponAnimsPackage.FindExport("WeaponAnimData").GetProperty<ArrayProperty<StructProperty>>("WeaponAnimSpecs");

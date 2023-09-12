@@ -43,7 +43,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Set runtime feature flags
             CoalescedHandler.EnableFeatureFlag("bIconicRandomizer");
             CoalescedHandler.EnableFeatureFlag("bIconicRandomizer_Persistent", option.HasSubOptionSelected(SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE));
-            MERControl.SetVariable("fIconicFaceRandomization", option.SliderValue);
+            MERControl.SetVariable("fIconicFaceRandomization", option.SliderValue, CoalesceParseAction.Add);
            return true;
         }
 

@@ -12,7 +12,6 @@ var config bool bEyeRandomizer;
 
 var config bool bEnemyWeaponRandomizer;
 var config bool bEnemyWeaponRandomizer_Force;
-var config bool bEnemyWeaponRandomizer_AllowInvisible;
 var config bool bEnemyWeaponRandomizer_OneTime;
 
 var config bool bEnemyPowerRandomizer;

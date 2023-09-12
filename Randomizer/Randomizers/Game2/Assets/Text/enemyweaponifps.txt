@@ -2,6 +2,7 @@ SFXGameContent_Inventory.SFXHeavyWeapon_RocketLauncher
 SFXGameContent_Inventory.SFXHeavyWeapon_GrenadeLauncher
 SFXGameContent_Inventory.SFXHeavyWeapon_NukeLauncher
 SFXGameContent_Inventory.SFXHeavyWeapon_ParticleBeam
+// Seems to only work for player due to targeting
 //SFXGameContent_Inventory.SFXHeavyWeapon_FreezeGun
 SFXGameContent_Inventory.SFXHeavyWeapon_MissileLauncher
 SFXGameContent_Inventory.SFXWeapon_AssaultRifle
@@ -21,6 +22,7 @@ SFXGameContent_Inventory.SFXWeapon_SniperRifle
 SFXGameContent_Inventory.SFXWeapon_AntiMatRifle
 SFXGameContent_Inventory.SFXWeapon_MassCannon
 SFXGameContentDLC_PRE_Incisor.SFXWeapon_IncisorSniperRifle
+// Seems to only work for player due to targeting
 //SFXGameContentDLC_CER_Arc.SFXHeavyWeapon_ArcProjector
 SFXGameContentDLC_PRE_Cerberus.SFXWeapon_CerberusShotgun
 SFXGameContentDLC_PRE_Collectors.SFXWeapon_CollectorAssaultRifle_Player
@@ -31,3 +33,6 @@ SFXGameContentMER.SFXHeavyWeapon_Blackstorm_MER
 SFXGameContent_Inventory.SFXHeavyWeapon_ScionGun
 SFXGameContent_Inventory.SFXWeapon_GethMiniGun
 SFXGameContent_Inventory.SFXHeavyWeapon_FlameThrower
+// These are corrected 
+SFXGameContent_Inventory.SFXHeavyWeapon_ReaperMIRV
+SFXGameContent_Inventory.SFXHeavyWeapon_OculusParticleBeam

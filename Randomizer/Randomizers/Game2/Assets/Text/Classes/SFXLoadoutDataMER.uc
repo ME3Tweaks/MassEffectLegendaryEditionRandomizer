@@ -11,7 +11,6 @@ struct PowerOption
 
 // Variables
 var config array<string> RandomWeaponOptions;
-var config array<string> InvisibleRandomWeaponOptions;
 var config array<PowerOption> RandomPowerOptions;
 var array<Object> OldReferences;
 var bool bPreventPowerRandomization;
@@ -61,21 +60,9 @@ private final function RandomizeWeapons(BioPawn BP)
         return;
     }
     ChoiceCount = RandomWeaponOptions.Length;
-    if (SFXPawn(BP) != None && !SFXPawn(BP).bSupportsVisibleWeapons || Class'MERControlEngine'.default.bEnemyWeaponRandomizer_AllowInvisible)
-    {
-        ChoiceCount += InvisibleRandomWeaponOptions.Length;
-    }
     while (I < Weapons.Length)
     {
-        WeaponIDX = Rand(ChoiceCount);
-        if (WeaponIDX < RandomWeaponOptions.Length)
-        {
-            weaponIFP = RandomWeaponOptions[WeaponIDX];
-        }
-        else
-        {
-            weaponIFP = InvisibleRandomWeaponOptions[WeaponIDX - RandomWeaponOptions.Length];
-        }
+        weaponIFP = RandomWeaponOptions[Rand(ChoiceCount)];
         if (newWeapons.Find(weaponIFP) < 0)
         {
             NewWeapon = Class<SFXWeapon>(Class'SFXEngine'.static.LoadSeekFreeObject(weaponIFP, Class'Class'));
