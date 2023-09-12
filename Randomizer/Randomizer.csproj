@@ -132,6 +132,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\IsFriendlyBlockingFireLine.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\Light.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\PlayerOnPowersLoaded.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXAI_Reaper.SelectTarget.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXGame.ModifyDamage.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXPawn_Reaper.TakeDamage.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSaveGame.LoadMorphHead.uc" />

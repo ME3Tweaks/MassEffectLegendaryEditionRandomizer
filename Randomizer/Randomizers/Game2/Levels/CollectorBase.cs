@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
+using System.Threading.Tasks;
 using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
@@ -20,25 +21,44 @@ namespace Randomizer.Randomizers.Game2.Levels
 {
     class CollectorBase
     {
+
         public static bool PerformRandomization(GameTarget target, RandomizationOption option)
         {
             using var sequenceSupportPackage = MEPackageHandler.OpenMEPackageFromStream(
                 MEREmbedded.GetEmbeddedPackage(target.Game, "SeqPrefabs.SuicideMission.pcc"), "SuicideMission.pcc");
 
             // Hives are the segment before The Long Walk (pipes)
-            UpdateHives1(target, sequenceSupportPackage); // First combat
-            UpdateHives2(target, sequenceSupportPackage); // First possessed enemy, long open area
-            UpdateHives3(target, sequenceSupportPackage); // Olympic high jump sprint
-            UpdateHives4(target, sequenceSupportPackage); // Run to the final button
+
+            Action<GameTarget, IMEPackage>[] parallelizableEdits =
+            {
+                UpdateHives1, // First combat
+                UpdateHives2, // First possessed enemy
+                UpdateHives3, // Olympic High Jump Sprint
+                UpdateHives4, // Run to the final button
+
+                UpdateLongWalk2, // After first checkpoint
+                UpdateLongWalk3, // After ditch checkpoint
+                UpdateLongWalk5, // Final run for it 
+
+                UpdatePreFinalBattle,
+                UpdateFinalBattle
+            };
+
+            Parallel.ForEach(parallelizableEdits, action => action(target, sequenceSupportPackage));
+
+            //UpdateHives1(target, sequenceSupportPackage); // First combat
+            //UpdateHives2(target, sequenceSupportPackage); // First possessed enemy, long open area
+            //UpdateHives3(target, sequenceSupportPackage); // Olympic high jump sprint
+            //UpdateHives4(target, sequenceSupportPackage); // Run to the final button
 
             // The Long Walk
             RandomlyChooseTeams(target, option);
             AutomateTheLongWalk(target, option);
-            UpdateSpawnsLongWalk(target, sequenceSupportPackage);
+            // UpdateSpawnsLongWalk(target, sequenceSupportPackage);
 
             // Platforming and Final Battles
-            UpdatePreFinalBattle(target, sequenceSupportPackage);
-            UpdateFinalBattle(target, sequenceSupportPackage);
+            //UpdatePreFinalBattle(target, sequenceSupportPackage);
+            //UpdateFinalBattle(target, sequenceSupportPackage);
 
             // Post-CollectorBase
             UpdatePostCollectorBase(target);
@@ -1237,7 +1257,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             // Logic here
             MichaelBayifyFinalFight(target, package, sequenceSupportPackage);
-            FixReaperHurtingHimself(target, package, sequenceSupportPackage);
+            PatchReaper(target, package, sequenceSupportPackage);
             InstallAtmosphereHandler(package, sequenceSupportPackage); // <--- This must come before ChangeLowHealthEnemies!
             ChangeLowHealthEnemies(target, package, sequenceSupportPackage);
             RandomizePickups(target, package, sequenceSupportPackage);
@@ -1312,14 +1332,17 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Add post events
         }
 
-        private static void FixReaperHurtingHimself(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
+        private static void PatchReaper(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
         {
             ScriptTools.AddToClassInPackage(target, package, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
+            ScriptTools.AddToClassInPackage(target, package, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
 
             // BioWer Pls
             // Why is the reaper in here
             var stasisNew = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "SFXPower_StasisNew.pcc"));
             ScriptTools.AddToClassInPackage(target, stasisNew, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
+            ScriptTools.AddToClassInPackage(target, stasisNew, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
+
             MERFileSystem.SavePackage(stasisNew);
         }
 
