@@ -21,6 +21,7 @@ var bool bPreventWeaponRandomization;
 var bool bForcePreventWeaponRandomization;
 var bool bWeaponRandomizerHasRunAtLeastOnce;
 var config int NumPowerRetriesAllowed;
+
 // Functions
 public function Randomize(BioPawn BP, bool willSpawnWeapons)
 {
@@ -108,11 +109,7 @@ private final function bool CanRandomizePowers(BioPawn BP)
     Controller = BioAiController(BP.Controller);
     if (Controller != None)
     {
-        if (InStr(string(Controller.Class.Name), "husk", TRUE, , ) >= 0)
-        {
-            return FALSE;
-        }
-        if (InStr(string(Controller.Class.Name), "Husk", TRUE, , ) >= 0 || InStr(string(Controller.Class.Name), "ination", TRUE, , ) >= 0)
+        if (InStr(string(Controller.Class.Name), "RedHusk", TRUE, , ) >= 0 || InStr(string(Controller.Class.Name), "ination", TRUE, , ) >= 0)
         {
             return FALSE;
         }
@@ -127,7 +124,9 @@ private final function RandomizePowers(BioPawn BP)
     local Class<SFXPower> NewPower;
     local array<string> AddedBasePowers;
     local array<Name> ValidatedBasePowers;
-    local bool hasDeathPower;
+    local bool bHasDeathPower;
+    local bool bHasMeleePower;
+    local bool isLoadingMeleePower;
 
     if (!CanRandomizePowers(BP))
     {
@@ -141,9 +140,20 @@ private final function RandomizePowers(BioPawn BP)
             continue;
         }
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
-        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && hasDeathPower){
+        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && bHasDeathPower)
+        {
             continue;
-            }
+        }
+        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && BP.IsA('SFXPawn_Collector'))
+        {
+            // This messes up their death thing when possessed
+            continue;
+        }
+        isLoadingMeleePower = InStr(PowerInfo.BasePowerName, "Melee", TRUE) >= 0;
+        if (!bHasMeleePower && !isLoadingMeleePower && BP.IsA('SFXPawn_HuskLite'))
+        {
+            continue;
+        }
         if (AddedBasePowers.Find(PowerInfo.BasePowerName) < 0)
         {
             NewPower = Class<SFXPower>(Class'SFXEngine'.static.LoadSeekFreeObject(PowerInfo.PowerIFP, Class'Class'));
@@ -159,9 +169,13 @@ private final function RandomizePowers(BioPawn BP)
                 }
                 Powers[I] = NewPower;
                 Class'SFXEngine'.static.ReleaseSeekFreeObject(PowerInfo.PowerIFP);
-                if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death){
-                    hasDeathPower = true;
-                    }
+                if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death)
+                {
+                    bHasDeathPower = TRUE;
+                }
+                if (isLoadingMeleePower){
+                    bHasMeleePower = true;
+                }
                 LogInternal("Set Power to " $ NewPower, );
             }
         }

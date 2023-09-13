@@ -116,20 +116,15 @@ namespace Randomizer.Randomizers.Game2.Enemy
             }
         }
 
-        private static string GetBaseName(ExportEntry exp)
+        private static string GetBaseName(ExportEntry exp, MERPackageCache cache)
         {
-            var baseName = exp.GetProperty<NameProperty>("BaseName");
-            if (baseName == null && exp.SuperClass != null && exp.SuperClass.IsA("SFXPower") && exp.SuperClass is ExportEntry sExp)
-            {
-                return GetBaseName(sExp);
-            }
-
+            var baseName = exp.GetInstanceProperty<NameProperty>("BaseName");
             if (baseName != null)
             {
-                return baseName.Value;
+                return baseName.Value.ToString();
             }
 
-            return null;
+            return exp.GetInstanceProperty<NameProperty>("PowerName")?.Value.ToString() ?? null;
         }
 
         public static bool InitLE2R(GameTarget target, RandomizationOption option)
@@ -148,7 +143,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 var powInfo = new PowerInfo2()
                 {
                     PowerIFP = powExp.InstancedFullPath,
-                    BasePowerName = GetBaseName(powExp),
+                    BasePowerName = GetBaseName(powExp.GetDefaults(), MERCaches.GlobalCommonLookupCache),
                     CapabilityType = powExp.GetDefaults().GetInstanceProperty<EnumProperty>("CapabilityType")?.Value ?? "BioCaps_AllTypes"
                 };
 
@@ -742,7 +737,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
             // Some pawns should not be randomized
             var objName = export.ObjectName.Name;
-            if (objName.Contains("Husk", StringComparison.InvariantCultureIgnoreCase) // Husks don't have AI to use powers
+            if (objName.Contains("RedHusk", StringComparison.InvariantCultureIgnoreCase) // Husks don't have AI to use powers
                 || objName.Contains("omination", StringComparison.InvariantCultureIgnoreCase)) // LE2R abominations (suicide + cover jumping) - YES ITS omination, not abomination, as other loadouts are named bomination
             {
                 export.WriteProperty(new BoolProperty(true, "bPreventPowerRandomization"));
