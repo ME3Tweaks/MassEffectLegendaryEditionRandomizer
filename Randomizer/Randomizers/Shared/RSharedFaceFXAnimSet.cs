@@ -12,7 +12,7 @@ namespace Randomizer.Randomizers.Shared
     public class RSharedFaceFXAnimSet
     {
 #if __GAME1__ || __GAME2__
-        private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == "FaceFXAnimSet";
+        private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName is "FaceFXAnimSet" or "FaceFXAsset";
 #elif __GAME3__
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName is "FaceFXAnimSet" or "FaceFXAsset";
 #endif
@@ -49,7 +49,7 @@ namespace Randomizer.Randomizers.Shared
                     {
                         //Randomize the names used for animation
                         faceFxline.AnimationNames.Shuffle();
-                        randomizedBoneList = true;
+                        randomizedBoneList = ThreadSafeRandom.Next(5) == 0; // Make it also randomize the values sometimes. This will be very rare
                     }
                     if (!randomizedBoneList || ThreadSafeRandom.Next(16 - (int)option.SliderValue) == 0) // if bonelist was shuffled, or if 1 in 16 chance while it was also shuffled.
                     {

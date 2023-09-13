@@ -236,9 +236,9 @@ namespace Randomizer.Randomizers.Game2
                         if (true
                         //&& false //uncomment to disable filtering
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("Pro", StringComparison.InvariantCultureIgnoreCase)
-                         && !file.Contains("JnkKga", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
+                        //&& !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -375,15 +375,15 @@ namespace Randomizer.Randomizers.Game2
 #endif
                     new RandomizationOption()
                     {
-                        Description="Changes facial animation. The best feature of MER",
-                        HumanName = "FaceFX animation", Ticks = "1,2,3,4,5", HasSliderOption = true, IsRecommended = true, SliderToTextConverter = rSetting =>
+                        Description="Changes facial animation. Higher values yield more extreme facial animation",
+                        HumanName = "FaceFX animation", Ticks = "1,2,3,4", HasSliderOption = true, IsRecommended = true, SliderToTextConverter = rSetting =>
                             rSetting switch
                             {
                                 1 => "Oblivion",
                                 2 => "Knights of the old Republic",
                                 3 => "Sonic Adventure",
                                 4 => "Source filmmaker",
-                                5 => "Total madness",
+                                // 5 => "Total madness",
                                 _ => "Error"
                             },
                         SliderTooltip = "Higher settings yield more extreme facial animation values. Default value is Sonic Adventure",
@@ -481,16 +481,20 @@ namespace Randomizer.Randomizers.Game2
                         Description = "Changes the order of animations mapped to bones. E.g. arm rotation will be swapped with eyes",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
                     },
-                    new RandomizationOption() {HumanName = "NPC colors", Description="Changes NPC colors such as skin tone, hair, etc",
-                        PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
                     new RandomizationOption() {
-                        HumanName = "NPC hair",
-                        Description="Randomizes the hair on NPCs that have a hair mesh",
-                        PerformRandomizationOnExportDelegate = NPCHair.RandomizeExport,
-                        PerformSpecificRandomizationDelegate = NPCHair.Init,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
+                        HumanName = "NPC colors", 
+                        Description="Changes NPC colors such as skin tone, hair, etc",
+                        //PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true
                     },
+                    // Too much work for LE2R
+                    //new RandomizationOption() {
+                    //    HumanName = "NPC hair",
+                    //    Description="Randomizes the hair on NPCs that have a hair mesh",
+                    //    PerformRandomizationOnExportDelegate = NPCHair.RandomizeExport,
+                    //    PerformSpecificRandomizationDelegate = NPCHair.Init,
+                    //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
+                    //},
                     new RandomizationOption() {
                         HumanName = "Romance",
                         Description="Randomizes which romance you will get",
@@ -580,7 +584,7 @@ namespace Randomizer.Randomizers.Game2
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
                     new RandomizationOption() {HumanName = "Hologram colors", Description="Changes colors of holograms",PerformRandomizationOnExportDelegate = RSharedHolograms.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Drone colors", Description="Changes colors of drones",PerformRandomizationOnExportDelegate = CombatDrone.RandomizeExport, IsRecommended = true},
+                    // new RandomizationOption() {HumanName = "Drone colors", Description="Changes colors of drones",PerformRandomizationOnExportDelegate = CombatDrone.RandomizeExport, IsRecommended = true},
                     //new RandomizationOption() {HumanName = "Omnitool", Description="Changes colors of omnitools",PerformRandomizationOnExportDelegate = ROmniTool.RandomizeExport},
                     new RandomizationOption() {HumanName = "Specific textures",Description="Changes specific textures to more fun ones", PerformRandomizationOnExportDelegate = TextureHandler.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
                     new RandomizationOption() {HumanName = "SizeSixteens mode",
@@ -633,7 +637,7 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = "Weapon stats",
                         IsRuntimeRandomizer = true,
                         Description = "Attempts to change gun stats in a way that makes game still playable",
-                        PerformSpecificRandomizationDelegate = Weapons.RandomizeWeapons, 
+                        PerformSpecificRandomizationDelegate = Weapons.RandomizeWeapons,
                         IsRecommended = true
                     },
                     new RandomizationOption()
