@@ -21,8 +21,46 @@ using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Enemy
 {
-    public class EnemyPowerChanger
+    public static class EnemyPowerChanger
     {
+        /// <summary>
+        /// Gets a property on an object, looking at archetype first, then up the class chain if its not defined locally.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="exp"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static T GetInstanceProperty<T>(this ExportEntry exp, string propertyName, PackageCache globalcache = null, PackageCache localcache = null) where T : Property
+        {
+            var prop = exp.GetProperty<T>(propertyName);
+            if (prop != null) return prop;
+
+            if (exp.Archetype is ExportEntry aExp)
+            {
+                prop = aExp.GetInstanceProperty<T>(propertyName, globalcache, localcache);
+                if (prop != null) return prop;
+            }
+            else if (exp.Archetype is ImportEntry aImp && EntryImporter.TryResolveImport(aImp, out var resAExp, localcache, globalcache))
+            {
+                prop = resAExp.GetInstanceProperty<T>(propertyName, globalcache, localcache);
+                if (prop != null) return prop;
+            }
+
+
+            if (exp.SuperClass is ExportEntry sExp)
+            {
+                prop = sExp.GetDefaults().GetInstanceProperty<T>(propertyName);
+                if (prop != null) return prop;
+            }
+            else if (exp.SuperClass is ImportEntry scImp && EntryImporter.TryResolveImport(scImp, out var resSCExp, localcache, globalcache))
+            {
+                prop = resSCExp.GetInstanceProperty<T>(propertyName, globalcache, localcache);
+                if (prop != null) return prop;
+            }
+
+            return null; // Could not find instanced property
+        }
+
         public const string SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER = "SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER";
         public const string SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM = "SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM";
         public const string SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE = "SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE";
@@ -31,9 +69,11 @@ namespace Randomizer.Randomizers.Game2.Enemy
         private static string[] PowersToNotSwap = new[]
         {
             // Collector powers, used by it's AI
-            "SFXPower_CollectorWarp", //Used by Combat_Collector_Possessed
-            "SFXPower_Singularity_NPC", // Used by Combat_Collector_Possessed
-            "SFXPower_Collector_Pulse", // Used by Combat_Collector_Possessed
+            // Patched via startup
+            //"SFXPower_CollectorWarp", //Used by Combat_Collector_Possessed
+            //"SFXPower_Singularity_NPC", // Used by Combat_Collector_Possessed
+            //"SFXPower_Collector_Pulse", // Used by Combat_Collector_Possessed
+
 
             "SFXPower_HuskMelee_Right", //Used by SwipeAttack() in SFXAI_Husk
             "SFXPower_HuskMelee_Left",
@@ -59,6 +99,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
         {
             public string PowerIFP;
             public string BasePowerName;
+            public string CapabilityType;
 
             public string ToConfigValue()
             {
@@ -68,6 +109,8 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 {
                     dict[@"BasePowerName"] = BasePowerName;
                 }
+                dict[@"CapabilityType"] = CapabilityType;
+
 
                 return StringStructParser.BuildCommaSeparatedSplitValueList(dict, @"PowerIFP", @"BasePowerName");
             }
@@ -105,7 +148,8 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 var powInfo = new PowerInfo2()
                 {
                     PowerIFP = powExp.InstancedFullPath,
-                    BasePowerName = GetBaseName(powExp)
+                    BasePowerName = GetBaseName(powExp),
+                    CapabilityType = powExp.GetDefaults().GetInstanceProperty<EnumProperty>("CapabilityType")?.Value ?? "BioCaps_AllTypes"
                 };
 
                 CoalescedHandler.AddDynamicLoadMappingEntry(new SeekFreeInfo(powExp));

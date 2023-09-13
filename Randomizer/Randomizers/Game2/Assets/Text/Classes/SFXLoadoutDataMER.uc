@@ -7,6 +7,7 @@ struct PowerOption
 {
     var string PowerIFP;
     var string BasePowerName;
+    var EBioCapabilityTypes CapabilityType;
 };
 
 // Variables
@@ -19,7 +20,7 @@ var bool bPowerRandomizerHasRunAtLeastOnce;
 var bool bPreventWeaponRandomization;
 var bool bForcePreventWeaponRandomization;
 var bool bWeaponRandomizerHasRunAtLeastOnce;
-
+var config int NumPowerRetriesAllowed;
 // Functions
 public function Randomize(BioPawn BP, bool willSpawnWeapons)
 {
@@ -126,7 +127,8 @@ private final function RandomizePowers(BioPawn BP)
     local Class<SFXPower> NewPower;
     local array<string> AddedBasePowers;
     local array<Name> ValidatedBasePowers;
-    
+    local bool hasDeathPower;
+
     if (!CanRandomizePowers(BP))
     {
         return;
@@ -139,6 +141,9 @@ private final function RandomizePowers(BioPawn BP)
             continue;
         }
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
+        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && hasDeathPower){
+            continue;
+            }
         if (AddedBasePowers.Find(PowerInfo.BasePowerName) < 0)
         {
             NewPower = Class<SFXPower>(Class'SFXEngine'.static.LoadSeekFreeObject(PowerInfo.PowerIFP, Class'Class'));
@@ -154,6 +159,9 @@ private final function RandomizePowers(BioPawn BP)
                 }
                 Powers[I] = NewPower;
                 Class'SFXEngine'.static.ReleaseSeekFreeObject(PowerInfo.PowerIFP);
+                if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death){
+                    hasDeathPower = true;
+                    }
                 LogInternal("Set Power to " $ NewPower, );
             }
         }
@@ -178,4 +186,5 @@ private final function RandomizePowers(BioPawn BP)
 //class default properties can be edited in the Properties tab for the class's Default__ object.
 defaultproperties
 {
+    NumPowerRetriesAllowed = 5
 }
