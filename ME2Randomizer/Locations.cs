@@ -16,9 +16,9 @@ namespace RandomizerUI
     public static class Locations
     {
 #if __GAME1__
-        public static readonly MEGame[] SupportedGames = new[] { MEGame.ME1, MEGame.LE1};
+        public static readonly MEGame[] SupportedGames = new[] { MEGame.LE1};
 #elif __GAME2__
-        public static readonly MEGame[] SupportedGames = new[] { MEGame.ME2, MEGame.LE2 };
+        public static readonly MEGame[] SupportedGames = new[] { MEGame.LE2 };
 #elif __GAME3__
         public static readonly MEGame[] SupportedGames = new[] { MEGame.LE3};
 #endif
@@ -27,13 +27,8 @@ namespace RandomizerUI
             MERLog.Information("Loading game targets");
             LoadGamePaths();
         }
-        public static GameTarget OriginalTrilogyTarget { get; set; }
         public static GameTarget LegendaryEditionTarget { get; set; }
 
-        /// <summary>
-        /// UI display string of the OT target path. Do not trust this value as a true path, use the target instead.
-        /// </summary>
-        [DependsOn(nameof(OriginalTrilogyTarget))] public static string OTGamePath => OriginalTrilogyTarget?.TargetPath ?? "Not installed";
         /// <summary>
         /// UI display string of the LE target path. Do not trust this value as a true path, use the target instead.
         /// </summary>
@@ -70,11 +65,6 @@ namespace RandomizerUI
                 return false;
             }
 
-            if (game.IsOTGame())
-            {
-                OriginalTrilogyTarget = gt;
-                return true;
-            }
             if (game.IsLEGame())
             {
                 LegendaryEditionTarget = gt;
@@ -84,32 +74,21 @@ namespace RandomizerUI
             return false; // DEFAULT
         }
 
-        public static GameTarget GetTarget(bool legendaryEdition)
+        public static GameTarget GetTarget()
         {
-            if (legendaryEdition) return LegendaryEditionTarget;
-            return OriginalTrilogyTarget;
+            return LegendaryEditionTarget;
         }
 
-        public static void ReloadTarget(bool legendaryEdition)
+        public static void ReloadTarget()
         {
-            var target = GetTarget(legendaryEdition);
+            var target = GetTarget();
             target?.ReloadGameTarget();
-        }
-
-        public static List<GameTarget> GetAllAvailableTargets()
-        {
-            var list = new List<GameTarget>();
-            if (OriginalTrilogyTarget != null) list.Add(OriginalTrilogyTarget);
-            if (LegendaryEditionTarget != null) list.Add(LegendaryEditionTarget);
-            return list;
         }
 
         public static void SetTarget(GameTarget gt)
         {
             if (gt.Game.IsLEGame())
                 LegendaryEditionTarget = gt;
-            if (gt.Game.IsOTGame())
-                OriginalTrilogyTarget = gt;
         }
     }
 }

@@ -94,20 +94,17 @@ namespace RandomizerUI.Classes.Controllers
 
         private static bool PerformWriteCheck(Action<string, string> messageCallback)
         {
-            MERLog.Information("Performing write check on all game directories...");
-            var targets = Locations.GetAllAvailableTargets();
+            MERLog.Information("Performing write check on game directory");
+            var target = Locations.GetTarget();
             try
             {
                 List<string> directoriesToGrant = new List<string>();
-                foreach (var t in targets)
+                // Check all folders are writable
+                bool isFullyWritable = true;
+                var testDirectories = Directory.GetDirectories(target.TargetPath, "*", SearchOption.AllDirectories);
+                foreach (var d in testDirectories)
                 {
-                    // Check all folders are writable
-                    bool isFullyWritable = true;
-                    var testDirectories = Directory.GetDirectories(t.TargetPath, "*", SearchOption.AllDirectories);
-                    foreach (var d in testDirectories)
-                    {
-                        isFullyWritable &= MUtilities.IsDirectoryWritable(d);
-                    }
+                    isFullyWritable &= MUtilities.IsDirectoryWritable(d);
                 }
 
                 bool isAdmin = MUtilities.IsAdministrator();

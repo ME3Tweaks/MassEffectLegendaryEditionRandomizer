@@ -246,15 +246,12 @@ namespace RandomizerUI.Classes.Controllers
                     pd.SetMessage($"Loading {MERUI.GetRandomizerName()} framework");
                     ToolTipService.ShowOnDisabledProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(true));
                     ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(int.MaxValue));
-
-                    //ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread, false);
-
                     MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
 
                     handleM3Passthrough();
                     foreach (var game in Locations.SupportedGames)
                     {
-                        target = Locations.GetTarget(game.IsLEGame());
+                        target = Locations.GetTarget();
                         if (target == null)
                         {
                             var gamePath = MEDirectories.GetDefaultGamePath(game);
@@ -337,17 +334,7 @@ namespace RandomizerUI.Classes.Controllers
             bw.RunWorkerCompleted += async (a, b) =>
                     {
                         // Post critical startup
-                        window.SelectableTargets.AddRange(Locations.GetAllAvailableTargets());
-
-                        // Initial selected game
-                        if (Locations.GetTarget(true) != null)
-                        {
-                            window.SelectedTarget = Locations.GetTarget(true);
-                        }
-                        else if (Locations.GetTarget(false) != null)
-                        {
-                            window.SelectedTarget = Locations.GetTarget(false);
-                        }
+                        window.SelectedTarget = Locations.GetTarget();
 
                         Random random = new Random();
                         var preseed = random.Next();

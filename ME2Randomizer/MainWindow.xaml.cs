@@ -51,19 +51,9 @@ namespace RandomizerUI
 #endif
 
         /// <summary>
-        /// Which index is currently selected in the dropdown for which game to run for
-        /// </summary>
-        public int SelectedGameIndex { get; set; }
-
-        /// <summary>
         /// The current selected game target
         /// </summary>
         public GameTarget SelectedTarget { get; set; }
-
-        /// <summary>
-        /// The list of targets in the dropdown
-        /// </summary>
-        public ObservableCollectionExtended<GameTarget> SelectableTargets { get; } = new();
 
         public bool UseMultiThreadRNG { get; set; } = true;
 
@@ -633,11 +623,12 @@ namespace RandomizerUI
         {
             if (SelectedTarget == null)
             {
-                var gameName = Randomizer.MER.MERUtilities.GetGameUIName(SelectedGameIndex == 0);
+                var gameName = Randomizer.MER.MERUtilities.GetGameUIName(false);
                 GamePathString = $"{gameName} not detected. Repair and run your game to fix detection.";
             }
             else if (SelectedTarget.TextureModded)
             {
+                // How true is this for LE?
                 GamePathString = "Cannot randomize, game is texture modded";
             }
             else
