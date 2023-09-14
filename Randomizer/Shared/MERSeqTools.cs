@@ -967,5 +967,19 @@ namespace Randomizer.Shared
 
             return seqCond;
         }
+
+        /// <summary>
+        /// Creates a MERSeqAct_IsMERFeatureEnabled with the boolean of the given string set to true, which will return on the outputs if the feature is enabled in config
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <param name="featureName"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateMERIsFeatureEnabled(ExportEntry seq, string featureName)
+        {
+            var merCheck = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "MERSeqAct_IsMERFeatureEnabled", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(merCheck, seq);
+            merCheck.WriteProperty(new BoolProperty(true, featureName));
+            return merCheck;
+        }
     }
 }

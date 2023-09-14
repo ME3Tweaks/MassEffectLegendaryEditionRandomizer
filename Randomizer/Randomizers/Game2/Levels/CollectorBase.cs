@@ -16,6 +16,7 @@ using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 using Randomizer.Shared;
+using Windows.UI.Popups;
 
 namespace Randomizer.Randomizers.Game2.Levels
 {
@@ -59,6 +60,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Platforming and Final Battles
             //UpdatePreFinalBattle(target, sequenceSupportPackage);
             //UpdateFinalBattle(target, sequenceSupportPackage);
+            InstallCustomFinalBattleMusic(target, sequenceSupportPackage, option);
 
             // Post-CollectorBase
             UpdatePostCollectorBase(target);
@@ -570,6 +572,48 @@ namespace Randomizer.Randomizers.Game2.Levels
 
 
         private static float DESTROYER_PLAYRATE = 2;
+
+        private static void InstallCustomFinalBattleMusic(GameTarget target, IMEPackage sequenceSupportPackage, RandomizationOption option)
+        {
+            string file = "BioS_EndGm2.pcc";
+            using var package = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, file));
+
+            // Logic here
+            var musSeq = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.IMPORT_Music_Events");
+
+
+            // Set logic branch based on if music feature is enabled
+            var plotMusicInt = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.IMPORT_Music_Events.BioSeqVar_StoryManagerInt_3");
+
+            var originalSetMusic = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.IMPORT_Music_Events.SeqAct_SetInt_3");
+            var newSetMusic = MERSeqTools.CreateSetInt(musSeq, plotMusicInt, MERSeqTools.CreateInt(musSeq, 0));
+            var checkFeature = MERSeqTools.CreateMERIsFeatureEnabled(musSeq, "bUseNewFinalBossMusic");
+
+            // Port in events
+            var playEvent = PackageTools.PortExportIntoPackage(target, package, sequenceSupportPackage.FindExport("Wwise_Music_Streaming_SM_MER.Play_fallingdown"));
+            var stopEvent = PackageTools.PortExportIntoPackage(target, package, sequenceSupportPackage.FindExport("Wwise_Music_Streaming_SM_MER.Stop_fallingdown"));
+
+            // Branch code - boss mus
+            KismetHelper.CreateOutputLink(checkFeature, "Enabled", newSetMusic);
+            KismetHelper.CreateOutputLink(checkFeature, "Enabled", MERSeqTools.CreateWwisePostEvent(musSeq, playEvent));
+            KismetHelper.CreateOutputLink(checkFeature, "Not Enabled", originalSetMusic);
+
+
+            // Hookup music events
+            var trigFinalBossStarted = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.IMPORT_Music_Events.SeqEvent_RemoteEvent_2");
+            KismetHelper.RemoveOutputLinks(trigFinalBossStarted);
+            KismetHelper.CreateOutputLink(trigFinalBossStarted, "Out", checkFeature);
+
+            // Always post the stop
+            var trigFinalBossKilled = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.IMPORT_Music_Events.SeqEvent_RemoteEvent_3");
+            KismetHelper.CreateOutputLink(trigFinalBossKilled, "Out", MERSeqTools.CreateWwisePostEvent(musSeq, stopEvent));
+
+            MERFileSystem.SavePackage(package);
+
+            CoalescedHandler.EnableFeatureFlag("bUseNewFinalBossMusic", option.HasSubOptionSelected(SUBOPTIONKEY_NEWFINALBOSSMUSIC));
+        }
+
+        public const string SUBOPTIONKEY_NEWFINALBOSSMUSIC = "SUBOPTIONKEY_NEWFINALBOSSMUSIC";
 
         /// <summary>
         /// Adds a fog that gradually fades in as you damage the reaper, making it harder to see

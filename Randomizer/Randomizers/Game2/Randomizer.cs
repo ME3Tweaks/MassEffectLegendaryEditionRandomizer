@@ -482,7 +482,7 @@ namespace Randomizer.Randomizers.Game2
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
                     },
                     new RandomizationOption() {
-                        HumanName = "NPC colors", 
+                        HumanName = "NPC colors",
                         Description="Changes NPC colors such as skin tone, hair, etc",
                         //PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true
@@ -744,7 +744,21 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption() {HumanName = "Archangel Acquisition", Description = "It's a mystery!", PerformSpecificRandomizationDelegate = ArchangelAcquisition.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true, RequiresTLK = true},
                     new RandomizationOption() {HumanName = "Illium Hub", Description = "Changes the lounge", PerformSpecificRandomizationDelegate = IlliumHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
                     new RandomizationOption() {HumanName = "Omega Hub", Description = "Improved dancing technique", PerformSpecificRandomizationDelegate = OmegaHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight", PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresTLK = true, IsRecommended = true},
+                    new RandomizationOption()
+                    {
+                        HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight", PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresTLK = true, IsRecommended = true,
+                        SubOptions = new()
+                        {
+                            new RandomizationOption()
+                            {
+                                HumanName = "Use new music",
+                                Description = "Replaces the final battle music to better match the combat tempo",
+                                IsRecommended = true,
+                                IsOptionOnly = true,
+                                SubOptionKey = CollectorBase.SUBOPTIONKEY_NEWFINALBOSSMUSIC
+                            }
+                        }
+                    },
 
                     // DLC
                     new RandomizationOption() {HumanName = "Overlord DLC missions", Description = "Changes a few things across this DLC's missions", PerformSpecificRandomizationDelegate = OverlordDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
