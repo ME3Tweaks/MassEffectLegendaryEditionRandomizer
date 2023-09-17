@@ -14,7 +14,7 @@ namespace Randomizer.Randomizers.Shared
         public static bool InstallDynamicHeightFogRandomizer(GameTarget target, RandomizationOption option)
         {
             var engine = Engine.GetEngine(target);
-            ScriptTools.AddToClassInPackage(target, engine, "HeightFog.PostBeginPlay", "HeightFog");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, engine, "HeightFog.PostBeginPlay", "HeightFog");
             MERFileSystem.SavePackage(engine);
             CoalescedHandler.EnableFeatureFlag("bFogRandomizer");
             return true;

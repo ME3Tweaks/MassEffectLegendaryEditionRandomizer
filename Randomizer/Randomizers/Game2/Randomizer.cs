@@ -236,9 +236,9 @@ namespace Randomizer.Randomizers.Game2
                         if (true
                         //&& false //uncomment to disable filtering
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
-                         && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
-                         && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
-                        //&& !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
+                        && !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -484,7 +484,7 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption() {
                         HumanName = "NPC colors",
                         Description="Changes NPC colors such as skin tone, hair, etc",
-                        //PerformRandomizationOnExportDelegate = RMaterialInstance.RandomizeNPCExport2,
+                        PerformSpecificRandomizationDelegate = RSharedNPC.InstallPawnColorRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true
                     },
                     // Too much work for LE2R
@@ -525,11 +525,16 @@ namespace Randomizer.Randomizers.Game2
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
                     new RandomizationOption() {
-                        HumanName = "Premade faces",
+                        HumanName = "Player face morph options",
                         IsRecommended = true,
-                        Description = "Completely randomizes settings including skin tones and slider values. Adds extra premade faces",
+                        Description = "Extends the range of allowed values for morphing the player's face. This will cause more extreme facial features. This also makes infinite random presets.",
                         PerformSpecificRandomizationDelegate = CharacterCreator.RandomizeCharacterCreator,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        Ticks = "1.25,1.5,1.75,2.0,2.25,2.5,2.75,3.0",
+                        HasSliderOption = true,
+                        SliderTooltip = "Higher settings yield more ridiculous faces for characters. The original game value is 1.0, higher values are multiplicative.",
+                        SliderToTextConverter = rSetting => $"Morph multiplier: {rSetting}x",
+                        SliderValue = 2.0, // This must come after the converter
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()

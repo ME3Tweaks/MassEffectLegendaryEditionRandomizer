@@ -7,10 +7,11 @@ using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Misc
 {
-
+#if FALSE
     /// <summary>
     /// Illusive Man Eye randomizer - No longer used
     /// </summary>
+
     class RIllusiveEyes
     {
         private static bool CanRandomize(ExportEntry exp) => !exp.IsDefaultObject && exp.ClassName == "MaterialInstanceConstant" && exp.ObjectName == "HMM_HED_EYEillusiveman_MAT_1a";
@@ -31,4 +32,5 @@ namespace Randomizer.Randomizers.Game2.Misc
             return true;
         }
     }
+#endif
 }

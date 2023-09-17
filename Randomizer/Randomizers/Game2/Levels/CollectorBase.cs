@@ -1378,14 +1378,14 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         private static void PatchReaper(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
         {
-            ScriptTools.AddToClassInPackage(target, package, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
-            ScriptTools.AddToClassInPackage(target, package, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
+            ScriptTools.AddToClassInPackageFromEmbedded(target, package, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, package, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
 
             // BioWer Pls
             // Why is the reaper in here
             var stasisNew = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "SFXPower_StasisNew.pcc"));
-            ScriptTools.AddToClassInPackage(target, stasisNew, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
-            ScriptTools.AddToClassInPackage(target, stasisNew, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
+            ScriptTools.AddToClassInPackageFromEmbedded(target, stasisNew, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, stasisNew, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
 
             MERFileSystem.SavePackage(stasisNew);
         }

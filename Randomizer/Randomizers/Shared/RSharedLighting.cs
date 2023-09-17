@@ -16,7 +16,7 @@ namespace Randomizer.Randomizers.Shared
         public static bool InstallDynamicLightingRandomizer(GameTarget target, RandomizationOption option)
         {
             var engine = Engine.GetEngine(target);
-            ScriptTools.AddToClassInPackage(target, engine, "Light.PostBeginPlay", "Light");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, engine, "Light.PostBeginPlay", "Light");
             MERFileSystem.SavePackage(engine);
             CoalescedHandler.EnableFeatureFlag("bLightRandomizer");
             return true;

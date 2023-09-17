@@ -548,7 +548,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             option.ProgressIndeterminate = true;
             option.CurrentOperation = "Adding fixes for class talent system";
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.AddToClassInPackage(target, sfxgame, "PlayerOnPowersLoaded", "SFXPawn_Player");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "PlayerOnPowersLoaded", "SFXPawn_Player");
             
             MERFileSystem.SavePackage(sfxgame);
             return true;
