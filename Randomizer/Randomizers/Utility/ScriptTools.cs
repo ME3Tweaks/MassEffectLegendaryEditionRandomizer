@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LegendaryExplorerCore.Packages;
@@ -123,14 +124,30 @@ namespace Randomizer.Randomizers.Utility
         }
 
         /// <summary>
-        /// Installs a class into the listed package, under the named package, or at the root if null. The package is not saved
+        /// Installs a class into the listed package, under the named package, or at the root if null. This loads text from the specified embedded file. The package is not saved
         /// </summary>
         /// <param name="target">The game target that this script can compile against</param>
         /// <param name="packageToInstallTo">The package to install the class into</param>
         /// <param name="embeddedClassName">The name of the embedded class file - the class name must match the filename. DO NOT PUT .uc here, it will be added automatically</param>
         /// <param name="rootPackageName">The IFP of the root package, null if you want the class created at the root of the file</param>
         /// <param name="useCache">If the MERCommonCache should be used. If you are adding things to basegame files you probably don't want to use this as it will be a mix of stale data and current until the cache is refreshed</param>
-        public static ExportEntry InstallClassToPackage(GameTarget target, IMEPackage packageToInstallTo, string embeddedClassName, string rootPackageName = null, bool useCache = true)
+        public static ExportEntry InstallClassToPackageFromEmbedded(GameTarget target, IMEPackage packageToInstallTo, string embeddedClassName, string rootPackageName = null, bool useCache = true)
+        {
+            var classText = MEREmbedded.GetEmbeddedTextAsset($"Classes.{embeddedClassName}.uc");
+            return InstallClassToPackage(target, packageToInstallTo, embeddedClassName, classText, rootPackageName, useCache);
+        }
+
+        /// <summary>
+        /// Installs a new class to the specified package, using the provided class text.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="packageToInstallTo"></param>
+        /// <param name="classText"></param>
+        /// <param name="rootPackageName"></param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static ExportEntry InstallClassToPackage(GameTarget target, IMEPackage packageToInstallTo, string className, string classText, string rootPackageName = null, bool useCache = true)
         {
             var fl = new FileLib(packageToInstallTo);
             bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: useCache ? MERCaches.GlobalCommonLookupCache : null);
@@ -158,36 +175,42 @@ namespace Randomizer.Randomizers.Utility
 
             // Todo: See if the class already exists
 
-            var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Classes.{embeddedClassName}.uc");
             MessageLog log;
-            (_, log) = UnrealScriptCompiler.CompileClass(packageToInstallTo, scriptText, fl, parent: parentExport);
+            (_, log) = UnrealScriptCompiler.CompileClass(packageToInstallTo, classText, fl, parent: parentExport);
 
             if (log.AllErrors.Any())
             {
-                MERLog.Error($@"Error compiling class {embeddedClassName}:");
+                MERLog.Error($@"Error compiling class {className}:");
                 foreach (var l in log.AllErrors)
                 {
                     MERLog.Error(l.Message);
                 }
 
-                throw new Exception($"Error compiling {embeddedClassName}: {string.Join(Environment.NewLine, log.AllErrors)}");
+                throw new Exception($"Error compiling {className}: {string.Join(Environment.NewLine, log.AllErrors)}");
             }
 
             return parentExport != null
-                ? packageToInstallTo.FindExport($"{parentExport.InstancedFullPath}.{embeddedClassName}")
-                : packageToInstallTo.FindExport(embeddedClassName);
+                ? packageToInstallTo.FindExport($"{parentExport.InstancedFullPath}.{className}")
+                : packageToInstallTo.FindExport(className);
         }
 
         /// <summary>
-        /// AddToOrReplace implementation. Does not save the package
+        /// AddToOrReplace implementation, reading file from embedded. Does not save the package
         /// </summary>
         /// <param name="target"></param>
         /// <param name="packageToInstallTo"></param>
         /// <param name="scriptName">Do not include .uc</param>
         /// <param name="classIFP"></param>
         /// <exception cref="Exception"></exception>
-        public static void AddToClassInPackage(GameTarget target, IMEPackage packageToInstallTo, string scriptName, string classIFP)
+        public static void AddToClassInPackageFromEmbedded(GameTarget target, IMEPackage packageToInstallTo, string scriptName, string classIFP)
         {
+            var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptName}.uc");
+            AddToClassInPackage(target, packageToInstallTo, scriptText, classIFP);
+        }
+
+        public static void AddToClassInPackage(GameTarget target, IMEPackage packageToInstallTo, string scriptText, string classIFP)
+        {
+            var classExp = packageToInstallTo.FindExport(classIFP);
             var fl = new FileLib(packageToInstallTo);
             bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
             if (!initialized)
@@ -200,19 +223,35 @@ namespace Randomizer.Randomizers.Utility
 
                 throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
             }
-
-            var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptName}.uc");
-            var classExp = packageToInstallTo.FindExport(classIFP);
             MessageLog log = UnrealScriptCompiler.AddOrReplaceInClass(classExp, scriptText, fl);
             if (log.HasErrors)
             {
                 Debugger.Break();
             }
         }
-
-        public static void InstallClassTextToPackage(GameTarget target, IMEPackage sfxgame, string mercontrol, string classMercontrol)
+        public static void CompileEmbeddedPropertiesToPackage(GameTarget target, IMEPackage packageToInstallTo, string textAssetName)
         {
-            throw new NotImplementedException();
+            var propertiesText = MEREmbedded.GetEmbeddedTextAsset($"Properties.{textAssetName}.uc");
+            var ifp = propertiesText.SplitToLines().First().TrimStart('/');
+            var targetExport = packageToInstallTo.FindExport(ifp);
+
+            var fl = new FileLib(packageToInstallTo);
+            bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
+            if (!initialized)
+            {
+                MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
+                foreach (var v in fl.InitializationLog.AllErrors)
+                {
+                    MERLog.Error(v.Message);
+                }
+
+                throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
+            }
+            var log = UnrealScriptCompiler.CompileDefaultProperties(targetExport, propertiesText, fl);
+            if (log.log.HasErrors)
+            {
+                Debugger.Break();
+            }
         }
     }
 }

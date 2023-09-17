@@ -7,6 +7,7 @@ using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.ExportTypes;
@@ -29,8 +30,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         public static bool InstallIconicRandomizer(GameTarget target, RandomizationOption option)
         {
-            MERControl.InstallBioMorphFaceRandomizerClasses(target);
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = MERControl.InstallBioMorphFaceRandomizerClasses(target) ?? SFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToExport(sfxgame.FindExport("SFXSaveGame.LoadMorphHead"), "SFXSaveGame.LoadMorphHead.uc");
             ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
             MERFileSystem.SavePackage(sfxgame);
@@ -44,7 +44,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             CoalescedHandler.EnableFeatureFlag("bIconicRandomizer");
             CoalescedHandler.EnableFeatureFlag("bIconicRandomizer_Persistent", option.HasSubOptionSelected(SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE));
             MERControl.SetVariable("fIconicFaceRandomization", option.SliderValue, CoalesceParseAction.Add);
-           return true;
+            return true;
         }
 
 #if ME2R
@@ -145,46 +145,55 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         public static bool RandomizeCharacterCreator(GameTarget target, RandomizationOption option)
         {
+            var sfxgame = SFXGame.GetSFXGame(target);
+            ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
+            //ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.ApplyNewCode"), "BioSFHandler_NewCharacter.ApplyNewCode.uc");
+            MERFileSystem.SavePackage(sfxgame);
+
+            // MERControl.SetVariable("fCCBioMorphFaceRandomization", 2);
+
+
             var biop_charF = MERFileSystem.GetPackageFile(target, @"BioP_Char.pcc");
             var biop_char = MEPackageHandler.OpenMEPackage(biop_charF);
-
-
-            ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
-            ScriptTools.InstallScriptToExport(biop_char.FindExport("BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead"), "BioSFHandler_NewCharacter.SelectPreviousPregeneratedHead.uc");
-
             var maleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Male");
             var femaleFrontEndData = biop_char.FindExport("BioChar_Player.FrontEnd.SFXMorphFaceFrontEnd_Female");
 
-            randomizeFrontEnd(maleFrontEndData);
-            randomizeFrontEnd(femaleFrontEndData);
+            var maleHeadSet = maleFrontEndData.GetProperty<ObjectProperty>("MorphTargetSet").ResolveToExport(biop_char);
+            var femaleHeadSet = femaleFrontEndData.GetProperty<ObjectProperty>("MorphTargetSet").ResolveToExport(biop_char);
 
-            //Copy the final skeleton from female into male.
-            var femBase = biop_char.FindExport("BIOG_MORPH_FACE.CharacterCreation_Base_Female");
-            var maleBase = biop_char.FindExport("BIOG_MORPH_FACE.CharacterCreation_Base_Male");
-            maleBase.WriteProperty(femBase.GetProperty<ArrayProperty<StructProperty>>("m_aFinalSkeleton"));
+            var list = new[] { maleHeadSet, femaleHeadSet };
+            foreach (var hs in list)
+            {
+                hs.ObjectName = new NameReference(hs.ObjectName.Name + "_MER", hs.ObjectName.Number);
+
+                var targets = hs.GetProperty<ArrayProperty<ObjectProperty>>("Targets");
+                foreach (var t in targets.Select(x => x.ResolveToExport(biop_char)))
+                {
+                    var bin = ObjectBinary.From<MorphTarget>(t);
+                    for (int i = 0; i < bin.MorphLODModels.Length; i++)
+                    {
+                        for (int j = 0; j < bin.MorphLODModels[i].Vertices.Length; j++)
+                        {
+                            bin.MorphLODModels[i].Vertices[j].PositionDelta.X *= (float)option.SliderValue;
+                            bin.MorphLODModels[i].Vertices[j].PositionDelta.Y *= (float)option.SliderValue;
+                            bin.MorphLODModels[i].Vertices[j].PositionDelta.Z *= (float)option.SliderValue;
+                        }
+                    }
+
+                    for (int i = 0; i < bin.BoneOffsets.Length; i++)
+                    {
+                        bin.BoneOffsets[i].Offset.X *= (float)option.SliderValue;
+                        bin.BoneOffsets[i].Offset.Y *= (float)option.SliderValue;
+                        bin.BoneOffsets[i].Offset.Z *= (float)option.SliderValue;
+                    }
+                    t.WriteBinary(bin);
+                }
+            }
 
             var randomizeColors = !option.HasSubOptionSelected(CharacterCreator.SUBOPTIONKEY_CHARCREATOR_NO_COLORS);
-
             foreach (var export in biop_char.Exports)
             {
-                if (export.ClassName == "BioMorphFace" && !export.ObjectName.Name.Contains("Iconic"))
-                {
-                    RBioMorphFace.RandomizeExportNonHench(target, export, SuperRandomOption); //.3 default
-                }
-                else if (export.ClassName == "MorphTarget")
-                {
-                    if (
-                         export.ObjectName.Name.StartsWith("jaw") || export.ObjectName.Name.StartsWith("mouth")
-                                                                  || export.ObjectName.Name.StartsWith("eye")
-                                                                  || export.ObjectName.Name.StartsWith("cheek")
-                                                                  || export.ObjectName.Name.StartsWith("nose")
-                                                                  || export.ObjectName.Name.StartsWith("teeth")
-                        )
-                    {
-                        RSharedMorphTarget.RandomizeExport(export, option);
-                    }
-                }
-                else if (export.ClassName == "BioMorphFaceFESliderColour" && randomizeColors)
+                if (export.ClassName == "BioMorphFaceFESliderColour" && randomizeColors)
                 {
                     var colors = export.GetProperty<ArrayProperty<StructProperty>>("m_acColours");
                     foreach (var color in colors)
@@ -193,40 +202,40 @@ namespace Randomizer.Randomizers.Game2.Levels
                     }
                     export.WriteProperty(colors);
                 }
-                else if (export.ClassName == "BioMorphFaceFESliderMorph")
-                {
-                    // These don't work becuase of the limits in the morph system
-                    // So all this does is change how much the values change, not the max/min
-                }
-                else if (export.ClassName == "BioMorphFaceFESliderScalar" || export.ClassName == "BioMorphFaceFESliderSetMorph")
-                {
-                    //no idea how to randomize this lol
-                    var floats = export.GetProperty<ArrayProperty<FloatProperty>>("m_afValues");
-                    var minfloat = floats.Min();
-                    var maxfloat = floats.Max();
-                    if (minfloat == maxfloat)
-                    {
-                        if (minfloat == 0)
-                        {
-                            maxfloat = 1;
-                        }
-                        else
-                        {
-                            var vari = minfloat / 2;
-                            maxfloat = ThreadSafeRandom.NextFloat(-vari, vari) + minfloat; //+/- 50%
-                        }
+                //else if (export.ClassName == "BioMorphFaceFESliderMorph")
+                //{
+                // These don't work becuase of the limits in the morph system
+                // So all this does is change how much the values change, not the max/min
+                //}
+                //else if (export.ClassName == "BioMorphFaceFESliderScalar" || export.ClassName == "BioMorphFaceFESliderSetMorph")
+                //{
+                //    //no idea how to randomize this lol
+                //    var floats = export.GetProperty<ArrayProperty<FloatProperty>>("m_afValues");
+                //    var minfloat = floats.Min();
+                //    var maxfloat = floats.Max();
+                //    if (minfloat == maxfloat)
+                //    {
+                //        if (minfloat == 0)
+                //        {
+                //            maxfloat = 1;
+                //        }
+                //        else
+                //        {
+                //            var vari = minfloat / 2;
+                //            maxfloat = ThreadSafeRandom.NextFloat(-vari, vari) + minfloat; //+/- 50%
+                //        }
 
-                    }
-                    foreach (var floatval in floats)
-                    {
-                        floatval.Value = ThreadSafeRandom.NextFloat(minfloat, maxfloat);
-                    }
-                    export.WriteProperty(floats);
-                }
-                else if (export.ClassName == "BioMorphFaceFESliderTexture")
-                {
+                //    }
+                //    foreach (var floatval in floats)
+                //    {
+                //        floatval.Value = ThreadSafeRandom.NextFloat(minfloat, maxfloat);
+                //    }
+                //    export.WriteProperty(floats);
+                //}
+                //else if (export.ClassName == "BioMorphFaceFESliderTexture")
+                //{
 
-                }
+                //}
             }
             MERFileSystem.SavePackage(biop_char);
             return true;
@@ -350,13 +359,13 @@ namespace Randomizer.Randomizers.Game2.Levels
                     {
                         var slDataExport = frontEnd.FileRef.GetUExport(sliderDatas[0].Value);
                         var range = slDataExport.GetProperty<FloatProperty>("m_fRange");
-                        val.Value = ThreadSafeRandom.NextFloat(0, range * 100);
                     }
                     else
                     {
                         // This is just a guess
                         val.Value = ThreadSafeRandom.NextFloat(0, 1f);
                     }
+
                 }
             }
         }

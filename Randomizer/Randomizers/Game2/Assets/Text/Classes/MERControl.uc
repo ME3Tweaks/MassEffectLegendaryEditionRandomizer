@@ -226,6 +226,128 @@ public static function SetEyeParent(MaterialInstanceConstant MIC, MaterialInterf
     }
     MIC.SetParent(DefaultParent);
 }
+public static function BioPawn_RandomizeColors(BioPawn BP)
+{
+    local int I;
+    local SkeletalMeshComponent MeshComp;
+    local array<SkeletalMeshComponent> MeshComps;
+    local array<Name> ColorMatNames;
+    local array<Name> LocalMatNames;
+    local Name ExprName;
+    local BioMaterialInstanceConstant BioMatConstant;
+    local MaterialInstanceConstant MatConstant;
+    local Material Mat;
+    local Color newcol;
+    local LinearColor currentval;
+    local bool Next;
+    
+    if (!Class'MERControlEngine'.default.bPawnColorsRandomizer)
+    {
+        return;
+    }
+    if (BP == None)
+    {
+        return;
+    }
+    MeshComps.AddItem(BP.HeadMesh);
+    MeshComps.AddItem(BP.Mesh);
+    MeshComps.AddItem(BP.m_oHairMesh);
+    MeshComps.AddItem(BP.m_oHeadGearMesh);
+    MeshComps.AddItem(BP.m_oHairMesh);
+    MeshComps.AddItem(BP.m_oVisorMesh);
+    MeshComps.AddItem(BP.m_oFacePlateMesh);
+    foreach MeshComps(MeshComp, )
+    {
+        if (MeshComp == None)
+        {
+            continue;
+        }
+        for (I = 0; I < MeshComp.Materials.Length; I++)
+        {
+            if (MeshComp.Materials[I] == None)
+            {
+                continue;
+            }
+            BioMatConstant = BioMaterialInstanceConstant(MeshComp.Materials[I]);
+            if (BioMatConstant != None)
+            {
+                LocalMatNames = GetVectorParamsMIC(BioMatConstant);
+                foreach LocalMatNames(ExprName, )
+                {
+                    LogInternal(string(ExprName), );
+                    if (ColorMatNames.Find(ExprName) == -1)
+                    {
+                        ColorMatNames.AddItem(ExprName);
+                    }
+                }
+                continue;
+            }
+            MatConstant = MaterialInstanceConstant(MeshComp.Materials[I]);
+            if (MatConstant != None)
+            {
+                BioMatConstant = new (BP) Class'BioMaterialInstanceConstant';
+                BioMatConstant.SetParent(MatConstant);
+                MeshComp.SetMaterial(I, BioMatConstant);
+                LocalMatNames = GetVectorParamsMIC(BioMatConstant);
+                foreach LocalMatNames(ExprName, )
+                {
+                    LogInternal(string(ExprName), );
+                    if (ColorMatNames.Find(ExprName) == -1)
+                    {
+                        ColorMatNames.AddItem(ExprName);
+                    }
+                }
+                continue;
+            }
+            Mat = Material(MeshComp.Materials[I]);
+            if (Mat != None)
+            {
+                BioMatConstant = new (BP) Class'BioMaterialInstanceConstant';
+                BioMatConstant.SetParent(Mat);
+                MeshComp.SetMaterial(I, BioMatConstant);
+                LocalMatNames = GetVectorParamsMIC(BioMatConstant);
+                foreach LocalMatNames(ExprName, )
+                {
+                    LogInternal(string(ExprName), );
+                    if (ColorMatNames.Find(ExprName) == -1)
+                    {
+                        ColorMatNames.AddItem(ExprName);
+                    }
+                }
+                continue;
+            }
+        }
+    }
+    foreach ColorMatNames(ExprName, )
+    {
+        if (SFXPawn_Player(BP) != None && ExprName == 'Skin_Tone'){
+            continue;
+        }
+
+        foreach MeshComps(MeshComp, )
+        {
+            Next = FALSE;
+            for (I = 0; I < MeshComp.Materials.Length; I++)
+            {
+                if (MeshComp.Materials[I] == None)
+                {
+                    continue;
+                }
+                if (MeshComp.Materials[I].GetVectorParameterValue(ExprName, currentval))
+                {
+                    newcol = Class'MERControlEngine'.static.RandColor(0, int(currentval.R * 255.0), 0, int(currentval.G * 255.0), 0, int(currentval.B * 255.0));
+                    BP.SetVectorParameterValue(ExprName, newcol);
+                    Next = TRUE;
+                    break;
+                }
+            }
+            if (Next)
+            {
+                break;
+            }
+        }
+    }
+}
 public static function BioPawn_RandomizeEyes(BioPawn BP)
 {
     local int I;

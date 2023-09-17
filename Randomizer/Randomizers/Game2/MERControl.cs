@@ -34,7 +34,7 @@ namespace Randomizer.Randomizers.Game2
             if (!InstalledSFXSkeletalMeshActorMATMERControl)
             {
                 var sfxgame = SFXGame.GetSFXGame(target);
-                ScriptTools.AddToClassInPackage(target, sfxgame, "SFXSkeletalMeshActorMAT.PostBeginPlay",
+                ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "SFXSkeletalMeshActorMAT.PostBeginPlay",
                     "SFXSkeletalMeshActorMAT");
                 MERFileSystem.SavePackage(sfxgame);
                 InstalledSFXSkeletalMeshActorMATMERControl = true;
@@ -43,11 +43,17 @@ namespace Randomizer.Randomizers.Game2
 
         private static bool InstalledBioMorphFaceClass = false;
 
-        public static void InstallBioMorphFaceRandomizerClasses(GameTarget target)
+        /// <summary>
+        /// Installs the tools needed to randomize morphs. Returns SFXGame if installed; null if already installed
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static IMEPackage InstallBioMorphFaceRandomizerClasses(GameTarget target)
         {
+            IMEPackage sfxgame = null;
             if (!InstalledBioMorphFaceClass)
             {
-                var sfxgame = SFXGame.GetSFXGame(target);
+                sfxgame = SFXGame.GetSFXGame(target);
 
                 // Instead headmorph utility classes
                 using var morphUtilP = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "Headmorph.MERHeadmorphUtility.pcc"), "MERHeadmorphUtility.pcc");
@@ -58,24 +64,46 @@ namespace Randomizer.Randomizers.Game2
                     EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, classx, sfxgame, classx.idxLink != 0 ? meshTools : null, true, new RelinkerOptionsPackage(), out _);
                 }
 
+                // Install dependencies of utility class
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "SFXObjectPinner");
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERMorphStructs");
+                ScriptTools.InstallClassToPackage(target, sfxgame, "CCAlgorithm", @"Class CCAlgorithm; var MorphRandomizationAlgorithm algorithm; defaultproperties{}");
+
                 // Install the utility class
-                ScriptTools.InstallClassToPackage(target, sfxgame, "MERBioMorphUtility");
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERBioMorphUtility");
 
                 MERFileSystem.SavePackage(sfxgame);
                 InstalledBioMorphFaceClass = true;
                 MERCaches.ReInit(target);
             }
+
+            return sfxgame;
         }
+
+        /// <summary>
+        /// Installs the object pinning system into SFXEngine, which can be used to store object references, differentiating via class types.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="sfxgame"></param>
+        private static void InstallObjectPinSystem(GameTarget target, IMEPackage sfxgame)
+        {
+            if (sfxgame.FindExport("SFXEngine.PinnedObjects") == null)
+            {
+                ScriptTools.AddToClassInPackage(target, sfxgame, @"var array<Object> PinnedObjects;", "SFXEngine");
+            }
+        }
+
 
         public static bool InstallMERControl(GameTarget target)
         {
             // Engine class
             var engine = Engine.GetEngine(target);
-            ScriptTools.InstallClassToPackage(target, engine, "MERControlEngine", useCache: false);
+            ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: false);
             MERFileSystem.SavePackage(engine);
 
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.InstallClassToPackage(target, sfxgame, "MERControl", useCache: false);
+            InstallObjectPinSystem(target, sfxgame); // Must come first as MERControl depends on this
+            ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl", useCache: false);
             MERFileSystem.SavePackage(sfxgame);
             MERCaches.ReInit(target); // Update the cache
             return true;
@@ -88,7 +116,7 @@ namespace Randomizer.Randomizers.Game2
             InstalledSFXSkeletalMeshActorMATMERControl = false;
         }
 
-        public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.AddUnique)
+        public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.Add)
         {
             var bioEngine = CoalescedHandler.GetIniFile("BIOEngine.ini");
             var section = bioEngine.GetOrAddSection("Engine.MERControlEngine");

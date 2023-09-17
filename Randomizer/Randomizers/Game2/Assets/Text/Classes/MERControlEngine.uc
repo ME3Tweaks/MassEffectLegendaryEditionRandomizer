@@ -9,6 +9,7 @@ var config bool bPlayerMovementSpeedRandomizer;
 var config bool bNPCMovementSpeedRandomizer;
 var config bool bPawnLookatRandomizer;
 var config bool bEyeRandomizer;
+var config bool bPawnColorsRandomizer;
 
 var config bool bEnemyWeaponRandomizer;
 var config bool bEnemyWeaponRandomizer_Force;
@@ -42,6 +43,15 @@ public static function Vector RandVector(float MinX, float MaxX, float MinY, flo
     V.Y = RandFloat(MinX, MinY);
     V.Z = RandFloat(MinX, MinY);
     return V;
+}
+public static function Color RandColor(int MinR, int MaxR, int MinG, int MaxG, int MinB, int MaxB)
+{
+    local Color LC;
+    
+    LC.R = byte(Rand(MaxR - MinR) + MinR);
+    LC.G = byte(Rand(MaxG - MinG) + MinG);
+    LC.B = byte(Rand(MaxB - MinB) + MinB);
+    return LC;
 }
 public static function LinearColor RandLinearColor(float MinR, float MaxR, float MinG, float MaxG, float MinB, float MaxB, float mina, float maxa)
 {

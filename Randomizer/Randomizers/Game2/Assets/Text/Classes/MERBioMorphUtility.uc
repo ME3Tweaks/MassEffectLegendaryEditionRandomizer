@@ -2,25 +2,6 @@
     config(Engine);
 
 // Types
-struct BMFFeatureRandomization 
-{
-    var string Feature;
-    var float Min;
-    var float Max;
-    var EBMFFeatureMergeMode MergeMode;
-    var bool AddIfNotFound;
-};
-struct MorphRandomizationAlgorithm 
-{
-    var string AlgoName;
-    var array<BMFFeatureRandomization> Randomizations;
-};
-enum EBMFFeatureMergeMode
-{
-    Multiplicative,
-    Additive,
-    Exact,
-};
 
 // Variables
 var config array<MorphRandomizationAlgorithm> HMMMorphAlgorithms;
@@ -97,9 +78,9 @@ public static function RandomizeBioMorphFace(BioMorphFace BMF, float randomizati
 {
     local int I;
     local int J;
-    local MorphRandomizationAlgorithm algorithm;
     local bool modified;
     local bool found;
+    local MorphRandomizationAlgorithm algorithm;
     local bool hasAlgorithm;
     local Class<CustomMorphTargetSet> MorphTargetSet;
     
@@ -208,7 +189,6 @@ public static final function Class<CustomMorphTargetSet> GetMorphTargetSet(BioMo
     }
     if (InStr(string(BaseName), "drl_", , TRUE, ) >= 0)
     {
-        // Drells are all male
         return Class'HMM_BaseMorphSet';
     }
     return None;
@@ -220,6 +200,132 @@ private static final function MorphFeature MakeNewMorphFeature(BMFFeatureRandomi
     MF.sFeatureName = Name(Feature.Feature);
     MF.Offset = Class'MERControlEngine'.static.RandFloat(Feature.Min, Feature.Max);
     return MF;
+}
+public static function RandomizeCCMorphFace(BioMorphFace BMF, float randomizationLimit, SFXMorphFaceFrontEndDataSource dataSource)
+{
+    local int I;
+    local int J;
+    local bool modified;
+    local bool found;
+    local bool hasAlgorithm;
+    local MorphRandomizationAlgorithm algorithm;
+    local Class<CustomMorphTargetSet> MorphTargetSet;
+    
+    MorphTargetSet = GetMorphTargetSet(BMF);
+    if (MorphTargetSet == None)
+    {
+        LogInternal("COULD NOT FIND MORPH TARGET SET FOR: " $ BMF.m_oBaseHead, );
+        return;
+    }
+    hasAlgorithm = GetCCAlgorithm(dataSource, randomizationLimit, MorphTargetSet, algorithm);
+    if (!hasAlgorithm)
+    {
+        LogInternal("Could not generate algorithm for " $ MorphTargetSet, );
+        return;
+    }
+    BMF.m_aMorphFeatures.Length = 0;
+    for (J = 0; J < algorithm.Randomizations.Length; J++)
+    {
+        found = FALSE;
+        for (I = 0; I < BMF.m_aMorphFeatures.Length; I++)
+        {
+            if (InStr(string(BMF.m_aMorphFeatures[I].sFeatureName), algorithm.Randomizations[J].Feature, , TRUE, ) >= 0)
+            {
+                if (FALSE)
+                {
+                    LogInternal("Updating morph feature: " $ BMF.m_aMorphFeatures[I].sFeatureName, );
+                }
+                BMF.m_aMorphFeatures[I] = RandomizeMorphTarget(BMF.m_aMorphFeatures[I], algorithm.Randomizations[J]);
+                modified = TRUE;
+                found = TRUE;
+                break;
+            }
+        }
+        if (!found && algorithm.Randomizations[J].AddIfNotFound)
+        {
+            if (FALSE)
+            {
+                LogInternal("Adding morph feature: " $ algorithm.Randomizations[J].Feature, );
+            }
+            BMF.m_aMorphFeatures[BMF.m_aMorphFeatures.Length] = MakeNewMorphFeature(algorithm.Randomizations[J]);
+            modified = TRUE;
+        }
+    }
+    if (modified)
+    {
+        Class'MorphTargetUtility'.static.UpdateMeshAndSkeleton(BMF, MorphTargetSet);
+        Class'MERControlEngine'.static.MarkObjectModified(BMF);
+    }
+    else
+    {
+        LogInternal("Not modified: " $ BMF, );
+    }
+}
+private static final function bool GetCCAlgorithm(SFXMorphFaceFrontEndDataSource dataSource, float randomizationLimit, Class<CustomMorphTargetSet> targetSet, out MorphRandomizationAlgorithm algorithm)
+{
+    local MorphRandomizationAlgorithm generatedAlgo;
+    local int I;
+    local int J;
+    local int K;
+    local array<string> MorphFeatures;
+    local Category Category;
+    local Slider Slider;
+    local BioMorphFaceFESliderBase sliderData;
+    local BioMorphFaceFESliderMorph SliderMorph;
+    local CCAlgorithm cachedAlgo;
+    
+    cachedAlgo = CCAlgorithm(Class'SFXObjectPinner'.static.GetPinnedObject(Class'CCAlgorithm'));
+    if (cachedAlgo != None)
+    {
+        algorithm = cachedAlgo.algorithm;
+        return TRUE;
+    }
+    generatedAlgo.AlgoName = "CCGenerated";
+    for (I = 0; I < dataSource.MorphCategories.Length; I++)
+    {
+        Category = dataSource.MorphCategories[I];
+        for (J = 0; J < Category.m_aoSliders.Length; J++)
+        {
+            Slider = Category.m_aoSliders[J];
+            for (K = 0; K < Slider.m_aoSliderData.Length; K++)
+            {
+                SliderMorph = BioMorphFaceFESliderMorph(Slider.m_aoSliderData[K]);
+                if (SliderMorph != None)
+                {
+                    if (Rand(2) == 0)
+                    {
+                        MorphFeatures.AddItem(SliderMorph.m_sMorph_Positive);
+                        continue;
+                    }
+                    MorphFeatures.AddItem(SliderMorph.m_sMorph_Negative);
+                }
+            }
+        }
+    }
+    generatedAlgo.Randomizations.Length = MorphFeatures.Length;
+    for (I = 0; I < MorphFeatures.Length; I++)
+    {
+        generatedAlgo.Randomizations[I].Feature = MorphFeatures[I];
+        generatedAlgo.Randomizations[I].Min = -randomizationLimit;
+        generatedAlgo.Randomizations[I].Max = randomizationLimit;
+        generatedAlgo.Randomizations[I].MergeMode = EBMFFeatureMergeMode.Exact;
+        if (targetSet == Class'HMM_BaseMorphSet')
+        {
+            generatedAlgo.Randomizations[I].AddIfNotFound = Class'MERControlEngine'.static.IsStringCapitalized(generatedAlgo.Randomizations[I].Feature) ? Rand(4) == 0 : TRUE;
+            continue;
+        }
+        if (targetSet == Class'HMF_BaseMorphSet')
+        {
+            generatedAlgo.Randomizations[I].AddIfNotFound = Class'MERControlEngine'.static.IsStringCapitalized(generatedAlgo.Randomizations[I].Feature) ? Rand(3) > 0 : TRUE;
+            continue;
+        }
+        generatedAlgo.Randomizations[I].AddIfNotFound = TRUE;
+    }
+    algorithm = generatedAlgo;
+    cachedAlgo = new (Class'SFXEngine'.static.GetEngine()) Class'CCAlgorithm';
+    cachedAlgo.algorithm = algorithm;
+    Class'SFXObjectPinner'.static.AddPinnedObject(cachedAlgo);
+    return TRUE;
 }
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.

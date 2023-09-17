@@ -114,13 +114,21 @@
 	<ItemGroup>
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControl.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControlEngine.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERMorphStructs.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERSeqAct_RandomizeProbe.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXLoadoutDataMER.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXObjectPinner.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\playerweaponifps.txt" />
+		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\ColonistsFOV.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\ColonistsITM.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\ItsACollectorITM.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\SeekersFreezeITM.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_AwardTreasure.Activated.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_ShowCharacterCreation.Activated.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.ApplyNewCode.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />

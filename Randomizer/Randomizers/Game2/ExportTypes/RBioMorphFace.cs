@@ -20,8 +20,8 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
             // Patch in the stubs (I miss you Stubby Mo)
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.AddToClassInPackage(target, sfxgame, "SKM_RandomizeMorphHead", "MERControl");
-            ScriptTools.AddToClassInPackage(target, sfxgame, "BioPawn_RandomizeMorphHead", "MERControl");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "SKM_RandomizeMorphHead", "MERControl");
+            ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "BioPawn_RandomizeMorphHead", "MERControl");
             MERFileSystem.SavePackage(sfxgame);
 
             MERControl.SetVariable("fBioMorphFaceRandomization", option.SliderValue, CoalesceParseAction.Add);
