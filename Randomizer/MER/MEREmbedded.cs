@@ -43,20 +43,27 @@ namespace Randomizer.MER
 #if DEBUG
                 var items = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 #endif
-                return Assembly.GetExecutingAssembly().GetManifestResourceStream(assetpath);
+                var result = Assembly.GetExecutingAssembly().GetManifestResourceStream(assetpath);
+#if DEBUG
+                if (result == null)
+                {
+                    Debugger.Break();
+                }
+#endif
+                return result;
             }
             else
             {
                 var fullAssetPath = GetEmbeddedAssetBasePath(assettype, assetpath, shared);
 #if DEBUG
                 var items = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+#endif
                 var result = Assembly.GetExecutingAssembly().GetManifestResourceStream(fullAssetPath);
                 if (result == null)
-                    Debugger.Break();
+                {
+                    return GetEmbeddedAsset(assettype, assetpath, shared, true); // Flip over to this in case input was wrong
+                }
                 return result;
-#else
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream(assetBase + assetpath);
-#endif
             }
         }
 
