@@ -30,12 +30,19 @@
     {
         BestIdx = -1;
         BestRating = -1.0;
+        AILog_Internal("Looping enemy list");
         for (Idx = 0; Idx < EnemyList.Length; Idx++)
         {
             EnemyPawn = EnemyList[Idx].Pawn;
+            AILog_Internal("Evaluating: " $ EnemyPawn);
             if (EnemyPawn == None || EnemyPawn.IsValidTargetFor(Self) == FALSE)
             {
                 AILog_Internal("Warning: Invalid pawn contained in the enemy list", 'Enemy');
+                continue;
+            }
+            if (SFXPawn_Player(EnemyPawn) == None && SFXPawn_Henchman(EnemyPawn) == None)
+            {
+                AILog_Internal("MER Warning: Reaper is not allowed to target anything but player and party");
                 continue;
             }
             AILog_Internal(((("Rate: " $ EnemyList[Idx].Pawn) $ " (") $ EnemyList[Idx].Pawn.Tag) $ ")", 'Enemy');
@@ -163,6 +170,7 @@
     }
     else
     {
+        LogInternal("AI does not have a valid enemy.", );
         FireTarget = None;
     }
     if (OldTarget != FireTarget)
