@@ -82,7 +82,7 @@ namespace Randomizer.Randomizers.Game2.Talents
             var displayName = CondensedProperties.GetProp<StringRefProperty>("DisplayName");
             if (displayName != null)
             {
-                PowerName = TLKBuilder.TLKLookupByLang(displayName.Value, MELocalization.INT);
+                PowerName = TLKBuilder.TLKLookupByLang(displayName.Value, MELocalization.INT, alsoLookedUpMER: true);
             }
 
             ShowInCR = CondensedProperties.GetProp<BoolProperty>("DisplayInCharacterRecord")?.Value ?? true;
@@ -141,8 +141,9 @@ namespace Randomizer.Randomizers.Game2.Talents
             if (IsEvolution)
             {
                 // Setup the blurb
-                var blurbDesc = TLKBuilder.TLKLookupByLang(CondensedProperties.GetProp<StringRefProperty>("TalentDescription").Value, MELocalization.INT).Split('\n')[0];
-                EvolvedBlurb = $"{PowerName}: {blurbDesc}";
+                var blurbDesc = TLKBuilder.TLKLookupByLang(CondensedProperties.GetProp<StringRefProperty>("TalentDescription").Value, MELocalization.INT, alsoLookedUpMER: true);
+                var blurbDesc2 = blurbDesc.Split('\n')[0];
+                EvolvedBlurb = $"{PowerName}: {blurbDesc2}";
             }
 
             IsAmmoPower = PowerName != null && PowerName.Contains("Ammo");

@@ -311,8 +311,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 
                                 if (!TLKBuilder.IsAssignedMERString(descriptionProp.Value))
                                 {
-                                    var description =
-                                        TLKBuilder.TLKLookupByLang(descriptionProp.Value, MELocalization.INT);
+                                    var description = TLKBuilder.TLKLookupByLang(descriptionProp.Value, MELocalization.INT, alsoLookedUpMER: true);
                                     var descriptionLines = description.Split('\n');
                                     descriptionLines[2] = $"1) {henchInfo.GenderizeString(evolution1.EvolvedBlurb)}";
                                     descriptionLines[4] = $"2) {henchInfo.GenderizeString(evolution2.EvolvedBlurb)}";
@@ -1123,7 +1122,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                     0);
 
                 // The fastest way to the shuttle -> Destroy crate object
-                KismetHelper.CreateOutputLink(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_6"), "Done", 
+                KismetHelper.CreateOutputLink(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_6"), "Done",
                     controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.SeqAct_Destroy_0"),
                     0);
 

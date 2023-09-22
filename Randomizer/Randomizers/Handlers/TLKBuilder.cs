@@ -30,10 +30,12 @@ namespace Randomizer.Randomizers.Handlers
         /// </summary>
         private static List<ITalkFile> MERTalkFiles { get; set; }
 
+#if __GAME1__
         /// <summary>
         /// The package that contains the global TLK
         /// </summary>
         private static List<IMEPackage> Game1GlobalTlkPackages { get; set; }
+#endif
 
         /// <summary>
         /// Gets the talk file
@@ -94,12 +96,22 @@ namespace Randomizer.Randomizers.Handlers
         /// <param name="stringId"></param>
         /// <param name="langCode">Upper case lang code</param>
         /// <returns></returns>
-        public static string TLKLookupByLang(int stringId, MELocalization localization)
+        public static string TLKLookupByLang(int stringId, MELocalization localization, bool alsoLookedUpMER = false)
         {
             if (stringId <= 0) return null; // No data
             if (LoadedOfficialTalkFiles != null)
             {
                 foreach (var tf in LoadedOfficialTalkFiles.Where(x => x.Localization == localization))
+                {
+                    var data = tf.FindDataById(stringId, returnNullIfNotFound: true, noQuotes: true);
+                    if (data != null)
+                        return data;
+                }
+            }
+
+            if (alsoLookedUpMER)
+            {
+                foreach (var tf in MERTalkFiles.Where(x => x.Localization == localization))
                 {
                     var data = tf.FindDataById(stringId, returnNullIfNotFound: true, noQuotes: true);
                     if (data != null)
@@ -140,9 +152,6 @@ namespace Randomizer.Randomizers.Handlers
             // ME2 doesn't appear to use $ repoints
             CurrentHandler.InternalReplaceStringByRepoint(oldTlkId, newTlkId);
         }
-
-
-
         #endregion
 
         #region Private members
@@ -217,7 +226,7 @@ namespace Randomizer.Randomizers.Handlers
             var tlkFiles = Directory.GetFiles(bgPath, "*.tlk", SearchOption.AllDirectories);
             foreach (var tlkFile in tlkFiles)
             {
-                if (tlkFile.Contains($"DLC_{(target.Game == MEGame.LE2 ? 39200 : 440)}")) // Change if our module number changes
+                if (tlkFile.Contains("DLC_39200")) // Change if our module number changes
                 {
                     var tf = new ME2ME3TalkFile();
                     tf.LoadTlkData(tlkFile);
@@ -265,60 +274,80 @@ namespace Randomizer.Randomizers.Handlers
 #endif
         }
 
-            private void Commit()
-            {
+        private void Commit()
+        {
 #if __GAME1__
             // Game 1 uses embedded TLKs. This method will commit the
             // the GlobalTlk for the DLC component.
 
 #elif __GAME2__ || __GAME3__
 
-                // Write out the TLKs
-                Parallel.ForEach(MERTalkFiles, tf =>
+            // Write out the TLKs
+            Parallel.ForEach(MERTalkFiles, tf =>
+            {
+                if (tf.IsModified)
                 {
-                    if (tf.IsModified)
-                    {
-                        var gsTLK = tf as ME2ME3TalkFile;
-                        var hc = new LegendaryExplorerCore.TLK.ME2ME3.HuffmanCompression();
-                        hc.LoadInputData(tf.StringRefs);
-                        hc.SaveToFile(gsTLK.FilePath);
-                    }
-                });
+                    var gsTLK = tf as ME2ME3TalkFile;
+                    var hc = new LegendaryExplorerCore.TLK.ME2ME3.HuffmanCompression();
+                    hc.LoadInputData(tf.StringRefs);
+                    hc.SaveToFile(gsTLK.FilePath);
+                }
+            });
 #endif
 
-                // Free memory
-                MERTalkFile = null;
-                MERTalkFiles = null;
-                LoadedOfficialTalkFiles = null;
-                _updatedTlkStrings = null;
+            // Free memory
+            MERTalkFile = null;
+            MERTalkFiles = null;
+            LoadedOfficialTalkFiles = null;
+            _updatedTlkStrings = null;
 #if __GAME1__
             Game1GlobalTlkPackages = null;
 #endif
-            }
+        }
 
-            private int GetNextID()
-            {
-                return NextDynamicID++;
-            }
+        private int GetNextID()
+        {
+            return NextDynamicID++;
+        }
 
-            private void InternalReplaceString(int stringid, string newText, MELocalization? localization = null)
+        private void InternalReplaceString(int stringid, string newText, MELocalization? localization = null)
+        {
+            foreach (var tf in MERTalkFiles)
             {
-                foreach (var tf in MERTalkFiles)
+                // Check if this string should be replaced in this language
+                if (localization != null && tf.Localization != localization) continue;
+                //Debug.WriteLine($"TLK installing {stringid}: {newText}");
+                lock (syncObj)
                 {
-                    // Check if this string should be replaced in this language
-                    if (localization != null && tf.Localization != localization) continue;
-                    //Debug.WriteLine($"TLK installing {stringid}: {newText}");
-                    lock (syncObj)
-                    {
-                        //Debug.WriteLine($"ReplaceStr {stringid} to {newText}");
-                        tf.ReplaceString(stringid, newText, true);
-                    }
+                    //Debug.WriteLine($"ReplaceStr {stringid} to {newText}");
+                    tf.ReplaceString(stringid, newText, true);
                 }
             }
+        }
 
         private object syncObj = new object();
 
-
+        /// <summary>
+        /// Merges the embedded TLKs into the final global TLKs for the randomizer mod
+        /// </summary>
+        public static void MergeEmbeddedTLKs()
+        {
+            var embeddedTLKs = MEREmbedded.ListEmbeddedAssets("Binary", "TLK");
+            foreach (var v in embeddedTLKs)
+            {
+                var loc = v.GetUnrealLocalization();
+                if (loc == MELocalization.INT)
+                {
+                    var tlkData = MEREmbedded.GetEmbeddedAsset("Binary", v, fullPath: true);
+                    var tlk = new ME2ME3TalkFile(tlkData);
+                    var destTlk = TLKBuilder.CurrentHandler.MERTalkFile;
+                    foreach (var str in tlk.StringRefs)
+                    {
+                        destTlk.ReplaceString(str.StringID, str.Data, addIfNotFound: true);
+                    }
+                }
+            }
+        }
 
         public static IEnumerable<ITalkFile> GetOfficialTLKs()
         {
