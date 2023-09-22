@@ -93,8 +93,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
             "SFXPower_BioticChargeLong_AsariSpectre",
         };
 
-
-
         internal class PowerInfo2
         {
             public string PowerIFP;
@@ -110,7 +108,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     dict[@"BasePowerName"] = BasePowerName;
                 }
                 dict[@"CapabilityType"] = CapabilityType;
-
 
                 return StringStructParser.BuildCommaSeparatedSplitValueList(dict, @"PowerIFP", @"BasePowerName");
             }
@@ -138,7 +135,8 @@ namespace Randomizer.Randomizers.Game2.Enemy
             var bioWeapon = CoalescedHandler.GetIniFile("BioWeapon.ini");
             var section = bioWeapon.GetOrAddSection("SFXGame.SFXLoadoutDataMER");
 
-            foreach (var powExp in pb.Exports.Where(x => x.IsClass && x.InheritsFrom("SFXPower")))
+            var referencer = pb.FindExport("ObjectReferencer_0");
+            foreach (var powExp in referencer.GetProperty<ArrayProperty<ObjectProperty>>("ReferencedObjects").Select(x => x.ResolveToExport(pb)))
             {
                 var powInfo = new PowerInfo2()
                 {
