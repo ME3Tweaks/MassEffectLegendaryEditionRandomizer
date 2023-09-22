@@ -65,7 +65,6 @@ namespace Randomizer.Randomizers.Game2
                 }
 
                 // Install dependencies of utility class
-                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "SFXObjectPinner");
                 ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERMorphStructs");
                 ScriptTools.InstallClassToPackage(target, sfxgame, "CCAlgorithm", @"Class CCAlgorithm; var MorphRandomizationAlgorithm algorithm; defaultproperties{}");
 
@@ -85,14 +84,14 @@ namespace Randomizer.Randomizers.Game2
         /// </summary>
         /// <param name="target"></param>
         /// <param name="sfxgame"></param>
-        private static void InstallObjectPinSystem(GameTarget target, IMEPackage sfxgame)
+        public static void InstallObjectPinSystem(GameTarget target, IMEPackage sfxgame)
         {
             if (sfxgame.FindExport("SFXEngine.PinnedObjects") == null)
             {
                 ScriptTools.AddToClassInPackage(target, sfxgame, @"var array<Object> PinnedObjects;", "SFXEngine");
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "SFXObjectPinner");
             }
         }
-
 
         public static bool InstallMERControl(GameTarget target)
         {
