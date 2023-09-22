@@ -53,10 +53,14 @@ SFXGameContentDLC.SFXPower_ZaeedUnique
 SFXGameContentKasumi.SFXPower_KasumiCloakTeleport
 SFXGameContentKasumi.SFXPower_Overload_Kasumi
 SFXGameContentKasumi.SFXPower_KasumiPassive
-SFXGameContentKasumi.SFXPower_KasumiUnique
+// This requires Kasumi AI
+// SFXGameContentKasumi.SFXPower_KasumiUnique
 // Called by KasumiCloakTeleport, must be in powers as well
 // SFXGameContentKasumi.SFXPower_KasumiAssassinate
 SFXGameContentKenson.SFXPower_Overload_Kenson
 SFXGameContentKenson.SFXPower_Incinerate_Kenson
 SFXGameContentKenson.SFXPower_CryoFreeze_Kenson
 SFXGameContentKenson.SFXPower_KensonPassive
+// Custom
+MERGameContent_Powers.SFXPower_HenchFirstAid
+MERGameContent_Powers.SFXPower_HenchShadowStrike
