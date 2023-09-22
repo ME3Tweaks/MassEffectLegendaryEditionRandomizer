@@ -140,6 +140,9 @@ namespace Randomizer.Randomizers.Game2
             Exception rethrowException = null;
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
                 // Initialize FileSystem and handlers
                 MERFileSystem.InitMERFS(SelectedOptions);
 
@@ -150,8 +153,7 @@ namespace Randomizer.Randomizers.Game2
                     GestureManager.Init(SelectedOptions.RandomizationTarget);
                 }
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+
 
                 // Install MERControl as many things will depend on it
                 MERControl.InstallMERControl(SelectedOptions.RandomizationTarget);
@@ -182,20 +184,29 @@ namespace Randomizer.Randomizers.Game2
                     var actualPath = Path.Combine(MERFileSystem.DLCModCookedPath, MEREmbedded.GetFilenameFromAssetName(package));
                     installTimeOnlyPackages.Add(actualPath);
 
+                    MERLog.Information($"Inventorying kismet package {actualPath}");
                     using var p = MEPackageHandler.OpenMEPackage(actualPath);
                     foreach (var ex in p.Exports.Where(x => x.IsClass && x.InheritsFrom("SequenceObject")))
                     {
                         var classInfo = GlobalUnrealObjectInfo.generateClassInfo(ex);
                         var defaults = p.GetUExport(ObjectBinary.From<UClass>(ex).Defaults);
-                        Debug.WriteLine($@"Inventorying {ex.InstancedFullPath}");
+                        MERLog.Information($@"Inventorying class {ex.InstancedFullPath}");
                         GlobalUnrealObjectInfo.GenerateSequenceObjectInfoForClassDefaults(defaults);
                         GlobalUnrealObjectInfo.InstallCustomClassInfo(ex.ObjectName, classInfo, ex.Game);
                     }
                 }
 
-                // Merge TLK data - this makes lookups work
-                TLKBuilder.MergeEmbeddedTLKs();
+                if (SelectedOptions.SelectedOptions.Any(x => x.RequiresTLK))
+                {
+                    // Merge TLK data - this makes lookups work
+                    TLKBuilder.MergeEmbeddedTLKs();
+                }
 
+                // Save SFXGame to disk here
+                SFXGame.GetSFXGame(SelectedOptions.RandomizationTarget).Save();
+
+
+                MERLog.Information($"Initialization complete, took {sw.ElapsedMilliseconds}ms");
                 // Pass 1: All randomizers that are file specific and are not post-run
                 foreach (var sr in specificRandomizers.Where(x => !x.IsPostRun))
                 {

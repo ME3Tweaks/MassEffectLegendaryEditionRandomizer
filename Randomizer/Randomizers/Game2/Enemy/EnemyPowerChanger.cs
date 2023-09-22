@@ -126,17 +126,17 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
         public static bool InitLE2R(GameTarget target, RandomizationOption option)
         {
-            MERFileSystem.InstallAlways("EnemyPowerRandomizer");
+            MERFileSystem.InstallAlways("PowerBank");
             MERFileSystem.SavePackage(SFXGame.CreateAndSetupMERLoadoutClass(target));
             SharedLE2Fixes.InstallPowerUsageFixes(); // Fixes collector ai
 
-            using var pb = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "EnemyPowersBank.pcc"));
+            using var pb = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "MERPowersBank.pcc"));
 
             var bioWeapon = CoalescedHandler.GetIniFile("BioWeapon.ini");
             var section = bioWeapon.GetOrAddSection("SFXGame.SFXLoadoutDataMER");
 
-            var referencer = pb.FindExport("ObjectReferencer_0");
-            foreach (var powExp in referencer.GetProperty<ArrayProperty<ObjectProperty>>("ReferencedObjects").Select(x => x.ResolveToExport(pb)))
+            var ePowersList = PackageTools.GetExportList(pb, "EnemyPowersReferencer");
+            foreach (var powExp in ePowersList)
             {
                 var powInfo = new PowerInfo2()
                 {

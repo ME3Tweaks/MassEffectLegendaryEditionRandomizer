@@ -168,7 +168,7 @@ namespace Randomizer.Randomizers.Utility
                 parentExport = packageToInstallTo.FindExport(rootPackageName);
                 if (parentExport == null)
                 {
-                    // Create the root package we will instal the class under
+                    // Create the root package we will install the class under
                     parentExport = ExportCreator.CreatePackageExport(packageToInstallTo, rootPackageName);
                 }
             }

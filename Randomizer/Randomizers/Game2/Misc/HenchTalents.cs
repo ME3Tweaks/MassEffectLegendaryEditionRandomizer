@@ -39,19 +39,19 @@ namespace Randomizer.Randomizers.Game2.Misc
             using var loadoutPackageP =
                 MEPackageHandler.OpenMEPackageFromStream(loadoutPackage, @"Startup_LE2R_HenchLoadouts.pcc");
 
-            var allPowers = MEREmbedded.GetEmbeddedPackage(MEGame.LE2, @"AllPowers.pcc");
-            using var allPowersP = MEPackageHandler.OpenMEPackageFromStream(allPowers, @"AllPowers.pcc");
+            var allPowers = MEREmbedded.GetEmbeddedPackage(target.Game, @"Always_PowerBank.MERPowersBank.pcc");
+            using var allPowersP = MEPackageHandler.OpenMEPackageFromStream(allPowers, @"MERPowersBank.pcc");
 
-            var henchBasePowerIFPs = MEREmbedded.GetEmbeddedTextAsset(@"Powers.BasePowerIFPs.txt").SplitToLines()
-                .Where(x => !x.StartsWith(@"//")).ToList();
-
+            var henchBasePowers = PackageTools.GetExportList(allPowersP, "HenchPowersReferencer");
+            
             List<HTalent> talentPoolMaster = new List<HTalent>(); // The base powers list (should be half the size of evolvedTalentPoolMaster)
             List<HTalent> evolvedTalentPoolMaster = new List<HTalent>(); // The master list (DO NOT EDIT) of all rank 4 powers
             ConcurrentBag<string> passiveStrs = new ConcurrentBag<string>(); // The list of passive strings, resolved via TLK
 
-            foreach (var hb in henchBasePowerIFPs)
+            foreach (var hb in henchBasePowers)
             {
-                var htalent = new HTalent(allPowersP.FindExport(hb));
+                var htalent = new HTalent(hb);
+
                 talentPoolMaster.Add(htalent);
                 if (htalent.HasEvolution())
                 {
@@ -1249,9 +1249,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         }
 
         /// <summary>
-        /// Generates the structs for
-        /// <param name="powerClass">The kit-power to depend on.</param>
-        /// <returns>< UnlockRequirements that are used to setup a dependency on this power
+        /// Generates the structs for the listed dependency requirement
         /// </summary>/returns>
         private static List<StructProperty> GetUnlockRequirementsForPower(ExportEntry powerClass, bool isLoyaltyPower, bool blankUnlock = false)
         {

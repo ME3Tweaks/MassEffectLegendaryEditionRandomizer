@@ -14,6 +14,7 @@ using LegendaryExplorerCore.UnrealScript.Compiling.Errors;
 using LegendaryExplorerCore.UnrealScript.Language.Tree;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Talents;
 
 namespace Randomizer.Randomizers.Utility
 {
@@ -317,6 +318,20 @@ namespace Randomizer.Randomizers.Utility
             }
             string fullPath = parent is null ? className : $"{parent.InstancedFullPath}.{className}";
             return Pcc.FindExport(fullPath);
+        }
+
+        /// <summary>
+        /// Returns the list of objects in the object referencer with the given name. Only returns exports
+        /// </summary>
+        /// <param name="package"></param>
+        /// <param name="referencerIFP"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static List<ExportEntry> GetExportList(IMEPackage package, string referencerIFP)
+        {
+            var exp = package.FindExport(referencerIFP);
+            return exp.GetProperty<ArrayProperty<ObjectProperty>>("ReferencedObjects").Where(x => x.Value > 0)
+                .Select(x => x.ResolveToExport(package)).ToList();
         }
     }
 }

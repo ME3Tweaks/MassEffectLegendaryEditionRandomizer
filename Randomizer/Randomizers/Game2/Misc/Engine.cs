@@ -15,13 +15,7 @@ namespace Randomizer.Randomizers.Game2.Misc
     {
         public static IMEPackage GetEngine(GameTarget target)
         {
-            var engine = Path.Combine(target.TargetPath, "BioGame", "CookedPCConsole", "Engine.pcc");
-            if (File.Exists(engine))
-            {
-                return MEPackageHandler.OpenMEPackage(engine);
-            }
-
-            return null;
+            return MERCaches.GlobalCommonLookupCache.GetCachedPackage("Engine.pcc");
         }
     }
 }

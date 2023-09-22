@@ -15,25 +15,7 @@ namespace Randomizer.Randomizers.Game2.Misc
     {
         public static IMEPackage GetSFXGame(GameTarget target)
         {
-            var sfxgame = Path.Combine(target.TargetPath, "BioGame", "CookedPCConsole", "SFXGame.pcc");
-            if (File.Exists(sfxgame))
-            {
-                return MEPackageHandler.OpenMEPackage(sfxgame);
-            }
-
-            return null;
-        }
-
-
-        private static IMEPackage GetEngine(GameTarget target)
-        {
-            var engine = Path.Combine(target.TargetPath, "BioGame", "CookedPCConsole", "Engine.pcc");
-            if (File.Exists(engine))
-            {
-                return MEPackageHandler.OpenMEPackage(engine);
-            }
-
-            return null;
+            return MERCaches.GlobalCommonLookupCache.GetCachedPackage("SFXGame.pcc");
         }
 
         public static bool MakeShepardRagdollable(GameTarget target, RandomizationOption option)

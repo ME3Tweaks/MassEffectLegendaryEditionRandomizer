@@ -8,6 +8,7 @@ using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.Targets;
+using Randomizer.Randomizers.Game2.Misc;
 
 namespace Randomizer.MER
 {
@@ -15,10 +16,11 @@ namespace Randomizer.MER
     {
         public static void Init(GameTarget target)
         {
-            Debug.WriteLine("Loading global lookup cache");
-            _globalCommonLookupCache = new MERPackageCache(target, null, true);
+            MERLog.Information(@"Loading global package cache");
+            _globalCommonLookupCache = new MERPackageCache(target, null, false);
             foreach (var fullySafeFile in EntryImporter.FilesSafeToImportFrom(target.Game))
             {
+                MERLog.Information($"Caching {fullySafeFile} into memory");
                 _globalCommonLookupCache.GetCachedPackage(fullySafeFile);
             }
         }

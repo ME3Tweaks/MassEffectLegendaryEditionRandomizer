@@ -97,14 +97,13 @@ namespace Randomizer.Randomizers.Game2
         {
             // Engine class
             var engine = Engine.GetEngine(target);
-            ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: false);
+            ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
             MERFileSystem.SavePackage(engine);
 
             var sfxgame = SFXGame.GetSFXGame(target);
-            InstallObjectPinSystem(target, sfxgame); // Must come first as MERControl depends on this
-            ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl", useCache: false);
-            MERFileSystem.SavePackage(sfxgame);
-            MERCaches.ReInit(target); // Update the cache
+            // InstallObjectPinSystem(target, sfxgame); // Must come first as MERControl depends on this
+            ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
+            // MERFileSystem.SavePackage(sfxgame);
             return true;
         }
 
