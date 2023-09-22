@@ -61,6 +61,7 @@
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.jpg" />
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.uc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
+		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game2Debug'">
@@ -87,6 +88,7 @@
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.afc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
+		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
@@ -101,6 +103,8 @@
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.afc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
+		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
+
 	</ItemGroup>
 
 	<ItemGroup>
@@ -116,6 +120,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControlEngine.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERMorphStructs.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERSeqAct_RandomizeProbe.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXAI_Reaper.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXLoadoutDataMER.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\SFXObjectPinner.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\playerweaponifps.txt" />
@@ -131,6 +136,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\Debug\BioAiController.AILog_Internal.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GetPhysicsLevel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\HeightFog.PostBeginPlay.uc" />
@@ -142,6 +148,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\PlayerOnPowersLoaded.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXAI_Reaper.SelectTarget.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXGame.ModifyDamage.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXPawn_Reaper.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXPawn_Reaper.TakeDamage.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSaveGame.LoadMorphHead.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\SFXSkeletalMeshActorMAT.PostBeginPlay.uc" />
@@ -197,7 +204,6 @@
 		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE3\" />
 		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME1\" />
 		<Folder Include="Randomizers\Game2\Assets\Texture2D\" />
-		<Folder Include="Randomizers\Game2\Assets\Text\Scripts\Debug\" />
 		<Folder Include="Randomizers\Game3\Assets\Images\GalaxyMap\" />
 		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\Banshee\" />
 		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\GunnerTurret\AI\" />

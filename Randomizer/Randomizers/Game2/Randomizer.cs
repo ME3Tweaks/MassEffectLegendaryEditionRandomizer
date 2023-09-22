@@ -193,6 +193,9 @@ namespace Randomizer.Randomizers.Game2
                     }
                 }
 
+                // Merge TLK data - this makes lookups work
+                TLKBuilder.MergeEmbeddedTLKs();
+
                 // Pass 1: All randomizers that are file specific and are not post-run
                 foreach (var sr in specificRandomizers.Where(x => !x.IsPostRun))
                 {
@@ -303,6 +306,8 @@ namespace Randomizer.Randomizers.Game2
                 SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
                 SelectedOptions.SetCurrentOperationText?.Invoke("Finishing up");
                 SelectedOptions.NotifyDLCComponentInstalled?.Invoke(true);
+
+
             }
             catch (Exception exception)
             {
@@ -766,7 +771,7 @@ namespace Randomizer.Randomizers.Game2
                     },
 
                     // DLC
-                    new RandomizationOption() {HumanName = "Overlord DLC missions", Description = "Changes a few things across this DLC's missions", PerformSpecificRandomizationDelegate = OverlordDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Overlord", Description = "Changes a few things across the DLC's missions", PerformSpecificRandomizationDelegate = OverlordDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
                     new RandomizationOption() {HumanName = "Genesis Comic", Description = "Completely changes the story recap segment", PerformSpecificRandomizationDelegate = GenesisDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresTLK = true, IsRecommended = true},
                 }
             });
@@ -869,7 +874,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
                         IsRuntimeRandomizer = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
-                    new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
+                    // new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
                     new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
                         PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
