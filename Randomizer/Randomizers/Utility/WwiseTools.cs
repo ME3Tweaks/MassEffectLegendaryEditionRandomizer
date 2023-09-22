@@ -11,8 +11,7 @@ namespace Randomizer.Randomizers.Utility
     public static class WwiseTools
     {
         /// <summary>
-        /// Repoint a WwiseStream to play the data from another, typically across banks.
-        /// </summary>
+        /// Repoint a WwiseStream to play the data from another, typically across banks. The original data is copied into the target.
         /// <param name="originalExport">The audio you want to play (e.g. this is the audio that will be 'installed')</param>
         /// <param name="targetAudioStream">The audio stream that you want to replace.</param>
         public static void RepointWwiseStream(ExportEntry originalExport, ExportEntry targetAudioStream)
