@@ -1300,8 +1300,8 @@ namespace Randomizer.Randomizers.Game2.Levels
             using var package = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, file));
 
             // Logic here
+            PatchReaper(target, package, sequenceSupportPackage); // This must be done first as it modifies classes
             MichaelBayifyFinalFight(target, package, sequenceSupportPackage);
-            PatchReaper(target, package, sequenceSupportPackage);
             InstallAtmosphereHandler(package, sequenceSupportPackage); // <--- This must come before ChangeLowHealthEnemies!
             ChangeLowHealthEnemies(target, package, sequenceSupportPackage);
             RandomizePickups(target, package, sequenceSupportPackage);
@@ -1378,16 +1378,36 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         private static void PatchReaper(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
         {
-            ScriptTools.AddToClassInPackageFromEmbedded(target, package, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
-            ScriptTools.AddToClassInPackageFromEmbedded(target, package, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
-
             // BioWer Pls
             // Why is the reaper in here
             var stasisNew = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "SFXPower_StasisNew.pcc"));
-            ScriptTools.AddToClassInPackageFromEmbedded(target, stasisNew, "SFXPawn_Reaper.TakeDamage", "SFXGamePawns.SFXPawn_Reaper");
-            ScriptTools.AddToClassInPackageFromEmbedded(target, stasisNew, "SFXAI_Reaper.SelectTarget", "SFXGamePawns.SFXAI_Reaper"); // Also ignore stealthed targets
+
+            var packages = new[] { package, stasisNew };
+            foreach (var p in packages)
+            {
+                // This must be ported in because it will not be in non suicide mission packages
+                var ported = PackageTools.PortExportIntoPackage(target, p, sequenceSupportPackage.FindExport("MERGameContent.MERReaperWeaponInfo"));
+
+                ScriptTools.InstallClassToPackageFromEmbedded(target, p, "SFXAI_Reaper", "SFXGamePawns");
+                
+                ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXPawn_Reaper.TakeDamage",
+                    "SFXGamePawns.SFXPawn_Reaper"); // Prevents damage to self or from team
+               /* ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.SelectTarget",
+                    "SFXGamePawns.SFXAI_Reaper"); // Ignore stealthed and non-player party targets
+                ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.OnTargetChanged",
+                    "SFXGamePawns.SFXAI_Reaper"); // Do not stop firing on target change */
+#if DEBUG
+                p.FindExport("SFXGamePawns.SFXAI_Reaper").GetDefaults().WriteProperty(new BoolProperty(true, "bAILogging"));
+                p.FindExport("SFXGamePawns.SFXAI_Reaper").GetDefaults().WriteProperty(new BoolProperty(true, "bAILogToWindow"));
+#endif
+            }
 
             MERFileSystem.SavePackage(stasisNew);
+
+#if DEBUG
+            MERDebug.InstallDebugScript(target, "SFXGame.pcc", "BioAiController.AILog_Internal");
+#endif
+            // Incoming package is not saved as its passed through
         }
 
 
