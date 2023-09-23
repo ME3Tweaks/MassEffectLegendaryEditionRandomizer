@@ -57,11 +57,11 @@ namespace RandomizerUI
         private static void SetupFirstVariables()
         {
 #if __GAME1__
-            MCoreFilesystem.AppDataFolderName = "ME1Randomizer";
+            MCoreFilesystem.AppDataFolderName = "LE1Randomizer";
 #elif __GAME2__
-            MCoreFilesystem.AppDataFolderName = "ME2Randomizer";
+            MCoreFilesystem.AppDataFolderName = "LE2Randomizer";
 #elif __GAME3__
-            MCoreFilesystem.AppDataFolderName = "ME3Randomizer";
+            MCoreFilesystem.AppDataFolderName = "LE3Randomizer";
 #endif
 
             MERSettings.InitRegistryKey();

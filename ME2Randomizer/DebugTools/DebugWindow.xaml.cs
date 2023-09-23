@@ -68,10 +68,5 @@ namespace RandomizerUI.DebugTools
         {
             //ME2Debug.CheckImportsWithPersistence();
         }
-
-        private void TestSaveWipe_Click(object sender, RoutedEventArgs e)
-        {
-            TalentReset.GetSaveFiles();
-        }
     }
 }
