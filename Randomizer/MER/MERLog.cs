@@ -12,11 +12,11 @@ namespace Randomizer.MER
     public static class MERLog
     {
 #if __GAME1__
-        private const string Prefix = "MER";
+        private const string Prefix = "LE1R";
 #elif __GAME2__
-        private const string Prefix = "ME2R";
+        private const string Prefix = "LE2R";
 #elif __GAME3__
-        private const string Prefix = "ME3R";
+        private const string Prefix = "LE3R";
 #endif
         public static void Exception(Exception exception, string preMessage, bool fatal = false)
         {

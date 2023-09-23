@@ -743,7 +743,17 @@ namespace Randomizer.MER
 
         public static void DoStuff(object sender, DoWorkEventArgs e)
         {
-            ReplaceGetUExport();
+            var pp = @"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank.pcc";
+            var p = MEPackageHandler.OpenMEPackage(pp);
+
+            var referencer = PackageTools.CreateObjectReferencer(p);
+            foreach (var exp in p.Exports.Where(x => x.IsClass && x.InheritsFrom("SFXPower")))
+            {
+                PackageTools.AddToObjectReferencer(exp);
+            }
+
+            p.Save(@"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank_or.pcc");
+            //ReplaceGetUExport();
         }
     }
 }

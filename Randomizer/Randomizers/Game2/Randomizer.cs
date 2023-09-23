@@ -146,6 +146,9 @@ namespace Randomizer.Randomizers.Game2
                 // Initialize FileSystem and handlers
                 MERFileSystem.InitMERFS(SelectedOptions);
 
+                // Initialize the global cache system
+                MERCaches.Init(SelectedOptions.RandomizationTarget);
+
                 // Initialize any special items here
                 if (SelectedOptions.SelectedOptions.Any(x => x.RequiresGestures))
                 {
@@ -153,7 +156,7 @@ namespace Randomizer.Randomizers.Game2
                     GestureManager.Init(SelectedOptions.RandomizationTarget);
                 }
 
-
+                
 
                 // Install MERControl as many things will depend on it
                 MERControl.InstallMERControl(SelectedOptions.RandomizationTarget);
@@ -362,6 +365,7 @@ namespace Randomizer.Randomizers.Game2
             PawnPorting.ResetClass();
             NPCHair.ResetClass();
             MERControl.ResetClass();
+            MERCaches.Cleanup();
         }
 
 

@@ -6,21 +6,21 @@
 		<Configurations>Game1Debug;Game1Release;Game2Debug;Game2Release;Game3Debug;Game3Release</Configurations>
 		<Authors>Mgamerz</Authors>
 		<Company>ME3Tweaks</Company>
-		<Copyright>2017 - 2023 ME3Tweaks</Copyright>
+		<Copyright>2017-2023 ME3Tweaks</Copyright>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
-		<Product>Mass Effect Randomizer Core Library</Product>
+		<Product>Mass Effect Legendary Edition Randomizer Core Library</Product>
 		<Description>Core randomization library for Mass Effect (Legendary Edition)</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
-		<Product>Mass Effect 2 Randomizer Core Library</Product>
+		<Product>Mass Effect 2 Legendary Edition Randomizer Core Library</Product>
 		<Description>Core randomization library for Mass Effect 2 (Legendary Edition)</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
-		<Product>Mass Effect 3 Randomizer Core Library</Product>
+		<Product>Mass Effect 3 Legendary Edition Randomizer Core Library</Product>
 		<Description>Core randomization library for Mass Effect 3 (Legendary Edition)</Description>
 	</PropertyGroup>
 
@@ -35,11 +35,11 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game2Debug|x64'">
 		<DefineConstants>DEBUG;TRACE;__GAME2__</DefineConstants>
-		<DefaultItemExcludes>$(DefaultItemExcludes);Randomizers\Game1\**\*;Randomizers\Game3\**\*</DefaultItemExcludes>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Randomizers\Game1\**;Randomizers\Game3\**</DefaultItemExcludes>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game2Release|x64'">
-		<DefineConstants>TRACE;__GAME2__</DefineConstants>
-		<DefaultItemExcludes>$(DefaultItemExcludes);Randomizers\Game1\**\*;Randomizers\Game3\**\*</DefaultItemExcludes>
+		<DefineConstants>__GAME2__</DefineConstants>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Randomizers\Game1\**;Randomizers\Game3\**</DefaultItemExcludes>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game3Debug|x64'">
@@ -57,11 +57,13 @@
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.xml" />
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.zip" />
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.pcc" />
-		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.png" />
-		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.jpg" />
-		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.uc" />
-		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
-		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.png" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.jpg" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.uc" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.tfc" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.tlk" />
+		<Folder Include="Randomizers\Game1\Assets\StarterKit\" />
+
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game2Debug'">
@@ -89,6 +91,15 @@
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
+
+		<Folder Include="Randomizers\Game2\Assets\Binary\ME2\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\LE2\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE2\Gestures\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME2\Gestures\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE1\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE3\" />
+		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME1\" />
+		<Folder Include="Randomizers\Game2\Assets\Texture2D\" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
@@ -101,9 +112,15 @@
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.jpg" />
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.uc" />
 		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.afc" />
-		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
-		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
-		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
+		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.tfc" />
+		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.bk2" />
+		<EmbeddedResource Include="Randomizers\Game3\Assets\**\*.tlk" />
+
+		<Folder Include="Randomizers\Game3\Assets\Images\GalaxyMap\" />
+		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\Banshee\" />
+		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\GunnerTurret\AI\" />
+		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\Gunner\Pawn\" />
+		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\PlayerTeamDominate\" />
 
 	</ItemGroup>
 
@@ -192,22 +209,5 @@
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCoreWPF\ME3TweaksCoreWPF.csproj" />
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\ME3TweaksCore.csproj" />
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\submodules\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Randomizers\Game1\Assets\StarterKit\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\ME2\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\LE2\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE2\Gestures\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME2\Gestures\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE1\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE3\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME1\" />
-		<Folder Include="Randomizers\Game2\Assets\Texture2D\" />
-		<Folder Include="Randomizers\Game3\Assets\Images\GalaxyMap\" />
-		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\Banshee\" />
-		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\GunnerTurret\AI\" />
-		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\Enemies\Gunner\Pawn\" />
-		<Folder Include="Randomizers\Game3\Assets\Text\Scripts\PlayerTeamDominate\" />
 	</ItemGroup>
 </Project>

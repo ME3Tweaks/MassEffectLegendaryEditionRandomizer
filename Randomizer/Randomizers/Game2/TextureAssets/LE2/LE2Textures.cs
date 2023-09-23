@@ -13,8 +13,6 @@ using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
 {
-#if DEBUG
-
     public class SourceTexture
     {
         private string FindFile()
@@ -74,7 +72,6 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
             newEntry.ObjectName = Id;
         }
     }
-#endif
 
     public static class LE2Textures
     {
