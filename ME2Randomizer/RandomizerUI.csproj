@@ -1,137 +1,140 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-	  <TargetFrameworks>net6.0-windows10.0.19041</TargetFrameworks>
-    <UseWPF>true</UseWPF>
-    <Platforms>x64</Platforms>
-    <Configurations>Game1Debug;Game1Release;Game2Debug;Game2Release;Game3Debug;Game3Release</Configurations>
-    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
-    <Company>ME3Tweaks</Company>
-    <Authors>ME3Tweaks</Authors>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net6.0-windows10.0.19041</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<Platforms>x64</Platforms>
+		<Configurations>Game1Debug;Game1Release;Game2Debug;Game2Release;Game3Debug;Game3Release</Configurations>
+		<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+		<Company>ME3Tweaks</Company>
+		<Authors>ME3Tweaks</Authors>
 
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="DebugTools\DebugWindow.xaml" />
-    <None Remove="DebugTools\MemoryAnalyzerUI.xaml" />
-    <Resource Include="fonts\aerolight.ttf" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="DebugTools\DebugWindow.xaml" />
+		<None Remove="DebugTools\MemoryAnalyzerUI.xaml" />
+		<Resource Include="fonts\aerolight.ttf" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Game1Debug'">
-    <DefineConstants>DEBUG;__GAME1__</DefineConstants>
-    <XamlDebuggingInformation>True</XamlDebuggingInformation>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game2Debug'">
-    <DefineConstants>DEBUG;__GAME2__</DefineConstants>
-    <XamlDebuggingInformation>True</XamlDebuggingInformation>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game3Debug'">
-    <DefineConstants>DEBUG;__GAME3__</DefineConstants>
-    <XamlDebuggingInformation>True</XamlDebuggingInformation>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game1Debug'">
+		<DefineConstants>DEBUG;__GAME1__</DefineConstants>
+		<XamlDebuggingInformation>True</XamlDebuggingInformation>
+		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game2Debug'">
+		<DefineConstants>DEBUG;__GAME2__</DefineConstants>
+		<XamlDebuggingInformation>True</XamlDebuggingInformation>
+		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game3Debug'">
+		<DefineConstants>DEBUG;__GAME3__</DefineConstants>
+		<XamlDebuggingInformation>True</XamlDebuggingInformation>
+		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Game1Release'">
-    <DefineConstants>__GAME1__</DefineConstants>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game2Release'">
-    <DefineConstants>__GAME2__</DefineConstants>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game3Release'">
-    <DefineConstants>__GAME3__</DefineConstants>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game1Release'">
+		<DefineConstants>__GAME1__</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<Description>Randomizer for Mass Effect Legendary Edition</Description>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game2Release'">
+		<DefineConstants>__GAME2__</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<Description>Randomizer for Mass Effect 2 Legendary Edition</Description>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game3Release'">
+		<DefineConstants>__GAME3__</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<Description>Randomizer for Mass Effect 3 Legendary Edition</Description>
+	</PropertyGroup>
 
-  <!--VERSION INFO-->
-  <PropertyGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
-    <ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
-    <Product>Mass Effect Randomizer</Product>
-    <Description>Randomizer for Mass Effect (Original and Legendary Edition)</Description>
-    <Copyright>2018-2022 ME3Tweaks</Copyright>
-    <Version>0.1.0</Version>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
-    <ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
-    <Product>Mass Effect 2 Randomizer</Product>
-    <Description>Randomizer for Mass Effect 2 (Original and Legendary Edition)</Description>
-    <Copyright>2019-2022 ME3Tweaks</Copyright>
-    <Version>0.9.50</Version>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
-    <ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
-    <Product>Mass Effect 3 Randomizer</Product>
-    <Description>Randomizer for Mass Effect 3 Legendary Edition</Description>
-    <Copyright>2021-2022 ME3Tweaks</Copyright>
-    <Version>0.1.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <Resource Include="images\shared\*.png" />
-    <Resource Include="images\shared\*.jpg" />
-    <Resource Include="masseffectrandomizer.ico" />
-    <EmbeddedResource Include="staticfiles\**\*" />
-  </ItemGroup>
+	<!--VERSION INFO-->
+	<PropertyGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
+		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
+		<Product>Mass Effect Legendary Edition Randomizer</Product>
+		<Description>Randomizer for Mass Effect Legendary Edition</Description>
+		<Copyright>2018-2023 ME3Tweaks</Copyright>
+		<Version>0.1.0</Version>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
+		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
+		<Product>Mass Effect 2 Legendary Edition Randomizer</Product>
+		<Description>Randomizer for Mass Effect 2 Legendary Edition</Description>
+		<Copyright>2019-2023 ME3Tweaks</Copyright>
+		<Version>0.9.50</Version>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
+		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
+		<Product>Mass Effect 3 Legendary Edition Randomizer</Product>
+		<Description>Randomizer for Mass Effect 3 Legendary Edition</Description>
+		<Copyright>2021-2022 ME3Tweaks</Copyright>
+		<Version>0.1.0</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<Resource Include="images\shared\*.png" />
+		<Resource Include="images\shared\*.jpg" />
+		<Resource Include="masseffectrandomizer.ico" />
+		<EmbeddedResource Include="staticfiles\**\*" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
-    <Resource Include="images\game1\*.jpg" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
-    <Resource Include="images\game2\*.jpg" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
-    <Resource Include="images\game3\*.jpg" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
+		<Resource Include="images\game1\*.jpg" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
+		<Resource Include="images\game2\*.jpg" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
+		<Resource Include="images\game3\*.jpg" />
+	</ItemGroup>
 
 
-  <ItemGroup>
-    <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Fody" Version="6.8.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft-Windows10-APICodePack-Core" Version="1.1.5" />
-    <PackageReference Include="Microsoft.AppCenter" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.2" />
-    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
-    <PackageReference Include="Serilog" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
-    <ProjectReference Include="..\ME3TweaksCore\ME3TweaksCoreWPF\ME3TweaksCoreWPF.csproj" />
-    <ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\ME3TweaksCore.csproj" />
-    <ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\submodules\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
-    <ProjectReference Include="..\Randomizer\Randomizer.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Classes\Restore\" />
-    <Folder Include="images\game1\" />
-    <Folder Include="images\game3\" />
-    <Folder Include="staticfiles\game1\" />
-    <Folder Include="staticfiles\game3\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Fody" Version="6.8.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="MahApps.Metro" Version="2.4.10" />
+		<PackageReference Include="Microsoft-Windows10-APICodePack-Core" Version="1.1.5" />
+		<PackageReference Include="Microsoft.AppCenter" Version="5.0.2" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.2" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.2" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+		<PackageReference Include="Serilog" Version="3.0.1" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+		<PackageReference Include="System.Management" Version="7.0.2" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game2Debug|x64'">
-    <Optimize>false</Optimize>
-  </PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCoreWPF\ME3TweaksCoreWPF.csproj" />
+		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\ME3TweaksCore.csproj" />
+		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\submodules\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
+		<ProjectReference Include="..\Randomizer\Randomizer.csproj" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game1Debug|x64'">
-    <Optimize>false</Optimize>
-  </PropertyGroup>
+	<ItemGroup>
+		<Folder Include="Classes\Restore\" />
+		<Folder Include="images\game1\" />
+		<Folder Include="images\game3\" />
+		<Folder Include="staticfiles\game1\" />
+		<Folder Include="staticfiles\game3\" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game2Debug|x64'">
+		<Optimize>false</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game1Debug|x64'">
+		<Optimize>false</Optimize>
+	</PropertyGroup>
 </Project>
