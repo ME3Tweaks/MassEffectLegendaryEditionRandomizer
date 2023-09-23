@@ -1,25 +1,32 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using LegendaryExplorerCore;
+using LegendaryExplorerCore.Compression;
 using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls.Dialogs;
 using ME3TweaksCore;
+using ME3TweaksCore.Diagnostics;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Randomizer.MER;
 using Randomizer.Randomizers;
 using RandomizerUI.Classes.Telemetry;
+using Serilog;
 
 namespace RandomizerUI.Classes.Controllers
 {
@@ -50,10 +57,10 @@ namespace RandomizerUI.Classes.Controllers
                 {
                     var attachments = new List<ErrorAttachmentLog>();
                     // Attach some text.
-                    string errorMessage = "ALOT Installer has crashed! This is the exception that caused the crash:\n" + report.StackTrace;
+                    string errorMessage = "Randomizer has crashed! This is the exception that caused the crash:\n" + report.StackTrace;
                     MERLog.Fatal(errorMessage);
-                    Log.Error("Note that this exception may appear to occur in a follow up boot due to how appcenter works");
-                    string log = LogCollector.CollectLatestLog(false);
+                    MERLog.Error("Note that this exception may appear to occur in a follow up boot due to how appcenter works");
+                    string log = LogCollector.CollectLatestLog(MCoreFilesystem.GetLogDir(), false);
                     if (log.Length < 1024 * 1024 * 7)
                     {
                         attachments.Add(ErrorAttachmentLog.AttachmentWithText(log, "crashlog.txt"));
@@ -120,6 +127,13 @@ namespace RandomizerUI.Classes.Controllers
                     RunOnUiThreadDelegate = RunOnUIThread,
                     LoadAuxiliaryServices = true,
                     LECPackageSaveFailedCallback = x => MERLog.Error($@"Failed to save package: {x}"),
+#if __GAME1__
+                    PropertyDatabasesToLoad = new [] { MEGame.LE1 },
+#elif __GAME2__
+                    PropertyDatabasesToLoad = new [] { MEGame.LE2 },
+#elif __GAME3__
+                    PropertyDatabasesToLoad = new [] { MEGame.LE3 },
+#endif
                 };
 
 
@@ -152,8 +166,7 @@ namespace RandomizerUI.Classes.Controllers
                                     AffirmativeButtonText = updateButtonText,
                                     NegativeButtonText = declineButtonText,
                                     DefaultButtonFocus = MessageDialogResult.Affirmative
-                                },
-                                    75);
+                                });
                                 response = result == MessageDialogResult.Affirmative;
                                 lock (syncObj)
                                 {
@@ -270,7 +283,7 @@ namespace RandomizerUI.Classes.Controllers
                                         {
                                             if (Application.Current.MainWindow is MainWindow mw)
                                             {
-                                                await mw.ShowMessageAsync("Mass Effect 2 target is texture modded", $"The game located at {target.TargetPath} has had textures modified. {MERUI.GetRandomizerName()} cannot randomize texture modified games, as it adds package files. If you want to texture mod your game, it must be done after randomization.", ContentWidthPercent: 75);
+                                                await mw.ShowMessageAsync("Mass Effect 2 target is texture modded", $"The game located at {target.TargetPath} has had textures modified. {MERUI.GetRandomizerName()} cannot randomize texture modified games, as it adds package files. If you want to texture mod your game, it must be done after randomization.");
                                                 lock (o)
                                                 {
                                                     Monitor.Pulse(o);
@@ -298,7 +311,7 @@ namespace RandomizerUI.Classes.Controllers
                         {
                             if (Application.Current.MainWindow is MainWindow mw)
                             {
-                                await mw.ShowMessageAsync(title, message, ContentWidthPercent: 75);
+                                await mw.ShowMessageAsync(title, message);
                                 lock (o)
                                 {
                                     Monitor.Pulse(o);
@@ -358,6 +371,8 @@ namespace RandomizerUI.Classes.Controllers
                     };
             bw.RunWorkerAsync();
         }
+
+        public static object Prop { get; set; }
 
         private static void MERPeriodicRefresh(object? sender, EventArgs e)
         {
