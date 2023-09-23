@@ -274,12 +274,6 @@ private static final function bool GetCCAlgorithm(SFXMorphFaceFrontEndDataSource
     local BioMorphFaceFESliderMorph SliderMorph;
     local CCAlgorithm cachedAlgo;
     
-    cachedAlgo = CCAlgorithm(Class'SFXObjectPinner'.static.GetPinnedObject(Class'CCAlgorithm'));
-    if (cachedAlgo != None)
-    {
-        algorithm = cachedAlgo.algorithm;
-        return TRUE;
-    }
     generatedAlgo.AlgoName = "CCGenerated";
     for (I = 0; I < dataSource.MorphCategories.Length; I++)
     {
@@ -322,9 +316,6 @@ private static final function bool GetCCAlgorithm(SFXMorphFaceFrontEndDataSource
         generatedAlgo.Randomizations[I].AddIfNotFound = TRUE;
     }
     algorithm = generatedAlgo;
-    cachedAlgo = new (Class'SFXEngine'.static.GetEngine()) Class'CCAlgorithm';
-    cachedAlgo.algorithm = algorithm;
-    Class'SFXObjectPinner'.static.AddPinnedObject(cachedAlgo);
     return TRUE;
 }
 

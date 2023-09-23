@@ -237,7 +237,7 @@ namespace Randomizer.Randomizers.Game2
 #if DEBUG
                     Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = SelectedOptions.UseMultiThread ? 4 : 1 }, (file) =>
 #else
-                Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = SelectedOptions.UseMultiThread ? 1 : 1 }, (file) =>
+                    Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = SelectedOptions.UseMultiThread ? 4 : 1 }, (file) =>
 #endif
                     {
 
@@ -255,7 +255,7 @@ namespace Randomizer.Randomizers.Game2
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("EndGm2", StringComparison.InvariantCultureIgnoreCase)
+                        && !file.Contains("Cit", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -768,7 +768,7 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption() {HumanName = "Citadel", Description = "Changes many things across the level", PerformSpecificRandomizationDelegate = Citadel.PerformRandomization, RequiresTLK = true, RequiresGestures = true, IsRecommended = true},
                     new RandomizationOption() {HumanName = "Archangel Acquisition", Description = "It's a mystery!", PerformSpecificRandomizationDelegate = ArchangelAcquisition.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true, RequiresTLK = true},
                     new RandomizationOption() {HumanName = "Illium Hub", Description = "Changes the lounge", PerformSpecificRandomizationDelegate = IlliumHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Omega Hub", Description = "Improved dancing technique", PerformSpecificRandomizationDelegate = OmegaHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Omega Hub", Description = "Improved dancing technique", PerformSpecificRandomizationDelegate = OmegaHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresGestures = true, IsRecommended = true},
                     new RandomizationOption()
                     {
                         HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight", PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresTLK = true, IsRecommended = true,
@@ -1063,7 +1063,6 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = "BioStage placement",
                         PerformRandomizationOnExportDelegate = RBioStage.RandomizeBioStage,
                         Description = "Swaps nodes where characters stand in a biostage. You WILL break the game if you turn this on.",
-                        IsRecommended = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     new RandomizationOption() {

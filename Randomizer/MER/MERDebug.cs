@@ -47,7 +47,7 @@ namespace Randomizer.MER
 
         public static void ReplaceGetUExport()
         {
-            var packF = MELoadedFiles.GetFilesLoadedInGame(MEGame.ME2)[@"BioA_Unc1Base4.pcc"];
+            var packF = MELoadedFiles.GetFilesLoadedInGame(MEGame.ME2)[@"BioD_OmgHub_230DenDance.pcc"];
             var package = MEPackageHandler.OpenMEPackage(packF); // ME2 file
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -743,17 +743,17 @@ namespace Randomizer.MER
 
         public static void DoStuff(object sender, DoWorkEventArgs e)
         {
-            var pp = @"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank.pcc";
-            var p = MEPackageHandler.OpenMEPackage(pp);
+            //var pp = @"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank.pcc";
+            //var p = MEPackageHandler.OpenMEPackage(pp);
 
-            var referencer = PackageTools.CreateObjectReferencer(p);
-            foreach (var exp in p.Exports.Where(x => x.IsClass && x.InheritsFrom("SFXPower")))
-            {
-                PackageTools.AddToObjectReferencer(exp);
-            }
+            //var referencer = PackageTools.CreateObjectReferencer(p);
+            //foreach (var exp in p.Exports.Where(x => x.IsClass && x.InheritsFrom("SFXPower")))
+            //{
+            //    PackageTools.AddToObjectReferencer(exp);
+            //}
 
-            p.Save(@"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank_or.pcc");
-            //ReplaceGetUExport();
+            //p.Save(@"B:\UserProfile\source\repos\ME2Randomizer\Randomizer\Randomizers\Game2\Assets\Binary\Packages\LE2\Always_EnemyPowerRandomizer\EnemyPowersBank_or.pcc");
+            ReplaceGetUExport();
         }
     }
 }

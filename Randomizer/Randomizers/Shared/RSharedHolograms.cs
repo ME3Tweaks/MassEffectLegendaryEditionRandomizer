@@ -53,9 +53,6 @@ namespace Randomizer.Randomizers.Shared
                 case option_hologram:
                     RSharedMaterialInstance.RandomizeExport(exp, option);
                     return true;
-                case option_avina:
-                    RandomizeVIMaterial(exp);
-                    return true;
             }
 
             Debug.WriteLine("Hologram randomizer is set up wrong!");

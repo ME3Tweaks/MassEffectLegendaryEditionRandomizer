@@ -17,7 +17,4 @@
     {
         Mesh.AttachComponentToSocket(Chest, 'chestdisc_VFX');
     }
-    
-    // Reset weapon firing information
-    Class'SFXObjectPinner'.static.ReleasePinnedObject(Class'MERReaperWeaponInfo');
 }

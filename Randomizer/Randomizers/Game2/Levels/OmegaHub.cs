@@ -22,105 +22,95 @@ namespace Randomizer.Randomizers.Game2.Levels
         private static void RandomizeVIPShepDance(GameTarget target)
         {
             var vipLoungeLF = MERFileSystem.GetPackageFile(target, @"BioD_OmgHub_500DenVIP_LOC_INT.pcc");
-            if (vipLoungeLF != null && File.Exists(vipLoungeLF))
-            {
-                var vipLounge = MEPackageHandler.OpenMEPackage(vipLoungeLF);
+            var vipLounge = MEPackageHandler.OpenMEPackage(vipLoungeLF);
 
-                var playerDanceInterpData = vipLounge.GetUExport(547);
-                var c = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
+            var playerDanceInterpData = vipLounge.FindExport("omgmwl_asari_dance_c_D.Node_Data_Sequence.InterpData_16.InterpGroup_2.BioEvtSysTrackGesture_0");
+            var c = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
 
-                InstallShepardDanceGesture(target, playerDanceInterpData, c); // Paragon
-                InstallShepardDanceGesture(target, vipLounge.GetUExport(559), c); // Stupid shep lol
+            InstallShepardDanceGesture(target, playerDanceInterpData, c); // Paragon
+            InstallShepardDanceGesture(target, vipLounge.FindExport("omgmwl_asari_dance_c_D.Node_Data_Sequence.InterpData_9.InterpGroup_5.BioEvtSysTrackGesture_20"), c); // Stupid shep lol
 
 
-                // Make able to dance again and again in convo
-                var danceTalk = vipLounge.GetUExport(217);
-                var bc = new ConversationExtended(danceTalk);
-                bc.LoadConversation(null);
-                bc.StartingList.Clear();
-                bc.StartingList.Add(0, 2);
-                bc.SerializeNodes();
+            // Make able to dance again and again in convo
+            var danceTalk = vipLounge.FindExport("omgmwl_asari_dance_c_D.omgmwl_asari_dance_c_dlg"); var bc = new ConversationExtended(danceTalk);
+            bc.LoadConversation(null);
+            bc.StartingList.Clear();
+            bc.StartingList.Add(0, 2);
+            bc.SerializeNodes();
 
-                MERFileSystem.SavePackage(vipLounge);
-            }
+            MERFileSystem.SavePackage(vipLounge);
 
             // make able to always talk to dancer
             var vipLoungeF = MERFileSystem.GetPackageFile(target, @"BioD_OmgHub_500DenVIP.pcc");
-            if (vipLoungeF != null && File.Exists(vipLoungeF))
-            {
-                var vipLounge = MEPackageHandler.OpenMEPackage(vipLoungeF);
-                var selectableBool = vipLounge.GetUExport(8845);
-                selectableBool.WriteProperty(new IntProperty(1, "bValue"));
-                MERFileSystem.SavePackage(vipLounge);
-            }
+            var vipLounge2 = MEPackageHandler.OpenMEPackage(vipLoungeF);
+            var selectableBool = vipLounge2.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dance_Floor_Events.Interactive_People_in_the_Club.Dancer.SeqVar_Bool_6");
+            selectableBool.WriteProperty(new IntProperty(1, "bValue"));
+            MERFileSystem.SavePackage(vipLounge2);
         }
 
 
         private static void RandomizeAfterlifeShepDance(GameTarget target)
         {
             var denDanceF = MERFileSystem.GetPackageFile(target, @"BioD_OmgHub_230DenDance.pcc");
-            if (denDanceF != null)
+            var loungeP = MEPackageHandler.OpenMEPackage(denDanceF);
+            var sequence = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance");
+
+            MERPackageCache cache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
+            List<InterpTools.InterpData> interpDatas = new List<InterpTools.InterpData>();
+            var interp1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.SeqAct_Interp_0");
+
+            // Make 2 additional dance options by cloning the interp and the data tree
+            var interp2 = MERSeqTools.CloneBasicSequenceObject(interp1);
+            var interp3 = MERSeqTools.CloneBasicSequenceObject(interp1);
+
+
+            // Clone the interp data for attaching to 2 and 3
+            var interpData1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.InterpData_0");
+            var interpData2 = EntryCloner.CloneTree(interpData1);
+            var interpData3 = EntryCloner.CloneTree(interpData2);
+            KismetHelper.AddObjectToSequence(interpData2, sequence);
+            KismetHelper.AddObjectToSequence(interpData3, sequence);
+
+            // Load ID for randomization
+            interpDatas.Add(new InterpTools.InterpData(interpData1));
+            interpDatas.Add(new InterpTools.InterpData(interpData2));
+            interpDatas.Add(new InterpTools.InterpData(interpData3));
+
+
+            // Chance the data for interp2/3
+            var id2 = SeqTools.GetVariableLinksOfNode(interp2);
+            id2[0].LinkedNodes[0] = interpData2;
+            SeqTools.WriteVariableLinksToNode(interp2, id2);
+
+            var id3 = SeqTools.GetVariableLinksOfNode(interp3);
+            id3[0].LinkedNodes[0] = interpData3;
+            SeqTools.WriteVariableLinksToNode(interp3, id3);
+
+            // Add additional finished states for fadetoblack when done
+            KismetHelper.CreateOutputLink(loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_1"), "Finished", interp2, 2);
+            KismetHelper.CreateOutputLink(loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_1"), "Finished", interp3, 2);
+
+
+            // Link up the random choice it makes
+            var randSw = MERSeqTools.InstallRandomSwitchIntoSequence(target, sequence, 3);
+            KismetHelper.CreateOutputLink(randSw, "Link 1", interp1);
+            KismetHelper.CreateOutputLink(randSw, "Link 2", interp2);
+            KismetHelper.CreateOutputLink(randSw, "Link 3", interp3);
+
+            // Break the original output to start the interp, repoint it's output to the switch instead
+            var sgm = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_SetGestureMode_3"); //set gesture mode
+            KismetHelper.RemoveOutputLinks(sgm);
+            KismetHelper.CreateOutputLink(sgm, "Done", loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_3"));
+            KismetHelper.CreateOutputLink(sgm, "Done", randSw);
+
+            // Now install the dances
+            foreach (var id in interpDatas)
             {
-                var loungeP = MEPackageHandler.OpenMEPackage(denDanceF);
-                var sequence = loungeP.GetUExport(3924);
-
-                MERPackageCache cache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
-                List<InterpTools.InterpData> interpDatas = new List<InterpTools.InterpData>();
-                var interp1 = loungeP.GetUExport(3813);
-
-                // Make 2 additional dance options by cloning the interp and the data tree
-                var interp2 = MERSeqTools.CloneBasicSequenceObject(interp1);
-                var interp3 = MERSeqTools.CloneBasicSequenceObject(interp1);
-
-
-                // Clone the interp data for attaching to 2 and 3
-                var interpData1 = loungeP.GetUExport(1174);
-                var interpData2 = EntryCloner.CloneTree(interpData1);
-                var interpData3 = EntryCloner.CloneTree(interpData2);
-                KismetHelper.AddObjectToSequence(interpData2, sequence);
-                KismetHelper.AddObjectToSequence(interpData3, sequence);
-
-                // Load ID for randomization
-                interpDatas.Add(new InterpTools.InterpData(interpData1));
-                interpDatas.Add(new InterpTools.InterpData(interpData2));
-                interpDatas.Add(new InterpTools.InterpData(interpData3));
-
-
-                // Chance the data for interp2/3
-                var id2 = SeqTools.GetVariableLinksOfNode(interp2);
-                id2[0].LinkedNodes[0] = interpData2;
-                SeqTools.WriteVariableLinksToNode(interp2, id2);
-
-                var id3 = SeqTools.GetVariableLinksOfNode(interp3);
-                id3[0].LinkedNodes[0] = interpData3;
-                SeqTools.WriteVariableLinksToNode(interp3, id3);
-
-                // Add additional finished states for fadetoblack when done
-                KismetHelper.CreateOutputLink(loungeP.GetUExport(958), "Finished", interp2, 2);
-                KismetHelper.CreateOutputLink(loungeP.GetUExport(958), "Finished", interp3, 2);
-
-
-                // Link up the random choice it makes
-                var randSw = MERSeqTools.InstallRandomSwitchIntoSequence(target, sequence, 3);
-                KismetHelper.CreateOutputLink(randSw, "Link 1", interp1);
-                KismetHelper.CreateOutputLink(randSw, "Link 2", interp2);
-                KismetHelper.CreateOutputLink(randSw, "Link 3", interp3);
-
-                // Break the original output to start the interp, repoint it's output to the switch instead
-                var sgm = loungeP.GetUExport(1003); //set gesture mode
-                KismetHelper.RemoveOutputLinks(sgm);
-                KismetHelper.CreateOutputLink(sgm, "Done", loungeP.GetUExport(960));
-                KismetHelper.CreateOutputLink(sgm, "Done", randSw);
-
-                // Now install the dances
-                foreach (var id in interpDatas)
-                {
-                    var danceTrack = id.InterpGroups[0].Tracks[0];
-                    OmegaHub.InstallShepardDanceGesture(target, danceTrack.Export, cache);
-                }
-
-                MERFileSystem.SavePackage(loungeP);
+                var danceTrack = id.InterpGroups[0].Tracks[0];
+                OmegaHub.InstallShepardDanceGesture(target, danceTrack.Export, cache);
             }
+
+            MERFileSystem.SavePackage(loungeP);
         }
 
         public static bool InstallShepardDanceGesture(GameTarget target, ExportEntry danceTrackExp, MERPackageCache cache)
@@ -164,11 +154,11 @@ namespace Randomizer.Randomizers.Game2.Levels
                 if (denBar != null)
                 {
                     var denBarP = MEPackageHandler.OpenMEPackage(denBar);
-                    RandomizeDancer(target, denBarP.GetUExport(1287));
-                    RandomizeDancer(target, denBarP.GetUExport(1288));
-                    RandomizeDancer(target, denBarP.GetUExport(1289));
-                    RandomizeDancer(target, denBarP.GetUExport(1292));
-                    RandomizeDancer(target, denBarP.GetUExport(1293));
+                    RandomizeDancer(target, denBarP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyPoleDance01"));
+                    RandomizeDancer(target, denBarP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyPoleDance02"));
+                    RandomizeDancer(target, denBarP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyPoleDance03"));
+                    RandomizeDancer(target, denBarP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyWallDance01"));
+                    RandomizeDancer(target, denBarP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyWallDance03"));
                     MERFileSystem.SavePackage(denBarP);
                 }
             }
@@ -177,12 +167,12 @@ namespace Randomizer.Randomizers.Game2.Levels
             if (denDance != null)
             {
                 var denDanceP = MEPackageHandler.OpenMEPackage(denDance);
-                RandomizeDancer(target, denDanceP.GetUExport(1257)); //sit
-                RandomizeDancer(target, denDanceP.GetUExport(1250));
-                RandomizeDancer(target, denDanceP.GetUExport(1251));
+                RandomizeDancer(target, denDanceP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyKneeling01")); //sit
+                RandomizeDancer(target, denDanceP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyWalk01"));
+                RandomizeDancer(target, denDanceP.FindExport("BioChar_OmgHub_LitePawns.Skel_Asaris.Skel_Asaris_SexyWallDance02"));
 
                 // shep sits at dancer. it uses different pawn.
-                var entertainerBPSKM = denDanceP.GetUExport(4322);
+                var entertainerBPSKM = denDanceP.FindExport("TheWorld.PersistentLevel.BioPawn_8.SkeletalMeshComponent_3682");
                 var newInfo = IlliumHub.DancerOptions.RandomElement();
                 while (newInfo.Location != null || newInfo.Rotation != null || newInfo.KeepHead == false || (newInfo.BodyAsset != null && !newInfo.BodyAsset.IsAssetFileAvailable(target)) || (newInfo.HeadAsset != null && !newInfo.HeadAsset.IsAssetFileAvailable(target)))
                 {

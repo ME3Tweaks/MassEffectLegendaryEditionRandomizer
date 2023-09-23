@@ -14,7 +14,6 @@
     {
         return;
     }
-    Class'SFXObjectPinner'.static.ReleasePinnedObject(Class'CCAlgorithm');
     Class'MERBioMorphUtility'.static.RandomizeCCMorphFace(BP.MorphHead, Class'MERControlEngine'.default.fCCBioMorphFaceRandomization, m_bMaleSelected ? MaleDataSource : FemaleDataSource);
     Class'MERBioMorphUtility'.static.RandomizeCCMorphFace(BioWorldInfo(oWorldInfo).m_UIWorld.GetSpawnedPawn(lstTemplates[int(m_nCurrentTemplate)]).MorphHead, Class'MERControlEngine'.default.fCCBioMorphFaceRandomization, m_bMaleSelected ? MaleDataSource : FemaleDataSource);
 }
