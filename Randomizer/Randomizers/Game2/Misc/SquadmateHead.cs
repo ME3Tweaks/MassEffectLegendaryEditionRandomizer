@@ -62,6 +62,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             new SquadMate() {ClassName = "SFXPawn_Liara", InternalName="Liara",IsFemale = true,NamePrefix = "Li"}, //EXP_Part01
         };
 
+        [DebuggerDisplay(@"HeadAssetSource - {AssetPath} in {PackageFile}")]
         class HeadAssetSource : IlliumHub.AssetSource
         {
             /// <summary>
@@ -144,7 +145,6 @@ namespace Randomizer.Randomizers.Game2.Misc
                 return AllowedPawns.Contains(squadmateInfo.ClassName);
             }
         }
-
         private static HeadAssetSource[] HeadAssetSources = new[]
         {
             new HeadAssetSource()

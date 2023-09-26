@@ -74,7 +74,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 
             // Step 3. Precalculate talent sets that will be assigned
 #if DEBUG
-            ThreadSafeRandom.SetSeed(132512);
+            //ThreadSafeRandom.SetSeed(132512);
 #endif
             #region Find compatible power sets
 

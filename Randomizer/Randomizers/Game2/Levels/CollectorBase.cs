@@ -1386,7 +1386,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             foreach (var p in packages)
             {
                 // This must be ported in because it will not be in non suicide mission packages
-                var ported = PackageTools.PortExportIntoPackage(target, p, sequenceSupportPackage.FindExport("MERGameContent.MERReaperWeaponInfo"));
+                // var ported = PackageTools.PortExportIntoPackage(target, p, sequenceSupportPackage.FindExport("MERGameContent.MERReaperWeaponInfo"));
 
                 ScriptTools.InstallClassToPackageFromEmbedded(target, p, "SFXAI_Reaper", "SFXGamePawns");
                 

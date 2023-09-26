@@ -255,7 +255,7 @@ namespace Randomizer.Randomizers.Game2
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("Cit", StringComparison.InvariantCultureIgnoreCase)
+                        && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
                         )
                             return;
 #endif
@@ -1055,7 +1055,7 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = "Actors in conversations",
                         PerformFileSpecificRandomization = RBioConversation.RandomizeActorsInConversation2,
                         Description = "Changes pawn roles in conversations. Somewhat buggy simply due to complexity and restrictions in engine, but can be entertaining",
-                        IsRecommended = true,
+                        IsRecommended = false,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Unsafe
                     },
                     new RandomizationOption()
