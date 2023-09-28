@@ -51,7 +51,7 @@ namespace Randomizer.Randomizers.Shared
             TLKBuilder.ReplaceString(263408, TrimForIntro(gameoverTexts.RandomElement().Trim()));
             TLKBuilder.ReplaceString(348756, TrimForIntro(gameoverTexts.RandomElement().Trim()));
             // Genesis DLC uses this extra string for some reason
-            TLKBuilder.ReplaceString(391285, TrimForIntro(gameoverTexts.RandomElement().Trim())); 
+            TLKBuilder.ReplaceString(391285, TrimForIntro(gameoverTexts.RandomElement().Trim()));
 #elif __GAME3__
             MERLog.Warning(@"RandomizeOpeningCrawl not implemented for this game!");
 #endif
@@ -719,6 +719,7 @@ namespace Randomizer.Randomizers.Shared
                 option.IncrementProgressValue();
 
                 if (sref.Data.Contains("DLC_")) continue; // Don't modify
+                if (sref.Data == "Male" || sref.Data == "Female") continue; // Don't modify
                 if (!isMERTlk && skipIDs.Contains(sref.StringID))
                 {
                     continue; // Do not randomize this version of the string as it's in the DLC version specifically
@@ -733,7 +734,8 @@ namespace Randomizer.Randomizers.Shared
                     // Skip any items we should not skip.
                     if (skipRanges.Any() && skipRanges[0] == i)
                     {
-                        i = skipRanges[1] - 1; // We subtract one as the next iteration of the loop will +1 it again, which then will make it read the 'next' character
+                        i = skipRanges[1] -
+                            1; // We subtract one as the next iteration of the loop will +1 it again, which then will make it read the 'next' character
                         skipRanges.RemoveAt(0); // remove first 2
                         skipRanges.RemoveAt(0); // remove first 2
 
@@ -751,9 +753,9 @@ namespace Randomizer.Randomizers.Shared
                     {
                         // Do not change the letter. It might be something like <.
                     }
-
-                    TLKBuilder.ReplaceString(sref.StringID, new string(newStr), tf.Localization);
                 }
+
+                TLKBuilder.ReplaceString(sref.StringID, new string(newStr), tf.Localization);
             }
         }
     }
