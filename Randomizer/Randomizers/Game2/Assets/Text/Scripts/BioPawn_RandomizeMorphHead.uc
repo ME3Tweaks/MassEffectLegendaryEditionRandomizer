@@ -21,6 +21,6 @@
     if (BMF != None && Class'MERControlEngine'.static.IsObjectModified(BMF) == FALSE)
     {
         Class'MERBioMorphUtility'.static.RandomizeBioMorphFace(BMF, Class'MERControlEngine'.default.fBioMorphFaceRandomization);
-        BP.m_oBehavior.m_oAppearanceType.UpdateAppearance(TRUE);
+        BP.m_oBehavior.m_oAppearanceType.UpdateAppearance(FALSE); // Setting this to true crashes things. IDK what false does.
     }
 }

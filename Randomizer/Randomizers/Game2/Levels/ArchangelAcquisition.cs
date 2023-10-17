@@ -31,8 +31,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 garrusSeqP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Archangel_Sniping.BioSeqAct_CauseDamage_0").WriteProperty(new FloatProperty(2, "MomentumScale"));
 
                 // Do not reset the chance to shoot shepard again
-                SeqTools.ChangeOutlink(garrusSeqP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Archangel_Sniping.BioSeqAct_AttachVisualEffect_2"), 0, 0, 982);
-
+                SeqTools.SkipSequenceElement(garrusSeqP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Archangel_Sniping.SeqAct_SetInt_2"), outboundLinkIdx: 0);
                 // Make garrus damage type very deadly
                 var garDamage = garrusSeqP.FindExport("SFXGameContent.Default__SFXDamageType_OmgGraFakeSniper");
                 var garrusDamageTypeProps = garDamage.GetProperties();
