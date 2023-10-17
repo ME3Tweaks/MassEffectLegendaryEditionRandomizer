@@ -1118,5 +1118,20 @@ namespace Randomizer.Randomizers.Game2.Misc
             }
             newPawnInstance.WriteProperties(props);
         }
+
+        public static bool ApplyFixes(GameTarget target, RandomizationOption arg2)
+        {
+            // MIRANDA FIXES
+            var shuttleBay = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioD_ProCer_300ShuttleBay.pcc"));
+            shuttleBay.FindExport("TheWorld.PersistentLevel.SFXPawn_Miranda_1.SkeletalMeshComponent_66").RemoveProperty("Materials");
+            MERFileSystem.SavePackage(shuttleBay);
+
+            var briefRoom = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioD_ProCer_350BriefRoom.pcc"));
+            briefRoom.FindExport("TheWorld.PersistentLevel.SFXPawn_Miranda_1.SkeletalMeshComponent_69").RemoveProperty("Materials");
+            MERFileSystem.SavePackage(briefRoom);
+
+
+            return true;
+        }
     }
 }
