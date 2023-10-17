@@ -11,10 +11,16 @@ namespace RandomizerUI.Classes.Converters
     public class ImplementedConverter : IValueConverter
     {
         private static SolidColorBrush SelectedBrush = new SolidColorBrush(Color.FromArgb(128, 0, 192, 0));
+        private static SolidColorBrush InProgressBrush = new SolidColorBrush(Color.FromArgb(128, 0, 192, 0));
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is RandomizationOption ro)
             {
+                if (ro.RandomizationInProgress)
+                {
+                    return InProgressBrush;
+                }
+
                 if (ro.OptionIsSelected)
                 {
                     return SelectedBrush;

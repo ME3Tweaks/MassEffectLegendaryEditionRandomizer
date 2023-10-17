@@ -27,13 +27,15 @@
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <converters:DangerColorConverter x:Key="DangerColorConverter"/>
         <converters:ImplementedConverter x:Key="ImplementedConverter"/>
+
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
             <Style.Resources>
                 <SolidColorBrush x:Key="HighlightBrush" Color="White" />
             </Style.Resources>
         </Style>
+
         <DataTemplate x:Key="RandomizationOptionTemplate" DataType="randomizers:RandomizationOption">
-            <StackPanel Background="{Binding Self, Converter={StaticResource ImplementedConverter}}">
+            <StackPanel Name="OptionContainer">
                 <CheckBox Content="{Binding HumanName}" FontWeight="Bold" Margin="3" 
                           IsChecked="{Binding OptionIsSelected}"
                           Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
@@ -63,6 +65,23 @@
                         </Style>
                     </StackPanel.Style>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                    <Border 
+                        ToolTip="This option is considered more for 'fun' than seriousness"
+                        Background="Indigo" Padding="4,0" Margin="2,0,0,0" Visibility="{Binding GoodTimeRandomizer, Converter={StaticResource BoolToVisibilityConverter}}" CornerRadius="2">
+                        <TextBlock Text="Fun" FontWeight="Bold"/>
+                    </Border>
+                    <Border 
+                        ToolTip="This is considered a lore-friendly option, only changing gameplay"
+                        Background="DarkCyan" Padding="4,0" Margin="2,0,0,0" Visibility="{Binding GameplayRandomizer, Converter={StaticResource BoolToVisibilityConverter}}" CornerRadius="2">
+                        <TextBlock Text="Gameplay" FontWeight="Bold"/>
+                    </Border>
+                    <Border 
+                        ToolTip="This randomizer can be turned on and off after initial installation using the randomizer control panel"
+                        Background="DarkRed" Padding="4,0" Margin="2,0,0,0" Visibility="{Binding IsRuntimeRandomizer, Converter={StaticResource BoolToVisibilityConverter}}" CornerRadius="2">
+                        <TextBlock Text="Runtime" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
                 <StackPanel Visibility="{Binding HasSliderOption, Converter={StaticResource BoolToVisibilityConverter}}"
                             Margin="20,0,0,0">
                     <TextBlock Text="{Binding TickText}"/>
@@ -91,7 +110,36 @@
                               Margin="20,0,0,0" 
                               ItemsSource="{Binding SubOptions}" 
                               ItemTemplate="{DynamicResource RandomizationOptionTemplate}"/>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Background" Value="#00000000"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OptionIsSelected}" Value="True">
+                                <Setter Property="Background" Value="#8800BB00"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
             </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RandomizationInProgress}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="PulseStoryboard">
+                            <Storyboard>
+                                <ColorAnimation  
+                                    From="#8800BB00"
+                                    To="#CC22DD88" 
+                                                 Storyboard.TargetName="OptionContainer"
+                                                 Storyboard.TargetProperty="(StackPanel.Background).(SolidColorBrush.Color)" 
+                                                 Duration="0:0:0.5" RepeatBehavior="Forever" AutoReverse="True"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="PulseStoryboard" />
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
         <DataTemplate x:Key="CreditTemplate" DataType="classes1:ImageCredit">
             <StackPanel>
@@ -311,7 +359,7 @@
                     </StackPanel>
                 </Grid>
             </DockPanel>
-            <TabControl Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Width="1200">
+            <TabControl Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MaxWidth="1800">
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabPanel}">
                         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -324,7 +372,7 @@
                             <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Name="GameLocationTextbox" VerticalAlignment="Top" Text="{Binding GamePathString}" />
                         </StackPanel>
                         <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding RandomizationGroups}" MaxWidth="1180" HorizontalContentAlignment="Center" IsEnabled="{Binding AllowOptionsChanging}">
+                            <ItemsControl ItemsSource="{Binding RandomizationGroups}" HorizontalContentAlignment="Center" IsEnabled="{Binding AllowOptionsChanging}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Orientation="Horizontal"/>
@@ -334,7 +382,9 @@
                                     <DataTemplate DataType="{x:Type randomizers:RandomizationGroup}">
                                         <StackPanel Margin="10">
                                             <fonts:OutlinedTextBlock Text="{Binding GroupName}" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="18" StrokeThickness="2" />
-                                            <ItemsControl ItemsSource="{Binding Options}" ItemTemplate="{DynamicResource RandomizationOptionTemplate}"/>
+                                            <TextBlock TextWrapping="Wrap" MaxWidth="185" Text="{Binding GroupDescription}" HorizontalAlignment="Left" Visibility="{Binding CollapseGroup, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Button Content="Show options" Margin="0,5,0,0" HorizontalAlignment="Left" Visibility="{Binding CollapseGroup, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding ShowOptionCommand}"/>
+                                            <ItemsControl ItemsSource="{Binding Options}" ItemTemplate="{DynamicResource RandomizationOptionTemplate}" Visibility="{Binding CollapseGroup, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

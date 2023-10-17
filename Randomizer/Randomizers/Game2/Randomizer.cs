@@ -156,7 +156,7 @@ namespace Randomizer.Randomizers.Game2
                     GestureManager.Init(SelectedOptions.RandomizationTarget);
                 }
 
-                
+
 
                 // Install MERControl as many things will depend on it
                 MERControl.InstallMERControl(SelectedOptions.RandomizationTarget);
@@ -216,8 +216,10 @@ namespace Randomizer.Randomizers.Game2
                     sr.OnOperationUpdate += srUpdate;
                     MERLog.Information($"Running specific randomizer {sr.HumanName}");
                     SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizing {sr.HumanName}");
+                    sr.RandomizationInProgress = true;
                     sr.PerformSpecificRandomizationDelegate?.Invoke(SelectedOptions.RandomizationTarget, sr);
                     sr.OnOperationUpdate -= srUpdate;
+                    sr.RandomizationInProgress = false;
                 }
 
                 // Pass 2: All exports
@@ -230,6 +232,12 @@ namespace Randomizer.Randomizers.Game2
                     var files = MELoadedFiles.GetFilesLoadedInGame(SelectedOptions.RandomizationTarget.Game, true, false, false, SelectedOptions.RandomizationTarget.TargetPath).Values.Where(x => !MERFileSystem.filesToSkip.Contains(Path.GetFileName(x))).ToList();
 
                     SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(false);
+
+
+                    foreach (var r in perExportRandomizers.Concat(perFileRandomizers))
+                    {
+                        r.RandomizationInProgress = true;
+                    }
 
                     var currentFileNumber = 0;
                     var totalFilesCount = files.Count;
@@ -250,7 +258,7 @@ namespace Randomizer.Randomizers.Game2
                         SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizing game files [{currentFileNumber}/{files.Count}]");
 
 #if DEBUG
-                        if (true
+                        if (false
                         //&& false //uncomment to disable filtering
                         // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
@@ -296,16 +304,24 @@ namespace Randomizer.Randomizers.Game2
                 }
 
 
-                // Pass 3: All randomizers that are file specific and are not post-run
+                foreach (var r in perExportRandomizers.Concat(perFileRandomizers))
+                {
+                    r.RandomizationInProgress = false;
+                }
+
+
+                // Pass 3: All randomizers that are file specific and are post-run
                 foreach (var sr in specificRandomizers.Where(x => x.IsPostRun))
                 {
                     try
                     {
                         sr.OnOperationUpdate += srUpdate;
+                        sr.RandomizationInProgress = true;
                         SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
                         MERLog.Information($"Running post-run specific randomizer {sr.HumanName}");
                         SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizing {sr.HumanName}");
                         sr.PerformSpecificRandomizationDelegate?.Invoke(SelectedOptions.RandomizationTarget, sr);
+                        sr.RandomizationInProgress = false;
                         sr.OnOperationUpdate -= srUpdate;
                     }
                     catch (Exception ex)
@@ -409,17 +425,20 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Higher settings yield more extreme facial animation values. Default value is Sonic Adventure",
                         SliderValue = 3, // This must come after the converter
                         PerformRandomizationOnExportDelegate = RSharedFaceFXAnimSet.RandomizeExport,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GoodTimeRandomizer = true
                     },
                     new RandomizationOption() {HumanName = "Squadmate heads",
                         Description = "Changes the heads of your squadmates",
+                        PerformSpecificRandomizationDelegate = SquadmateHead.ApplyFixes,
                         PerformRandomizationOnExportDelegate = SquadmateHead.RandomizeExport2,
                         // PerformFileSpecificRandomization = SquadmateHead.FilePrerun, // Miranda/Jacob fixes for ProCer
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         RequiresTLK = true,
                         StateChangingDelegate=optionChangingDelegate,
                         MutualExclusiveSet = "SquadHead",
-                        IsRecommended = true
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true
                     },
                     //new RandomizationOption() {HumanName = "Squadmate faces",
                     //    Description = "Only works on Wilson and Jacob, unfortunately. Other squadmates are fully modeled",
@@ -457,6 +476,8 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeBioMorphFace2,
                         Description="Changes the face morphs on most pawns",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRuntimeRandomizer = true,
+                        GoodTimeRandomizer = true,
                     },
 
                     // Sadly not used by anything but shepard
@@ -474,7 +495,9 @@ namespace Randomizer.Randomizers.Game2
                         //PerformSpecificRandomizationDelegate = RSharedEyes.Init,
                         //PerformRandomizationOnExportDelegate = RSharedEyes.RandomizeExport2,
                         PerformSpecificRandomizationDelegate = RSharedEyes.InstallEyeRandomizer,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRuntimeRandomizer = true,
+                        GoodTimeRandomizer = true
                     },
                     //new RandomizationOption() {HumanName = "Illusive Man eyes",
                     //    Description="Changes the Illusive Man's eye color",
@@ -499,13 +522,17 @@ namespace Randomizer.Randomizers.Game2
                         Ticks = "1,2,3,4,5",
                         SliderTooltip = "Higher settings yield more bone randomization. Default value basic bones only.",
                         Description = "Changes the order of animations mapped to bones. E.g. arm rotation will be swapped with eyes",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        GoodTimeRandomizer = true
                     },
                     new RandomizationOption() {
                         HumanName = "NPC colors",
                         Description="Changes NPC colors such as skin tone, hair, etc",
                         PerformSpecificRandomizationDelegate = RSharedNPC.InstallPawnColorRandomizer,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        IsRecommended = true,
+                        IsRuntimeRandomizer = true,
+                        GoodTimeRandomizer = true,
                     },
                     // Too much work for LE2R
                     //new RandomizationOption() {
@@ -520,7 +547,11 @@ namespace Randomizer.Randomizers.Game2
                         Description="Randomizes which romance you will get",
                         IsRuntimeRandomizer = true,
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        IsRecommended = true,
+                        // IsRuntimeRandomizer = true, // Technically this could be coded in but i'm lazy
+
+                    },
                     // This is not very interesting tbh
                     //new RandomizationOption() {
                     //    HumanName = "Look At Targets",
@@ -533,8 +564,9 @@ namespace Randomizer.Randomizers.Game2
                         Description="Changes how pawns look things, such as turning eyes, chest, neck",
                         IsConfigControlled = true,
                         IsRuntimeRandomizer = true,
+                        IsRecommended = true,
                         PerformSpecificRandomizationDelegate = RSharedBioLookAtTarget.RandomizeBioPawnLookatController,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                     },
                 }
             });
@@ -555,6 +587,7 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Higher settings yield more ridiculous faces for characters. The original game value is 1.0, higher values are multiplicative.",
                         SliderToTextConverter = rSetting => $"Morph multiplier: {rSetting}x",
                         SliderValue = 2.0, // This must come after the converter
+                        GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -579,6 +612,8 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Higher settings yield more ridiculous faces for characters. Default value is 1.5, which provides moderate facial randomization.",
                         SliderToTextConverter = rSetting => $"Randomization window: -{rSetting} to {rSetting}",
                         SliderValue = 1.5, // This must come after the converter
+                        IsRuntimeRandomizer = true,
+                        GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -598,7 +633,8 @@ namespace Randomizer.Randomizers.Game2
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = CharacterCreator.RandomizePsychProfiles,
-                        RequiresTLK = true
+                        RequiresTLK = true,
+                        GoodTimeRandomizer = true,
                     },
                 }
             });
@@ -608,15 +644,29 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Miscellaneous",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "Hologram colors", Description="Changes colors of holograms",PerformRandomizationOnExportDelegate = RSharedHolograms.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Hologram colors",
+                        Description="Changes colors of holograms",
+                        PerformRandomizationOnExportDelegate = RSharedHolograms.RandomizeExport,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
                     // new RandomizationOption() {HumanName = "Drone colors", Description="Changes colors of drones",PerformRandomizationOnExportDelegate = CombatDrone.RandomizeExport, IsRecommended = true},
                     //new RandomizationOption() {HumanName = "Omnitool", Description="Changes colors of omnitools",PerformRandomizationOnExportDelegate = ROmniTool.RandomizeExport},
-                    new RandomizationOption() {HumanName = "Specific textures",Description="Changes specific textures to more fun ones", PerformRandomizationOnExportDelegate = TextureHandler.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
+                    new RandomizationOption() {
+                        HumanName = "Specific textures",
+                        Description="Changes specific textures to more fun ones",
+                        PerformRandomizationOnExportDelegate = TextureHandler.RandomizeExport,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true
+                    },
                     new RandomizationOption() {HumanName = "SizeSixteens mode",
                         Description = "This option installs a change specific for the streamer SizeSixteens. If you watched his ME1 Randomizer streams, you'll understand the change.",
                         PerformSpecificRandomizationDelegate = SizeSixteens.InstallSSChanges,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        RequiresTLK = true
+                        RequiresTLK = true,
+                        GoodTimeRandomizer = true,
                     },
                     new RandomizationOption() {HumanName = "NPC names",
                         Description = "Install a list of names into the game and renames some of the generic NPCs to them. You can install your stream chat members, for example. There are 48 name slots.",
@@ -624,7 +674,8 @@ namespace Randomizer.Randomizers.Game2
                         SetupRandomizerDelegate = CharacterNames.SetupRandomizer,
                         SetupRandomizerButtonText = "Setup",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        RequiresTLK = true
+                        RequiresTLK = true,
+                        GoodTimeRandomizer = true,
                     }
                 }
             });
@@ -634,11 +685,36 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Movement & pawns",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "NPC movement speeds", Description = "Changes non-player movement stats", PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizeNonPlayerMovementSpeed, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Player movement speeds", Description = "Changes player movement stats", PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizePlayerMovementSpeed, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
+                    new RandomizationOption() {HumanName = "NPC movement speeds",
+                        Description = "Changes non-player movement stats",
+                        PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizeNonPlayerMovementSpeed,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true,
+                    },
+                    new RandomizationOption() {HumanName = "Player movement speeds",
+                        Description = "Changes player movement stats",
+                        PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizePlayerMovementSpeed,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        IsRuntimeRandomizer = true,
+                        GameplayRandomizer = true
+                    },
                     //new RandomizationOption() {HumanName = "NPC walking routes", PerformRandomizationOnExportDelegate = RRoute.RandomizeExport}, // Seems very specialized in ME2
-                    new RandomizationOption() {HumanName = "Hammerhead", IsRecommended = true, Description = "Changes HammerHead stats",PerformSpecificRandomizationDelegate = HammerHead.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
-                    new RandomizationOption() {HumanName = "'Lite' pawn animations", IsRecommended = true, Description = "Changes the animations used by basic non-interactable NPCs. Some may T-pose due to the sheer complexity of this randomizer",PerformRandomizationOnExportDelegate = RSFXSkeletalMeshActorMAT.RandomizeBasicGestures, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresGestures = true},
+                    new RandomizationOption() {HumanName = "Hammerhead", 
+                        IsRecommended = true, 
+                        Description = "Changes HammerHead stats",
+                        PerformSpecificRandomizationDelegate = HammerHead.PerformRandomization, 
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        GameplayRandomizer = true
+                    },
+                    new RandomizationOption() {HumanName = "'Lite' pawn animations", 
+                        IsRecommended = true, 
+                        Description = "Changes the animations used by basic non-interactable NPCs. Some may T-pose due to the sheer complexity of this randomizer",
+                        PerformRandomizationOnExportDelegate = RSFXSkeletalMeshActorMAT.RandomizeBasicGestures, 
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresGestures = true,
+                        GoodTimeRandomizer = true
+                    },
                     new RandomizationOption()
                     {
                         HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
@@ -648,6 +724,7 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Values are added +/- to 1 to generate the range of allowed sizes. For example, 0.1 yields 90-110% size multiplier. Default value is 0.1.",
                         SliderToTextConverter = x=> $"Maximum size change: {Math.Round(x * 100)}%",
                         SliderValue = 0.1,
+                        GoodTimeRandomizer = true,
                     },
                 }
             });
@@ -663,13 +740,16 @@ namespace Randomizer.Randomizers.Game2
                         IsRuntimeRandomizer = true,
                         Description = "Attempts to change gun stats in a way that makes game still playable",
                         PerformSpecificRandomizationDelegate = Weapons.RandomizeWeapons,
-                        IsRecommended = true
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
                     },
                     new RandomizationOption()
                     {
                         HumanName = "Usable weapon classes",
                         Description = "Changes what gun categories the player and squad can use",
-                        PerformSpecificRandomizationDelegate = Weapons.RandomizeSquadmateWeapons, IsRecommended = true
+                        PerformSpecificRandomizationDelegate = Weapons.RandomizeSquadmateWeapons,
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
                     },
                 }
             });
@@ -682,12 +762,13 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption()
                     {
                         HumanName = "Enemy weapons",
-                        Description =
-                            "Gives enemies different guns. Enemies custom made for this randomizer will not have their weapons randomized",
+                        Description = "Gives enemies different guns. Enemies custom made for this randomizer will not have their weapons randomized",
                         PerformRandomizationOnExportDelegate = EnemyWeaponChanger.RandomizeExport,
                         PerformSpecificRandomizationDelegate = EnemyWeaponChanger.Init,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -696,7 +777,8 @@ namespace Randomizer.Randomizers.Game2
                                 HumanName = "Force randomization",
                                 Description = "Forces randomization on custom made randomizer enemies",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                IsOptionOnly = true
+                                IsOptionOnly = true,
+                                IsRuntimeRandomizer = true
                             },
                             new RandomizationOption()
                             {
@@ -705,7 +787,8 @@ namespace Randomizer.Randomizers.Game2
                                 Description =
                                     "Randomizes the weapon loadout of a pawn only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all enemies near each other (typically a level) will have the same weapons until the loadout object is dropped from memory",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                IsOptionOnly = true
+                                IsOptionOnly = true,
+                                IsRuntimeRandomizer = true
                             },
                         }
                     }
@@ -720,12 +803,13 @@ namespace Randomizer.Randomizers.Game2
                     new RandomizationOption()
                     {
                         HumanName = "Enemy powers",
-                        Description = "Gives enemies different powers. May make some enemies very difficult to kill. Enemies that can softlock the game and custom made enemeis for this randomzier will not be randomized",
+                        Description = "Gives enemies different powers. May make some enemies very difficult to kill. Enemies that can softlock the game and custom made enemies for this randomzier will not be randomized",
                         IsRuntimeRandomizer = true,
                         PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport2,
                         PerformSpecificRandomizationDelegate = EnemyPowerChanger.InitLE2R,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
+                        GameplayRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>(){
                                     new RandomizationOption()
                                     {
@@ -733,7 +817,8 @@ namespace Randomizer.Randomizers.Game2
                                         HumanName = "Force randomization",
                                         Description = "Forces randomization on custom made randomizer enemies. A select few will not randomize as it will break their AI. Enemies that will softlock the game will not be randomized",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                        IsOptionOnly = true
+                                        IsOptionOnly = true,
+                                        IsRuntimeRandomizer = true
                                     },
                                     new RandomizationOption()
                                     {
@@ -741,7 +826,8 @@ namespace Randomizer.Randomizers.Game2
                                         HumanName = "Randomize once per loadout",
                                         Description = "Randomizes the powers of a pawn type only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all same enemies near each other (typically a level) will have the same powers until the loadout object is dropped from memory",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                        IsOptionOnly = true
+                                        IsOptionOnly = true,
+                                        IsRuntimeRandomizer = true
                                     },
                                     new RandomizationOption()
                                     {
@@ -750,7 +836,8 @@ namespace Randomizer.Randomizers.Game2
                                         HumanName = "Give powers to all enemies",
                                         Description = "Ensures all enemies have at least 2 powers. Not all AI is equipped to use powers (e.g. husks). Significantly increases game difficulty",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                        IsOptionOnly = true
+                                        IsOptionOnly = true,
+                                        IsRuntimeRandomizer = true
                                     }
                                 }
                     },
@@ -762,16 +849,65 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Level-specific",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "Normandy", Description = "Changes various things around the ship, including one sidequest", PerformSpecificRandomizationDelegate = Normandy.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Prologue", Description = "In Mass Effect Randomizer, lore is very important", PerformSpecificRandomizationDelegate = LazarusStation.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                    new RandomizationOption() {HumanName = "Normandy",
+                        Description = "Changes various things around the ship, including one sidequest",
+                        PerformSpecificRandomizationDelegate = Normandy.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption() {HumanName = "Prologue",
+                        Description = "In Mass Effect Randomizer, lore is very important",
+                        PerformSpecificRandomizationDelegate = LazarusStation.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GoodTimeRandomizer = true,
+                    },
                     //new RandomizationOption() {HumanName = "Tali Acquisition"}, //sfxgame tla damagetype
-                    new RandomizationOption() {HumanName = "Citadel", Description = "Changes many things across the level", PerformSpecificRandomizationDelegate = Citadel.PerformRandomization, RequiresTLK = true, RequiresGestures = true, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Archangel Acquisition", Description = "It's a mystery!", PerformSpecificRandomizationDelegate = ArchangelAcquisition.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true, RequiresTLK = true},
-                    new RandomizationOption() {HumanName = "Illium Hub", Description = "Changes the lounge", PerformSpecificRandomizationDelegate = IlliumHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Omega Hub", Description = "Improved dancing technique", PerformSpecificRandomizationDelegate = OmegaHub.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresGestures = true, IsRecommended = true},
                     new RandomizationOption()
                     {
-                        HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight", PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresTLK = true, IsRecommended = true,
+                        HumanName = "Citadel",
+                        Description = "Changes many things across the level",
+                        PerformSpecificRandomizationDelegate = Citadel.PerformRandomization,
+                        RequiresTLK = true,
+                        RequiresGestures = true,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Archangel Acquisition", Description = "It's a mystery!",
+                        PerformSpecificRandomizationDelegate = ArchangelAcquisition.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        RequiresTLK = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Illium Hub", Description = "Changes the lounge",
+                        PerformSpecificRandomizationDelegate = IlliumHub.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Omega Hub",
+                        Description = "Improved dancing technique",
+                        PerformSpecificRandomizationDelegate = OmegaHub.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        RequiresGestures = true,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight",
+                        PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        RequiresTLK = true,
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
                         SubOptions = new()
                         {
                             new RandomizationOption()
@@ -786,8 +922,15 @@ namespace Randomizer.Randomizers.Game2
                     },
 
                     // DLC
-                    new RandomizationOption() {HumanName = "Overlord", Description = "Changes a few things across the DLC's missions", PerformSpecificRandomizationDelegate = OverlordDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Genesis Comic", Description = "Completely changes the story recap segment", PerformSpecificRandomizationDelegate = GenesisDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresTLK = true, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Overlord",
+                        Description = "Changes a few things across the DLC's missions",
+                        PerformSpecificRandomizationDelegate = OverlordDLC.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true, // Technically also gameplay
+                    },
+                    new RandomizationOption() {HumanName = "Genesis Comic",
+                        Description = "Completely changes the story recap segment", PerformSpecificRandomizationDelegate = GenesisDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresTLK = true, IsRecommended = true},
                 }
             });
 
@@ -804,21 +947,10 @@ namespace Randomizer.Randomizers.Game2
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = ClassTalents.ShuffleClassAbilitites,
                         RequiresTLK = true,
-                        /* Will have to implement later as removing gating code is actually complicated
-                        SubOptions = new ObservableCollectionExtended<RandomizationOption>()
-                        {
-                            new RandomizationOption()
-                            {
-                                IsOptionOnly = true,
-                                SubOptionKey = HenchTalents.SUBOPTION_HENCHPOWERS_REMOVEGATING,
-                                HumanName = "Remove rank-up gating",
-                                Description = "Removes the unlock requirement for the second power slot. The final power slot will still be gated by loyalty."
-                            }
-                        }*/
+                        GameplayRandomizer = true,
                     },
 
-#if DEBUG
-                    // Needs fixes in porting code...
+
                     new RandomizationOption()
                     {
                         HumanName = "Henchmen powers",
@@ -830,6 +962,7 @@ namespace Randomizer.Randomizers.Game2
                         // SetupRandomizerButtonToolTip = "Allows you to select a save file to remove henchman records from.\nThis will wipe all henchman powers and refund the correct amount of talent points to spend.\nThis will ALSO reset the weapon they are using the default weapon they use.",
                         // SetupRandomizerButtonText = "Refund points",
                         RequiresTLK = true,
+                        GameplayRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -837,11 +970,11 @@ namespace Randomizer.Randomizers.Game2
                                 IsOptionOnly = true,
                                 SubOptionKey = HenchTalents.SUBOPTION_HENCHPOWERS_REMOVEGATING,
                                 HumanName = "Remove rank-up gating",
-                                Description = "Removes the unlock requirement for the second power slot. The final power slot will still be gated by loyalty."
+                                Description = "Removes the unlock requirement for the second power slot. The final power slot will still be gated by loyalty.",
+                                GameplayRandomizer = true
                             }
                         }
                     },
-#endif
                 }
             });
 
@@ -857,6 +990,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = SFXGame.TurnOnFriendlyFire,
                         Description = "Enables weapons to damage friendlies (enemy and player)",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        GameplayRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -864,7 +998,8 @@ namespace Randomizer.Randomizers.Game2
                                 IsOptionOnly = true,
                                 SubOptionKey = SFXGame.SUBOPTIONKEY_CARELESSFF,
                                 HumanName = "Careless mode",
-                                Description = "Attack enemies, regardless of friendly casualties"
+                                Description = "Attack enemies, regardless of friendly casualties",
+                                GameplayRandomizer = true
                             }
                         }
                     },
@@ -874,6 +1009,7 @@ namespace Randomizer.Randomizers.Game2
                         Description = "Makes Shepard able to be ragdolled from various powers/attacks. Can greatly increase difficulty",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         PerformSpecificRandomizationDelegate = SFXGame.MakeShepardRagdollable,
+                        GameplayRandomizer = true,
                     }
                 }
             });
@@ -885,15 +1021,23 @@ namespace Randomizer.Randomizers.Game2
                 {
                     // Doesn't seem to work
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
-                    new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true,
+                    new RandomizationOption() {
+                        HumanName = "Fog colors",
+                        Description = "Changes colors of fog",
+                        IsRecommended = true,
                         PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
                         IsRuntimeRandomizer = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GoodTimeRandomizer = true
+                    },
                     // new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
                     new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
                         PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GoodTimeRandomizer = true,
+                        IsRuntimeRandomizer = true
+                    },
                     //new RandomizationOption() {HumanName = "Mission rewards", Description = "Randomizes the tech and weapons given to you at the end of a mission. You can still get all the tech and weapons if you complete all the missions that award them.",
                     //    //PerformSpecificRandomizationDelegate = MissionRewards.Inventory,
                     //    PerformSpecificRandomizationDelegate = MissionRewards.PerformRandomization,
@@ -905,12 +1049,15 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = MissionRewards.PerformRandomization,
                         IsRecommended = true,
                         ProgressIndeterminate = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GameplayRandomizer = true,
+                    },
                     new RandomizationOption() {
                         HumanName = "Galaxy Map",
                         Description = "Moves things around the map, speeds up normandy",
                         PerformSpecificRandomizationDelegate = GalaxyMap.RandomizeGalaxyMap,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -919,7 +1066,8 @@ namespace Randomizer.Randomizers.Game2
                                 HumanName = "Infinite fuel",
                                 Description = "Prevents the Normandy from running out of fuel. Prevents possible softlock due to randomization",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                                IsOptionOnly = true
+                                IsOptionOnly = true,
+                                GoodTimeRandomizer = true,
                             }
                         }
                     },
@@ -931,8 +1079,20 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Text",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "Game over text", PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeGameOverText, RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Intro Crawl", PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeOpeningCrawl, RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Game over text",
+                        PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeGameOverText,
+                        RequiresTLK = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption() {HumanName = "Intro Crawl",
+                        PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeOpeningCrawl,
+                        RequiresTLK = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
                     new RandomizationOption()
                     {
                         HumanName = "Vowels",
@@ -943,6 +1103,7 @@ namespace Randomizer.Randomizers.Game2
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
+                        GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -960,6 +1121,7 @@ namespace Randomizer.Randomizers.Game2
                         RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
                         IsPostRun = true,
+                        GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -975,7 +1137,8 @@ namespace Randomizer.Randomizers.Game2
                                 HumanName = "Emoticons",
                                 Description = "Adds emoticons ^_^\n'Keep casing' recommended. Might break email or mission summaries, sowwy UwU",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
-                                SubOptionKey = RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED
+                                SubOptionKey = RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED,
+                                GoodTimeRandomizer = true,
                             }
                         }
                     },
@@ -992,7 +1155,9 @@ namespace Randomizer.Randomizers.Game2
                         Description="Swaps pawns around in animated cutscenes. May break some due to complexity, but often hilarious",
                         PerformRandomizationOnExportDelegate = Cutscene.ShuffleCutscenePawns3,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
-                        IsRecommended = true
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true
+                        // This technically could be disabled post-install with modification of the pre-shuffler class...
                     },
                     new RandomizationOption() {
                             HumanName = "Animation data",
@@ -1002,9 +1167,9 @@ namespace Randomizer.Randomizers.Game2
                             SliderValue = 1,
                             Ticks = "1,2",
                             Description="Fuzzes rigged bone positions and rotations",
-                            IsRecommended = true,
                             SliderTooltip = "Value determines which bones are used in the remapping. Default value is basic bones only.",
-                            Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
+                            Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                            GoodTimeRandomizer = true
                     },
                     new RandomizationOption()
                     {
@@ -1017,6 +1182,7 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Higher settings yield more extreme position and rotational changes to interpolations. Values above 0.05 are very likely to make the game unplayable. Default value is 0.05.",
                         SliderToTextConverter = x=> $"Maximum interp change: {Math.Round(x * 100)}%",
                         SliderValue = 0.05,
+                        GoodTimeRandomizer = true,
                     },
 
 
@@ -1036,6 +1202,9 @@ namespace Randomizer.Randomizers.Game2
             RandomizationGroups.Add(new RandomizationGroup()
             {
                 GroupName = "Bad ideas",
+                CollapseGroup = true,
+                GroupDescription = "These are ideas that did not work out: you should not enable them unless you just want to experiment. They are likely to ruin the gameplay experience.",
+                SortPriority = 5,
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
                     new RandomizationOption()
@@ -1084,7 +1253,8 @@ namespace Randomizer.Randomizers.Game2
             {
                 g.Options.Sort(x => x.HumanName);
             }
-            RandomizationGroups.Sort(x => x.GroupName);
+
+            RandomizationGroups.ReplaceAll(RandomizationGroups.OrderBy(x => x.SortPriority).ThenBy(x => x.GroupName).ToList()); // To list is required here
         }
     }
 }

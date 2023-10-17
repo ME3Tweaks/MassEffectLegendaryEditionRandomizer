@@ -207,6 +207,21 @@ namespace Randomizer.Randomizers
         /// </summary>
         public bool IsRuntimeRandomizer { get; set; }
 
+        /// <summary>
+        /// If this is a 'Good time' randomizer option
+        /// </summary>
+        public bool GoodTimeRandomizer { get; set; }
+
+        /// <summary>
+        /// If this is a 'Gameplay' randomizer for people who don't like having a good time
+        /// </summary>
+        public bool GameplayRandomizer { get; set; }
+
+        /// <summary>
+        /// If this randomizer is currently being installed
+        /// </summary>
+        public bool RandomizationInProgress { get; set; }
+
         #endregion
 
         /// <summary>
