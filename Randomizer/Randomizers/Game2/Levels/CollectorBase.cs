@@ -1308,7 +1308,25 @@ namespace Randomizer.Randomizers.Game2.Levels
             MarkDownedSquadmatesDead(package, sequenceSupportPackage);
             ImproveSquadmateAI(package, sequenceSupportPackage);
             AddNewHarbyVoiceLines(target, package, sequenceSupportPackage);
+            FixSquadmatesNeverRespawning(target, package, sequenceSupportPackage);
+            InstallDifficultyHelper(target, package, sequenceSupportPackage);
             MERFileSystem.SavePackage(package);
+        }
+
+        private static void FixSquadmatesNeverRespawning(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
+        {
+            // Henchmen can fly off and never respawn due to bad logic in their states
+            // This is the lazy way of fixing it
+            MERSeqTools.InstallSequenceStandalone(sequenceSupportPackage.FindExport("HenchRespawner"), package,
+                package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Reaper_Combat_Handler"));
+        }
+
+        private static void InstallDifficultyHelper(GameTarget target, IMEPackage package, IMEPackage sequenceSupportPackage)
+        {
+            // Engineer's kit sucks real bad in this game
+            // Make it slightly easier on higher difficult for them
+            MERSeqTools.InstallSequenceStandalone(sequenceSupportPackage.FindExport("EngineerHelper"), package,
+                package.FindExport("TheWorld.PersistentLevel.Main_Sequence.Reaper_Combat_Handler"));
         }
 
         private static void AddNewHarbyVoiceLines(GameTarget target, IMEPackage reaperFightPackage, IMEPackage sequenceSupportPackage)
@@ -1389,13 +1407,13 @@ namespace Randomizer.Randomizers.Game2.Levels
                 // var ported = PackageTools.PortExportIntoPackage(target, p, sequenceSupportPackage.FindExport("MERGameContent.MERReaperWeaponInfo"));
 
                 ScriptTools.InstallClassToPackageFromEmbedded(target, p, "SFXAI_Reaper", "SFXGamePawns");
-                
+
                 ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXPawn_Reaper.TakeDamage",
                     "SFXGamePawns.SFXPawn_Reaper"); // Prevents damage to self or from team
-               /* ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.SelectTarget",
-                    "SFXGamePawns.SFXAI_Reaper"); // Ignore stealthed and non-player party targets
-                ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.OnTargetChanged",
-                    "SFXGamePawns.SFXAI_Reaper"); // Do not stop firing on target change */
+                /* ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.SelectTarget",
+                     "SFXGamePawns.SFXAI_Reaper"); // Ignore stealthed and non-player party targets
+                 ScriptTools.AddToClassInPackageFromEmbedded(target, p, "SFXAI_Reaper.OnTargetChanged",
+                     "SFXGamePawns.SFXAI_Reaper"); // Do not stop firing on target change */
 #if DEBUG
                 p.FindExport("SFXGamePawns.SFXAI_Reaper").GetDefaults().WriteProperty(new BoolProperty(true, "bAILogging"));
                 p.FindExport("SFXGamePawns.SFXAI_Reaper").GetDefaults().WriteProperty(new BoolProperty(true, "bAILogToWindow"));
