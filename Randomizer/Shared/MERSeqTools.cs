@@ -27,9 +27,9 @@ namespace Randomizer.Shared
         /// <param name="sequence"></param>
         /// <param name="numLinks"></param>
         /// <returns></returns>
-        public static ExportEntry InstallRandomSwitchIntoSequence(GameTarget target, ExportEntry sequence, int numLinks)
+        public static ExportEntry CreateRandSwitch(ExportEntry sequence, int numLinks)
         {
-            var nSwitch = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqAct_RandomSwitch", new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true));
+            var nSwitch = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqAct_RandomSwitch", MERCaches.GlobalCommonLookupCache);
             KismetHelper.AddObjectToSequence(nSwitch, sequence);
             var properties = nSwitch.GetProperties();
             //    var packageBin = MEREmbedded.GetEmbeddedPackage(target.Game, "PremadeSeqObjs.pcc");
@@ -61,6 +61,7 @@ namespace Randomizer.Shared
 
             return nSwitch;
         }
+
 
         /// <summary>
         /// Adds a new switch output link. Returns the link number (NOT THE INDEX!!) that you can use 'Link X' as the description for

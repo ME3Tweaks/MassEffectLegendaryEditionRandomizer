@@ -92,7 +92,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
 
             // Link up the random choice it makes
-            var randSw = MERSeqTools.InstallRandomSwitchIntoSequence(target, sequence, 3);
+            var randSw = MERSeqTools.CreateRandSwitch(sequence, 3);
             KismetHelper.CreateOutputLink(randSw, "Link 1", interp1);
             KismetHelper.CreateOutputLink(randSw, "Link 2", interp2);
             KismetHelper.CreateOutputLink(randSw, "Link 3", interp3);

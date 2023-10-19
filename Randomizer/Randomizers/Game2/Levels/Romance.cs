@@ -33,7 +33,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
                 // Install random switch and point it at the romance log culminations for each
                 // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
-                var randomSwitch = MERSeqTools.InstallRandomSwitchIntoSequence(target, romSeq, 7);
+                var randomSwitch = MERSeqTools.CreateRandSwitch(romSeq, 7);
                 var outLinks = SeqTools.GetOutboundLinksOfNode(randomSwitch);
 
                 outLinks[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_7") }); // JACOB
@@ -66,7 +66,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
                 // Install random switch and point it at the romance log culminations for each
                 // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
-                var randomSwitch = MERSeqTools.InstallRandomSwitchIntoSequence(target, romSeq, 2);
+                var randomSwitch = MERSeqTools.CreateRandSwitch(romSeq, 2);
                 var outLinks = SeqTools.GetOutboundLinksOfNode(randomSwitch);
 
                 outLinks[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Introduction.Intro_Cutscene_Bridge.SeqAct_Log_0") }); // MIRANDA

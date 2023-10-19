@@ -56,7 +56,8 @@ namespace Randomizer.Randomizers
             /// <summary>
             /// The game is definitely not gonna work how you want
             /// </summary>
-            Danger_RIP
+            Danger_RIP,
+
         }
 
         public EOptionDangerousness Dangerousness { get; set; } = EOptionDangerousness.Danger_Normal;

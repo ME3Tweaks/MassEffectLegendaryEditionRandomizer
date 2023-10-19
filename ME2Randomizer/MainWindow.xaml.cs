@@ -57,6 +57,12 @@ namespace RandomizerUI
 
         public bool UseMultiThreadRNG { get; set; } = true;
 
+
+        /// <summary>
+        /// If the UI should display the labels
+        /// </summary>
+        public bool ShowLabels { get; set; }
+
         #region Flyouts
         public bool LogUploaderFlyoutOpen { get; set; }
         public bool FirstRunFlyoutOpen { get; set; }
@@ -196,6 +202,12 @@ namespace RandomizerUI
             UploadSelectedLogCommand = new GenericCommand(CollectAndUploadLog, () => SelectedLogForUpload != null);
             SetupRandomizerCommand = new RelayCommand(SetupRandomizer, CanSetupRandomizer);
             UninstallDLCCommand = new GenericCommand(UninstallDLCComponent, CanUninstallDLCComponent);
+            OptionTogglerCommand = new GenericCommand(ShowOptionToggler, () => DLCComponentInstalled);
+        }
+
+        private void ShowOptionToggler()
+        {
+
         }
 
         private async void UninstallDLCComponent()
@@ -285,8 +297,7 @@ namespace RandomizerUI
 
         public string IntroTitleText => $"Welcome to {MERUtilities.GetGameUIName(true)} Legendary Edition Randomizer";
         public string IntroTitleSubText => $"Please read the following information to help ensure you have the best experience\nwith {MERUtilities.GetGameUIName(true)} Randomizer ({MERUtilities.GetRandomizerShortName()}).";
-
-
+        public ICommand OptionTogglerCommand { get; set; }
 
 
         private bool CanStartRandomization()

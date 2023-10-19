@@ -549,6 +549,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
+                        GoodTimeRandomizer = true,
                         // IsRuntimeRandomizer = true, // Technically this could be coded in but i'm lazy
 
                     },
@@ -567,6 +568,7 @@ namespace Randomizer.Randomizers.Game2
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = RSharedBioLookAtTarget.RandomizeBioPawnLookatController,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        GoodTimeRandomizer = true,
                     },
                 }
             });
@@ -701,30 +703,19 @@ namespace Randomizer.Randomizers.Game2
                         GameplayRandomizer = true
                     },
                     //new RandomizationOption() {HumanName = "NPC walking routes", PerformRandomizationOnExportDelegate = RRoute.RandomizeExport}, // Seems very specialized in ME2
-                    new RandomizationOption() {HumanName = "Hammerhead", 
-                        IsRecommended = true, 
+                    new RandomizationOption() {HumanName = "Hammerhead",
+                        IsRecommended = true,
                         Description = "Changes HammerHead stats",
-                        PerformSpecificRandomizationDelegate = HammerHead.PerformRandomization, 
+                        PerformSpecificRandomizationDelegate = HammerHead.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         GameplayRandomizer = true
                     },
-                    new RandomizationOption() {HumanName = "'Lite' pawn animations", 
-                        IsRecommended = true, 
+                    new RandomizationOption() {HumanName = "'Lite' pawn animations",
+                        IsRecommended = true,
                         Description = "Changes the animations used by basic non-interactable NPCs. Some may T-pose due to the sheer complexity of this randomizer",
-                        PerformRandomizationOnExportDelegate = RSFXSkeletalMeshActorMAT.RandomizeBasicGestures, 
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, RequiresGestures = true,
+                        PerformRandomizationOnExportDelegate = RSFXSkeletalMeshActorMAT.RandomizeBasicGestures,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal, RequiresGestures = true,
                         GoodTimeRandomizer = true
-                    },
-                    new RandomizationOption()
-                    {
-                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
-                        Ticks = "0.1,0.2,0.3,0.4,0.5,0.75",
-                        HasSliderOption = true,
-                        SliderTooltip = "Values are added +/- to 1 to generate the range of allowed sizes. For example, 0.1 yields 90-110% size multiplier. Default value is 0.1.",
-                        SliderToTextConverter = x=> $"Maximum size change: {Math.Round(x * 100)}%",
-                        SliderValue = 0.1,
-                        GoodTimeRandomizer = true,
                     },
                 }
             });
@@ -916,7 +907,8 @@ namespace Randomizer.Randomizers.Game2
                                 Description = "Replaces the final battle music to better match the combat tempo",
                                 IsRecommended = true,
                                 IsOptionOnly = true,
-                                SubOptionKey = CollectorBase.SUBOPTIONKEY_NEWFINALBOSSMUSIC
+                                SubOptionKey = CollectorBase.SUBOPTIONKEY_NEWFINALBOSSMUSIC,
+                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                             }
                         }
                     },
@@ -930,7 +922,13 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true, // Technically also gameplay
                     },
                     new RandomizationOption() {HumanName = "Genesis Comic",
-                        Description = "Completely changes the story recap segment", PerformSpecificRandomizationDelegate = GenesisDLC.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, RequiresTLK = true, IsRecommended = true},
+                        Description = "Completely changes the story recap segment",
+                        PerformSpecificRandomizationDelegate = GenesisDLC.PerformRandomization,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        RequiresTLK = true,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                    },
                 }
             });
 
@@ -955,7 +953,7 @@ namespace Randomizer.Randomizers.Game2
                     {
                         HumanName = "Henchmen powers",
                         Description = "Shuffles the powers of squadmates. Points spent in powers removed from henchmen in your save will be refunded",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = HenchTalents.ShuffleSquadmateAbilitiesLE2,
                         // etupRandomizerDelegate = HenchTalents.ResetTalents,
@@ -999,7 +997,6 @@ namespace Randomizer.Randomizers.Game2
                                 SubOptionKey = SFXGame.SUBOPTIONKEY_CARELESSFF,
                                 HumanName = "Careless mode",
                                 Description = "Attack enemies, regardless of friendly casualties",
-                                GameplayRandomizer = true
                             }
                         }
                     },
@@ -1067,7 +1064,6 @@ namespace Randomizer.Randomizers.Game2
                                 Description = "Prevents the Normandy from running out of fuel. Prevents possible softlock due to randomization",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true,
-                                GoodTimeRandomizer = true,
                             }
                         }
                     },
@@ -1100,7 +1096,7 @@ namespace Randomizer.Randomizers.Game2
                         Description="Changes vowels in text in a consistent manner, making a 'new' language",
                         PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeVowels,
                         RequiresTLK = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
                         GoodTimeRandomizer = true,
@@ -1130,15 +1126,15 @@ namespace Randomizer.Randomizers.Game2
                                 HumanName = "Keep casing",
                                 Description = "Keeps upper and lower casing",
                                 SubOptionKey = RSharedTexts.SUBOPTIONKEY_UWU_KEEPCASING,
+                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                             },
                             new RandomizationOption()
                             {
                                 IsOptionOnly = true,
                                 HumanName = "Emoticons",
                                 Description = "Adds emoticons ^_^\n'Keep casing' recommended. Might break email or mission summaries, sowwy UwU",
-                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 SubOptionKey = RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED,
-                                GoodTimeRandomizer = true,
                             }
                         }
                     },
@@ -1171,19 +1167,7 @@ namespace Randomizer.Randomizers.Game2
                             Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                             GoodTimeRandomizer = true
                     },
-                    new RandomizationOption()
-                    {
-                        HumanName = "Random interpolations",
-                        Description = "Randomly fuzzes interpolation data. Can make game very dizzying on higher values!",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
-                        PerformRandomizationOnExportDelegate = RSharedInterpTrackMove.RandomizeExport,
-                        Ticks = "0.025,0.05,0.075,0.1,0.15,0.2,0.3,0.4,0.5",
-                        HasSliderOption = true,
-                        SliderTooltip = "Higher settings yield more extreme position and rotational changes to interpolations. Values above 0.05 are very likely to make the game unplayable. Default value is 0.05.",
-                        SliderToTextConverter = x=> $"Maximum interp change: {Math.Round(x * 100)}%",
-                        SliderValue = 0.05,
-                        GoodTimeRandomizer = true,
-                    },
+
 
 
                     // Crashes game too often :/
@@ -1207,6 +1191,30 @@ namespace Randomizer.Randomizers.Game2
                 SortPriority = 5,
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
+                    new RandomizationOption()
+                    {
+                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
+                        Ticks = "0.1,0.2,0.3,0.4,0.5,0.75",
+                        HasSliderOption = true,
+                        SliderTooltip = "Values are added +/- to 1 to generate the range of allowed sizes. For example, 0.1 yields 90-110% size multiplier. Default value is 0.1.",
+                        SliderToTextConverter = x=> $"Maximum size change: {Math.Round(x * 100)}%",
+                        SliderValue = 0.1,
+                        GoodTimeRandomizer = true,
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Random interpolations",
+                        Description = "Randomly fuzzes interpolation data. Can make game very dizzying on higher values!",
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
+                        PerformRandomizationOnExportDelegate = RSharedInterpTrackMove.RandomizeExport,
+                        Ticks = "0.025,0.05,0.075,0.1,0.15,0.2,0.3,0.4,0.5",
+                        HasSliderOption = true,
+                        SliderTooltip = "Higher settings yield more extreme position and rotational changes to interpolations. Values above 0.05 are very likely to make the game unplayable. Default value is 0.05.",
+                        SliderToTextConverter = x=> $"Maximum interp change: {Math.Round(x * 100)}%",
+                        SliderValue = 0.05,
+                        GoodTimeRandomizer = true,
+                    },
                     new RandomizationOption()
                     {
                         HumanName = "Lots of sounds", PerformSpecificRandomizationDelegate = SFXGame.RandomizeWwiseEvents,
