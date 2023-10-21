@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
@@ -54,6 +55,11 @@ namespace Randomizer.Randomizers.Game2.Enemy
     }
     public class PawnPorting
     {
+        public static PortablePawn GetPortablePawn(string pawnTypeIFP)
+        {
+            return PortablePawns.FirstOrDefault(x => x.BioPawnTypeIFP == pawnTypeIFP);
+        }
+
         public static PortablePawn[] PortablePawns = new[]
         {
             // YMIR Mech
@@ -175,15 +181,31 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 IsCorrectedPackage = true
             },
 
+            // collector sniper
+            
             new PortablePawn()
             {
-                PackageFilename = "SFXPawn_GethDestroyer.pcc",
-                BioPawnTypeIFP = "MERChar_Enemies.GethDestroyerSpawnable",
-                AssetToPortIn = "MERChar_Enemies.GethDestroyerSpawnable",
+                PackageFilename = "SFXPawn_CollectorNeedler.pcc",
+                BioPawnTypeIFP = "BioChar_Collectors.Soldiers.ELT_COL_Needler",
+                AssetToPortIn = "BioChar_Collectors.Soldiers.ELT_COL_Needler",
+                AssetPaths = new string[] {
+                    // Collector already has this here
+                },
+                PawnClassPath = "SFXGamePawns.SFXPawn_CollectorDrone",
+                IsCorrectedPackage = true
+            },
+
+
+            // collector flamer
+            new PortablePawn()
+            {
+                PackageFilename = "SFXPawn_CollectorFlamer.pcc",
+                BioPawnTypeIFP = "MERChar_Enemies.CollectorFlamerSpawnable",
+                AssetToPortIn = "MERChar_Enemies.CollectorFlamerSpawnable",
                 AssetPaths = new string[] {
                     // Assets are already referenced by custom pawn
                 },
-                PawnClassPath = "MERGamePawns.SFXPawn_GethDestroyerFull",
+                PawnClassPath = "MERGameContent.SFXPawn_CollectorFlamer",
                 IsCorrectedPackage = true
             },
 

@@ -41,19 +41,14 @@ namespace Randomizer.Randomizers.Game2.Levels
                 UpdateHives4, // Run to the final button
 
                 UpdateLongWalk2, // After first checkpoint
-                UpdateLongWalk3, // After ditch checkpoint
+                UpdateLongWalk3, // Down the hill to the ditch
                 UpdateLongWalk5, // Final run for it 
 
                 UpdatePreFinalBattle,
-                UpdateFinalBattle
+                UpdateFinalBattle,
             };
 
-            // Parallel.ForEach(parallelizableEdits, action => action(target, sequenceSupportPackage));
-
-            //UpdateHives1(target, sequenceSupportPackage); // First combat
-            //UpdateHives2(target, sequenceSupportPackage); // First possessed enemy, long open area
-            //UpdateHives3(target, sequenceSupportPackage); // Olympic high jump sprint
-            //UpdateHives4(target, sequenceSupportPackage); // Run to the final button
+            Parallel.ForEach(parallelizableEdits, action => action(target, sequenceSupportPackage));
 
             // The Long Walk
             if (!option.HasSubOptionSelected(SUBOPTIONKEY_DONT_RANDOMIZE_TEAMS))
@@ -62,11 +57,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             }
 
             AutomateTheLongWalk(target, sequenceSupportPackage, option);
-            // UpdateSpawnsLongWalk(target, sequenceSupportPackage);
 
-            // Platforming and Final Battles
-            //UpdatePreFinalBattle(target, sequenceSupportPackage);
-            //UpdateFinalBattle(target, sequenceSupportPackage);
             InstallCustomFinalBattleMusic(target, sequenceSupportPackage, option);
 
             // Post-CollectorBase
@@ -162,7 +153,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             using var package = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, file));
 
             // Logic here
-            string[] allowedPawns = new[] { "MERChar_Enemies.ChargingHusk", "BioChar_Animals.Combat.ELT_Spider" }; // Swarm the player
+            string[] allowedPawns = new[] { "MERChar_Enemies.ChargingHusk" }; // Swarm the player
 
             AddRandomSpawns(target, package,
                 "TheWorld.PersistentLevel.Main_Sequence.CombatEncounter_FlyerRaid.SeqAct_Delay_1",
@@ -258,7 +249,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Logic here
             // Originally was Varren
             // Varren turn into land sharks for some reason
-            string[] allowedPawns = new[] { "MERChar_Enemies.GethDestroyerSpawnable" };
+            string[] allowedPawns = new[] { "MERChar_Enemies.CollectorFlamerSpawnable" };
 
             AddRandomSpawns(target, package,
                 "TheWorld.PersistentLevel.Main_Sequence.Corridor150_Combat_Respawn.SeqAct_Gate_0", allowedPawns, 2,
@@ -445,7 +436,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
                 // Signal LongWalkHelper
                 var stopWalking = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqEvent_SequenceActivated_2");
-                var stoppedWalkingARE = MERSeqTools.CreateActivateRemoteEvent(seq, "StoppedWalking");
+                var stoppedWalkingARE = MERSeqTools.CreateActivateRemoteEvent(seq, "WalkingDone");
                 KismetHelper.CreateOutputLink(stopWalking, "Out", stoppedWalkingARE);
 
                 // Add LongWalkHelper listener
@@ -720,7 +711,17 @@ namespace Randomizer.Randomizers.Game2.Levels
             var kSpawnable = MERSeqTools.CreateObject(seq, reaperFightPackage.FindExport("MERChar_Enemies.KaidanSpawnable"));
             var aSpawnable = MERSeqTools.CreateObject(seq, reaperFightPackage.FindExport("MERChar_Enemies.AshleySpawnable"));
 
-            var list = MERSeqTools.CreateSeqVarList(seq, reaperFightPackage.FindExport("BioChar_Collectors.Soldiers.MIN_COL_AssaultRifle"));
+            // The default enemies
+            // These two must be ported in as they may not reliably be in memory, even though sniper is technically in 420CombatZone
+            PawnPorting.PortPawnIntoPackage(target, PawnPorting.GetPortablePawn("BioChar_Collectors.Soldiers.ELT_COL_Needler"), reaperFightPackage);
+            PawnPorting.PortPawnIntoPackage(target, PawnPorting.GetPortablePawn("MERChar_Enemies.CollectorFlamerSpawnable"), reaperFightPackage);
+
+            var defCollector = reaperFightPackage.FindExport("BioChar_Collectors.Soldiers.MIN_COL_AssaultRifle");
+            var sniperCollector = reaperFightPackage.FindExport("BioChar_Collectors.Soldiers.ELT_COL_Needler");
+            var flamerCollector = reaperFightPackage.FindExport("MERChar_Enemies.CollectorFlamerSpawnable");
+
+            // The default list uses 4:1:1 distribution of enemy types
+            var list = MERSeqTools.CreateRandSeqVarList(seq, defCollector, defCollector, defCollector, defCollector, sniperCollector, flamerCollector );
             list.WriteProperty(new NameProperty("CrawlingCombatPawnTypes", "VarName")); // Set as a variable
 
             var lowHPTrigger = MERSeqTools.CreateSeqEventRemoteActivated(seq, "ReaperLowHP");
@@ -728,7 +729,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             var clearList = MERSeqTools.CreateModifyObjectList(seq);
             var addKList = MERSeqTools.CreateModifyObjectList(seq);
             var addAList = MERSeqTools.CreateModifyObjectList(seq);
-            var pmCheckState = MERSeqTools.CreatePMCheckState(seq, 1541);
+            var pmCheckState = MERSeqTools.CreatePMCheckState(seq, 1541); // Kaidan died?
 
             // Link up the sequence
 
@@ -761,7 +762,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 KismetHelper.AddObjectToSequence(aiFactoryAssignment, seq);
                 aiFactoryAssignment.WriteProperty(new ObjectProperty(aiFactory.GetProperty<ObjectProperty>("Factory").ResolveToEntry(reaperFightPackage), "Factory"));
                 var pawnTypeList = MERSeqTools.CreateSeqVarNamed(seq, "CrawlingCombatPawnTypes", "SeqVar_ObjectList");
-                KismetHelper.CreateVariableLink(aiFactoryAssignment, "Pawn Type", pawnTypeList);
+                KismetHelper.CreateVariableLink(aiFactoryAssignment, "PawnType(s)", pawnTypeList);
 
                 // Repoint incoming to spawn to this node instead
                 MERSeqTools.RedirectInboundLinks(aiFactory, aiFactoryAssignment);
@@ -1591,7 +1592,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 KismetHelper.AddObjectToSequence(aiFactoryAssignment, seq);
                 aiFactoryAssignment.WriteProperty(new ObjectProperty(aiFactory.GetProperty<ObjectProperty>("Factory").ResolveToEntry(package), "Factory"));
                 var pawnTypeList = MERSeqTools.CreatePawnList(target, seq, allowedPawns);
-                KismetHelper.CreateVariableLink(aiFactoryAssignment, "Pawn Type", pawnTypeList);
+                KismetHelper.CreateVariableLink(aiFactoryAssignment, "PawnType(s)", pawnTypeList);
 
                 // Repoint incoming to spawn to this node instead
                 MERSeqTools.RedirectInboundLinks(aiFactory, aiFactoryAssignment);

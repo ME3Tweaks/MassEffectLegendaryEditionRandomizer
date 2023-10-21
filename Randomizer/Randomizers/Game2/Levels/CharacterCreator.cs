@@ -31,13 +31,13 @@ namespace Randomizer.Randomizers.Game2.Levels
         public static bool InstallIconicRandomizer(GameTarget target, RandomizationOption option)
         {
             var sfxgame = MERControl.InstallBioMorphFaceRandomizerClasses(target) ?? SFXGame.GetSFXGame(target);
-            ScriptTools.InstallScriptToExport(sfxgame.FindExport("SFXSaveGame.LoadMorphHead"), "SFXSaveGame.LoadMorphHead.uc");
-            ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
+            ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXSaveGame.LoadMorphHead"), "SFXSaveGame.LoadMorphHead.uc");
+            ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
             MERFileSystem.SavePackage(sfxgame);
 
             // Patch BioP_Char to randomize face on load
             var biop_char = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioP_Char.pcc"));
-            ScriptTools.InstallScriptToExport(biop_char.FindExport("SFXGameContent.BioSeqAct_ShowCharacterCreation.Activated"), "BioSeqAct_ShowCharacterCreation.Activated.uc");
+            ScriptTools.InstallScriptToExport(target, biop_char.FindExport("SFXGameContent.BioSeqAct_ShowCharacterCreation.Activated"), "BioSeqAct_ShowCharacterCreation.Activated.uc");
             MERFileSystem.SavePackage(biop_char);
 
             // Set runtime feature flags
@@ -146,7 +146,7 @@ namespace Randomizer.Randomizers.Game2.Levels
         public static bool RandomizeCharacterCreator(GameTarget target, RandomizationOption option)
         {
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
+            ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
             //ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.ApplyNewCode"), "BioSFHandler_NewCharacter.ApplyNewCode.uc");
             MERFileSystem.SavePackage(sfxgame);
 

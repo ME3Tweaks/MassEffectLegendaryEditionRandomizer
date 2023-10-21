@@ -30,7 +30,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 
             // Update power script design and patch out player physics level
             var sd = sfxgame.FindExport(@"BioPowerScriptDesign.GetPhysicsLevel");
-            ScriptTools.InstallScriptToExport(sd, "GetPhysicsLevel.uc", false, null);
+            ScriptTools.InstallScriptToExport(target, sd, "GetPhysicsLevel.uc", false, null);
 
             MERFileSystem.SavePackage(sfxgame);
             return true;
@@ -43,7 +43,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             if (option.HasSubOptionSelected(SUBOPTIONKEY_CARELESSFF))
             {
                 // Remove the friendly fire check
-                ScriptTools.InstallScriptToPackage(sfxgame, "BioAiController.IsFriendlyBlockingFireLine", "IsFriendlyBlockingFireLine.uc", false);
+                ScriptTools.InstallScriptToPackage(target, sfxgame, "BioAiController.IsFriendlyBlockingFireLine", "IsFriendlyBlockingFireLine.uc", false);
             }
             MERFileSystem.SavePackage(sfxgame);
             return true;
@@ -141,7 +141,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 PackageTools.CreateNewClass(sfxGame, @"SFXLoadoutDataMER", classText);
 
                 // Patch the loadout generation method
-                ScriptTools.InstallScriptToExport(sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc");
+                ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc");
             }
 
             return sfxGame;

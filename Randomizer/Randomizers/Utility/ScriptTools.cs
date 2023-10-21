@@ -24,10 +24,10 @@ namespace Randomizer.Randomizers.Utility
         /// <param name="instancedFullPath"></param>
         /// <param name="scriptFilename"></param>
         /// <param name="shared"></param>
-        public static IMEPackage InstallScriptToPackage(IMEPackage pf, string instancedFullPath, string scriptFilename, bool shared, bool saveOnFinish = false, PackageCache cache = null)
+        public static IMEPackage InstallScriptToPackage(GameTarget target, IMEPackage pf, string instancedFullPath, string scriptFilename, bool shared, bool saveOnFinish = false, PackageCache cache = null)
         {
             var targetExp = pf.FindExport(instancedFullPath);
-            InstallScriptToExport(targetExp, scriptFilename, shared, cache);
+            InstallScriptToExport(target, targetExp, scriptFilename, shared, cache);
             if (saveOnFinish)
             {
                 MERFileSystem.SavePackage(pf);
@@ -47,14 +47,14 @@ namespace Randomizer.Randomizers.Utility
         public static IMEPackage InstallScriptToPackage(GameTarget target, string packageFile, string instancedFullPath, string scriptFilename, bool shared, bool saveOnFinish = false, PackageCache cache = null)
         {
             var pf = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, packageFile));
-            return InstallScriptToPackage(pf, instancedFullPath, scriptFilename, shared, saveOnFinish, cache);
+            return InstallScriptToPackage(target, pf, instancedFullPath, scriptFilename, shared, saveOnFinish, cache);
         }
 
-        public static void InstallScriptToExport(ExportEntry targetExport, string scriptFilename, bool shared = false, PackageCache cache = null)
+        public static void InstallScriptToExport(GameTarget target, ExportEntry targetExport, string scriptFilename, bool shared = false, PackageCache cache = null)
         {
             MERLog.Information($@"Installing script {scriptFilename} to export {targetExport.InstancedFullPath}");
             string scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptFilename}", shared);
-            InstallScriptTextToExport(targetExport, scriptText, scriptFilename, cache);
+            InstallScriptTextToExport(target,targetExport, scriptText, scriptFilename, cache);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Randomizer.Randomizers.Utility
         {
             var pf = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, packageFile));
             var export = pf.FindExport(instancedFullPath);
-            InstallScriptTextToExport(export, scriptText, scriptFileNameForLogging, cache);
+            InstallScriptTextToExport(target, export, scriptText, scriptFileNameForLogging, cache);
             if (saveOnFinish)
             {
                 MERFileSystem.SavePackage(pf);
@@ -79,10 +79,10 @@ namespace Randomizer.Randomizers.Utility
             return pf;
         }
 
-        public static void InstallScriptTextToExport(ExportEntry targetExport, string scriptText, string scriptFileNameForLogging, PackageCache cache)
+        public static void InstallScriptTextToExport(GameTarget target, ExportEntry targetExport, string scriptText, string scriptFileNameForLogging, PackageCache cache)
         {
             var fl = new FileLib(targetExport.FileRef);
-            bool initialized = fl.Initialize(cache);
+            bool initialized = fl.Initialize(cache, gameRootPath: target.TargetPath);
             if (!initialized)
             {
                 MERLog.Error($@"FileLib loading failed for package {targetExport.InstancedFullPath} ({targetExport.FileRef.FilePath}):");

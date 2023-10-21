@@ -1020,5 +1020,23 @@ namespace Randomizer.Shared
             }
             return comp;
         }
+
+            /// <summary>
+            /// Makes a new MERSeqVar_RandObjectList in the given sequence with the given values in ObjList.
+            /// </summary>
+            /// <param name="objects"></param>
+            /// <param name="sequence"></param>
+            /// <returns></returns>
+            public static ExportEntry CreateRandSeqVarList(ExportEntry sequence, params ExportEntry[] objects)
+            {
+                var list = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "MERSeqVar_RandObjectList", MERCaches.GlobalCommonLookupCache);
+                KismetHelper.AddObjectToSequence(list, sequence);
+
+                ArrayProperty<ObjectProperty> objList = new ArrayProperty<ObjectProperty>("ObjList");
+                objList.ReplaceAll(objects.Select(x => new ObjectProperty(x)));
+                list.WriteProperty(objList);
+
+                return list;
+            }
     }
 }

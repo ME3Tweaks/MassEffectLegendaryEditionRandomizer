@@ -39,10 +39,10 @@ namespace Randomizer.MER
         }
 
         [Conditional("DEBUG")]
-        public static void InstallDebugScript(IMEPackage package, string scriptName, bool saveOnFinish)
+        public static void InstallDebugScript(GameTarget target, IMEPackage package, string scriptName, bool saveOnFinish)
         {
             Debug.WriteLine($"Installing debug script {scriptName}");
-            ScriptTools.InstallScriptToPackage(package, scriptName, "Debug." + scriptName + ".uc", false, saveOnFinish);
+            ScriptTools.InstallScriptToPackage(target, package, scriptName, "Debug." + scriptName + ".uc", false, saveOnFinish);
         }
 
         public static void ReplaceGetUExport()

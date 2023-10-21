@@ -21,7 +21,7 @@ namespace Randomizer.Randomizers.Game2
             if (!InstalledBioPawnMERControl)
             {
                 var sfxgame = SFXGame.GetSFXGame(target);
-                ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioPawn.PostBeginPlay"),
+                ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioPawn.PostBeginPlay"),
                     "BioPawn.PostBeginPlay.uc");
                 MERFileSystem.SavePackage(sfxgame);
                 InstalledBioPawnMERControl = true;

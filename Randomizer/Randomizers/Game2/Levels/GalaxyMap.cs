@@ -38,7 +38,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             if (option.HasSubOptionSelected(SUBOPTIONKEY_INFINITEGAS))
             {
                 var BurnFuel = sfxgameP.FindExport("BioCameraBehaviorGalaxy.BurnFuel");
-                ScriptTools.InstallScriptToExport(BurnFuel, "BurnFuel.uc");
+                ScriptTools.InstallScriptToExport(target, BurnFuel, "BurnFuel.uc");
             }
 
 

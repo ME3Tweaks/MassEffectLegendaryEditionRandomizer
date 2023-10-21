@@ -122,7 +122,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         public static bool RandomizeWeapons(GameTarget target, RandomizationOption option)
         {
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.InstallScriptToExport(sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
+            ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
             MERFileSystem.SavePackage(sfxgame);
             return true;
 
