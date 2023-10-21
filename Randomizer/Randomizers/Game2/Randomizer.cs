@@ -901,6 +901,15 @@ namespace Randomizer.Randomizers.Game2
                         GameplayRandomizer = true,
                         SubOptions = new()
                         {
+
+                            new RandomizationOption()
+                            {
+                                HumanName = "Don't randomize team leaders",
+                                Description = "Prevents autopicking who leads the various teams in the mission",
+                                IsOptionOnly = true,
+                                SubOptionKey = CollectorBase.SUBOPTIONKEY_DONT_RANDOMIZE_TEAMS,
+                                Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                            },
                             new RandomizationOption()
                             {
                                 HumanName = "Use new music",

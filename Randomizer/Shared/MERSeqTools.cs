@@ -982,5 +982,43 @@ namespace Randomizer.Shared
             merCheck.WriteProperty(new BoolProperty(true, featureName));
             return merCheck;
         }
+
+        /// <summary>
+        /// Creates a SFXSeqCond_GetDifficulty object and returns it - automatically adds player variable link
+        /// </summary>
+        /// <param name="seq"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateCondGetDifficulty(ExportEntry seq)
+        {
+            var diff = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SFXSeqCond_GetDifficulty", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(diff, seq);
+            var player = MERSeqTools.CreatePlayerObject(seq, true);
+            KismetHelper.CreateVariableLink(diff, "Player", player);
+            return diff;
+        }
+
+        public static ExportEntry CreatePlotInt(ExportEntry seq, int idx)
+        {
+            var plotInt = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "BioSeqVar_StoryManagerInt", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(plotInt, seq);
+            plotInt.WriteProperty(new IntProperty(idx, "m_nIndex"));
+            // Technically there's other props but I don't think they are used.
+            return plotInt;
+        }
+
+        public static ExportEntry CreateCompareInt(ExportEntry seq, ExportEntry int1 = null, ExportEntry int2 = null)
+        {
+            var comp = SequenceObjectCreator.CreateSequenceObject(seq.FileRef, "SeqCond_CompareInt", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(comp, seq);
+            if (int1 != null)
+            {
+                KismetHelper.CreateVariableLink(comp, "A", int1);
+            }
+            if (int1 != null)
+            {
+                KismetHelper.CreateVariableLink(comp, "B", int2);
+            }
+            return comp;
+        }
     }
 }

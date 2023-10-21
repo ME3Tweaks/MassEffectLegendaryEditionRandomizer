@@ -10,6 +10,7 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
+using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Enemy;
 using Randomizer.Randomizers.Game2.Misc;
@@ -22,6 +23,8 @@ namespace Randomizer.Randomizers.Game2.Levels
 {
     class CollectorBase
     {
+        public const string SUBOPTIONKEY_DONT_RANDOMIZE_TEAMS = "SUBOPTIONKEY_DONT_RANDOMIZE_TEAMS";
+        public const string SUBOPTIONKEY_NEWFINALBOSSMUSIC = "SUBOPTIONKEY_NEWFINALBOSSMUSIC";
 
         public static bool PerformRandomization(GameTarget target, RandomizationOption option)
         {
@@ -45,7 +48,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 UpdateFinalBattle
             };
 
-            Parallel.ForEach(parallelizableEdits, action => action(target, sequenceSupportPackage));
+            // Parallel.ForEach(parallelizableEdits, action => action(target, sequenceSupportPackage));
 
             //UpdateHives1(target, sequenceSupportPackage); // First combat
             //UpdateHives2(target, sequenceSupportPackage); // First possessed enemy, long open area
@@ -53,8 +56,12 @@ namespace Randomizer.Randomizers.Game2.Levels
             //UpdateHives4(target, sequenceSupportPackage); // Run to the final button
 
             // The Long Walk
-            RandomlyChooseTeams(target, option);
-            AutomateTheLongWalk(target, option);
+            if (!option.HasSubOptionSelected(SUBOPTIONKEY_DONT_RANDOMIZE_TEAMS))
+            {
+                RandomlyChooseTeams(target, option);
+            }
+
+            AutomateTheLongWalk(target, sequenceSupportPackage, option);
             // UpdateSpawnsLongWalk(target, sequenceSupportPackage);
 
             // Platforming and Final Battles
@@ -72,6 +79,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             MERFileSystem.InstallAlways("SuicideMission");
             return true;
         }
+
 
         private static void UpdateLevelStreaming(GameTarget target)
         {
@@ -424,37 +432,83 @@ namespace Randomizer.Randomizers.Game2.Levels
             }
         }
 
-        private static void AutomateTheLongWalk(GameTarget target, RandomizationOption option)
+        private static void AutomateTheLongWalk(GameTarget target, IMEPackage sequenceSupportPackage, RandomizationOption option)
         {
             var longwalkfile = MERFileSystem.GetPackageFile(target, "BioD_EndGm2_300LongWalk.pcc");
             if (longwalkfile != null)
             {
                 // automate TLW
                 var package = MEPackageHandler.OpenMEPackage(longwalkfile);
-                var seq = package.FindExport(
-                    "TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State");
-                var stopWalking =
-                    package.FindExport(
-                        "TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqEvent_SequenceActivated_2");
+                var seq = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State");
+
+                MERSeqTools.InstallSequenceStandalone(sequenceSupportPackage.FindExport("LongWalkHelper"), package, seq);
+
+                // Signal LongWalkHelper
+                var stopWalking = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqEvent_SequenceActivated_2");
+                var stoppedWalkingARE = MERSeqTools.CreateActivateRemoteEvent(seq, "StoppedWalking");
+                KismetHelper.CreateOutputLink(stopWalking, "Out", stoppedWalkingARE);
+
+                // Add LongWalkHelper listener
+                var startWalkingRE = MERSeqTools.CreateSeqEventRemoteActivated(seq, "StartWalking");
+                KismetHelper.CreateOutputLink(startWalkingRE, "Out", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqAct_Toggle_1"), 1);
+
+                // Skip the saving/resurrecting code. This is now handled by LongWalkHelper
+                SeqTools.SkipSequenceElement(package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqCond_CompareBool_0"), "True");
+
 
                 // The auto walk delay on Stop Walking
-                var delay = MERSeqTools.CreateDelay(seq, ThreadSafeRandom.NextFloat(2, 7)); // How long to hold position
-                KismetHelper.CreateOutputLink(delay, "Finished",
-                            package.FindExport(
-                                "TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0"));
-                KismetHelper.CreateOutputLink(stopWalking, "Out", delay);
+                /*
+                var delayNormal = MERSeqTools.CreateRandomDelay(seq, 2, 7); // How long to hold position
+                var delayHardcore = MERSeqTools.CreateRandomDelay(seq, 3, 9); // How long to hold position
+                var delayInsanity = MERSeqTools.CreateRandomDelay(seq, 6, 13); // How long to hold position
+                var diffSwitch = MERSeqTools.CreateCondGetDifficulty(seq);
+
+                KismetHelper.CreateOutputLink(diffSwitch, "Casual", delayNormal);
+                KismetHelper.CreateOutputLink(diffSwitch, "Normal", delayNormal);
+                KismetHelper.CreateOutputLink(diffSwitch, "Veteran", delayNormal);
+                KismetHelper.CreateOutputLink(diffSwitch, "Hardcore", delayHardcore);
+                KismetHelper.CreateOutputLink(diffSwitch, "Insanity", delayInsanity);
+                KismetHelper.CreateOutputLink(diffSwitch, "Failed", delayNormal);
+
+
+                KismetHelper.CreateOutputLink(delayNormal, "Finished", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0"));
+                KismetHelper.CreateOutputLink(delayHardcore, "Finished", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0"));
+                KismetHelper.CreateOutputLink(delayInsanity, "Finished", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0"));
+                KismetHelper.CreateOutputLink(stopWalking, "Out", diffSwitch); */
 
                 // Do not allow targeting the escort
                 package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqVar_Bool_8").WriteProperty(new IntProperty(0, "bValue")); // stopped walking
                 package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqVar_Bool_14").WriteProperty(new IntProperty(0, "bValue")); // loading from save - we will auto start
-                KismetHelper.CreateOutputLink(package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqAct_Toggle_2"), "Out", delay); // post loaded from save init
+                KismetHelper.CreateOutputLink(package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqAct_Toggle_2"), "Out", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0")); // Auto start walking
 
-                // Only sometimes allow autosaves
+
+                /*
+                // Only sometimes allow autosaves if combat was not completed
+                var itemAfterSave = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqAct_Gate_2"); // If skipping saving, it goes to this
+
                 var linkCountForSave = 4; // 25% chance
                 var rSaveSwitch = MERSeqTools.CreateRandSwitch(seq, linkCountForSave);
-                var saveGame = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SFXSeqAct_SaveGame_0");
-                MERSeqTools.RedirectInboundLinks(saveGame, rSaveSwitch);
 
+                var saveGame = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SFXSeqAct_SaveGame_0");
+                var inCombat = MERSeqTools.CreateAndAddToSequence(seq, "BioSeqCond_InCombat");
+
+                KismetHelper.CreateOutputLink(inCombat, "False", saveGame); // Player killed everything - save the game
+                KismetHelper.CreateOutputLink(inCombat, "True", rSaveSwitch); // Only a chance for save
+                
+
+
+                // Do not save after the third part
+                var saveChanceStart = MERSeqTools.CreateCompareInt(seq, MERSeqTools.CreatePlotInt(seq, 226), MERSeqTools.CreateInt(seq, 4));
+                KismetHelper.CreateOutputLink(saveChanceStart, "A >= B", itemAfterSave); // Can't ave after the third segment
+                KismetHelper.CreateOutputLink(saveChanceStart, "A < B", inCombat); // Go to save code
+
+                // Move ReviveHench
+                var loadedFromSave = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqCond_CompareBool_0");
+                var reviveHench = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.BioSeqAct_ResurrectHenchman_0");
+                SeqTools.ChangeOutlink(loadedFromSave, 1, 0, reviveHench.UIndex); // Change to revive hench
+                SeqTools.ChangeOutlink(reviveHench, 0, 0, saveChanceStart.UIndex);
+
+                // Rand chance to save if player did not complete combat. This prevents it from being impossible
                 for (int i = 0; i < linkCountForSave; i++)
                 {
                     if (i == 0)
@@ -467,7 +521,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                         // Don't save
                         KismetHelper.CreateOutputLink(rSaveSwitch, $"Link {i + 1}", package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.SeqAct_Gate_2"));
                     }
-                }
+                } */
 
                 // Damage henchmen outside of the bubble
                 var hench2Vfx = package.FindExport("TheWorld.PersistentLevel.Main_Sequence.LongWalk_Controller.Control_Walking_State.Damage_if_too_Far.HenchB_VFX_OnRange");
@@ -586,7 +640,6 @@ namespace Randomizer.Randomizers.Game2.Levels
             CoalescedHandler.EnableFeatureFlag("bUseNewFinalBossMusic", option.HasSubOptionSelected(SUBOPTIONKEY_NEWFINALBOSSMUSIC));
         }
 
-        public const string SUBOPTIONKEY_NEWFINALBOSSMUSIC = "SUBOPTIONKEY_NEWFINALBOSSMUSIC";
 
         /// <summary>
         /// Adds a fog that gradually fades in as you damage the reaper, making it harder to see
@@ -681,8 +734,8 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             KismetHelper.CreateOutputLink(lowHPTrigger, "Out", clearList, 2); // Empty list
             KismetHelper.CreateOutputLink(clearList, "Out", pmCheckState);
-            KismetHelper.CreateOutputLink(pmCheckState, "True", addAList); // Ashley lived
-            KismetHelper.CreateOutputLink(pmCheckState, "False", addKList); // Kaidan lived
+            KismetHelper.CreateOutputLink(pmCheckState, "True", addKList); // Ashley lived (use Kaidan instead)
+            KismetHelper.CreateOutputLink(pmCheckState, "False", addAList); // Kaidan lived (use Ashley instead)
 
             KismetHelper.CreateVariableLink(clearList, "ObjectListVar", list);
             KismetHelper.CreateVariableLink(addKList, "ObjectListVar", list);
@@ -1015,15 +1068,15 @@ namespace Randomizer.Randomizers.Game2.Levels
             var logHook = reaperFightP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Reaper_Combat_Handler.SEQ_Reaper_Attack_Loop.SeqAct_Log_2");
             var seq = SeqTools.GetParentSequence(logHook);
             var squad = MERSeqTools.CreateNewSquadObject(seq, squadActor: reaperFightP.FindExport("TheWorld.PersistentLevel.BioSquadCombat_4")); // This squad, on death, will drop heavy weapon ammo/medigel
-            var pmCheckState = MERSeqTools.CreatePMCheckState(seq, 1541);
+            var pmCheckState = MERSeqTools.CreatePMCheckState(seq, 1541); // Kaidan Died
             var kaSpawnDelay = MERSeqTools.CreateDelay(seq, 5);
 
             // Add delay to start of spawn
             KismetHelper.CreateOutputLink(logHook, "Out", kaSpawnDelay);
             KismetHelper.CreateOutputLink(kaSpawnDelay, "Finished", pmCheckState);
 
-            AddRandomSpawns(target, reaperFightP, pmCheckState.InstancedFullPath, new[] { "MERChar_Enemies.KaidanSpawnable" }, 2, squad.InstancedFullPath, 1000, sequenceSupportPackage, hookupOutputIdx: 1); // 1 = false, K Died -> false
-            AddRandomSpawns(target, reaperFightP, pmCheckState.InstancedFullPath, new[] { "MERChar_Enemies.AshleySpawnable" }, 2, squad.InstancedFullPath, 1000, sequenceSupportPackage, hookupOutputIdx: 0); // 1 = false, K Died -> true
+            AddRandomSpawns(target, reaperFightP, pmCheckState.InstancedFullPath, new[] { "MERChar_Enemies.KaidanSpawnable" }, 2, squad.InstancedFullPath, 1000, sequenceSupportPackage, hookupOutputIdx: 0, delayMultiplier: 4); // 0 = true, Kaidan died (use him for the fight)
+            AddRandomSpawns(target, reaperFightP, pmCheckState.InstancedFullPath, new[] { "MERChar_Enemies.AshleySpawnable" }, 2, squad.InstancedFullPath, 1000, sequenceSupportPackage, hookupOutputIdx: 1, delayMultiplier: 4); // 1 = false, Kaidan lived (use Ashley instead)
 
 
             // Fix collector possession code
@@ -1660,7 +1713,7 @@ namespace Randomizer.Randomizers.Game2.Levels
         private static void AddRandomSpawns(GameTarget target, IMEPackage package, string hookupIFP,
             string[] allowedPawns, int numToSpawn, string squadObjectIFP, float radius,
             IMEPackage sequenceSupportPackage,
-            float minSpawnDistance = 0.0f, string spawnSeqName = "EndGm2RandomEnemySpawn", int hookupOutputIdx = 0)
+            float minSpawnDistance = 0.0f, string spawnSeqName = "EndGm2RandomEnemySpawn", int hookupOutputIdx = 0, float delayMultiplier = 1)
         {
 
             if (minSpawnDistance > radius)
@@ -1688,7 +1741,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
             for (int i = 0; i < numToSpawn; i++)
             {
-                var delay = MERSeqTools.CreateRandomDelay(sequence, 0, numToSpawn * 1.25f);
+                var delay = MERSeqTools.CreateRandomDelay(sequence, 0, numToSpawn * 1.25f * delayMultiplier);
                 KismetHelper.CreateOutputLink(trigger, outputName, delay);
                 var spawnSeq = MERSeqTools.InstallSequenceStandalone(endGm2RandomEnemySpawn, package, sequence);
                 KismetHelper.CreateOutputLink(delay, "Finished", spawnSeq);
