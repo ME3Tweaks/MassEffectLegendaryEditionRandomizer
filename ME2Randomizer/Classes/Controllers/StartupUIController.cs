@@ -33,9 +33,6 @@ namespace RandomizerUI.Classes.Controllers
     public class StartupUIController
     {
         private static bool telemetryStarted = false;
-        internal static string PassthroughME1Path;
-        internal static string PassthroughME2Path;
-        internal static string PassthroughME3Path;
 
         private static void startTelemetry()
         {
@@ -58,8 +55,8 @@ namespace RandomizerUI.Classes.Controllers
                     var attachments = new List<ErrorAttachmentLog>();
                     // Attach some text.
                     string errorMessage = "Randomizer has crashed! This is the exception that caused the crash:\n" + report.StackTrace;
-                    MERLog.Fatal(errorMessage);
-                    MERLog.Error("Note that this exception may appear to occur in a follow up boot due to how appcenter works");
+                    MERUILog.Fatal(errorMessage);
+                    MERUILog.Error("Note that this exception may appear to occur in a follow up boot due to how appcenter works");
                     string log = LogCollector.CollectLatestLog(MCoreFilesystem.GetLogDir(), false);
                     if (log.Length < 1024 * 1024 * 7)
                     {
@@ -125,12 +122,12 @@ namespace RandomizerUI.Classes.Controllers
                     TrackEventCallback = TelemetryController.TrackEvent,
                     CreateLogger = MERLog.CreateLogger,
                     RunOnUiThreadDelegate = RunOnUIThread,
-                    LoadAuxiliaryServices = true,
+                    LoadAuxiliaryServices = false,
                     LECPackageSaveFailedCallback = x => MERLog.Error($@"Failed to save package: {x}"),
 #if __GAME1__
                     PropertyDatabasesToLoad = new [] { MEGame.LE1 },
 #elif __GAME2__
-                    PropertyDatabasesToLoad = new [] { MEGame.LE2 },
+                    PropertyDatabasesToLoad = new[] { MEGame.LE2 },
 #elif __GAME3__
                     PropertyDatabasesToLoad = new [] { MEGame.LE3 },
 #endif
@@ -261,47 +258,44 @@ namespace RandomizerUI.Classes.Controllers
                     ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(int.MaxValue));
                     MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
 
-                    handleM3Passthrough();
-                    foreach (var game in Locations.SupportedGames)
-                    {
-                        target = Locations.GetTarget();
-                        if (target == null)
-                        {
-                            var gamePath = MEDirectories.GetDefaultGamePath(game);
-                            if (Directory.Exists(gamePath))
-                            {
-                                target = new GameTarget(game, gamePath, true);
-                                var validationFailedReason = target.ValidateTarget();
-                                if (validationFailedReason == null)
-                                {
-                                    // CHECK NOT TEXTURE MODIFIED
-                                    if (target.TextureModded)
-                                    {
-                                        MERLog.Error($@"Game target is texture modded: {target.TargetPath}. This game target is not targetable");
-                                        object o = new object();
-                                        Application.Current.Dispatcher.Invoke(async () =>
-                                        {
-                                            if (Application.Current.MainWindow is MainWindow mw)
-                                            {
-                                                await mw.ShowMessageAsync("Mass Effect 2 target is texture modded", $"The game located at {target.TargetPath} has had textures modified. {MERUI.GetRandomizerName()} cannot randomize texture modified games, as it adds package files. If you want to texture mod your game, it must be done after randomization.");
-                                                lock (o)
-                                                {
-                                                    Monitor.Pulse(o);
-                                                }
-                                            }
-                                        });
-                                        lock (o)
-                                        {
-                                            Monitor.Wait(o);
-                                        }
-                                    }
+                    TargetHandler.LoadTargets(); // Load game target
+                    //target = Locations.GetTarget();
+                    //if (target == null)
+                    //{
+                    //    var gamePath = MEDirectories.GetDefaultGamePath(game);
+                    //    if (Directory.Exists(gamePath))
+                    //    {
+                    //        target = new GameTarget(MERFileSystem.Game, gamePath, true);
+                    //        var validationFailedReason = target.ValidateTarget();
+                    //        if (validationFailedReason == null)
+                    //        {
+                    //            // CHECK NOT TEXTURE MODIFIED
+                    //            if (target.TextureModded)
+                    //            {
+                    //                MERLog.Error($@"Game target is texture modded: {target.TargetPath}. This game target is not targetable");
+                    //                object o = new object();
+                    //                Application.Current.Dispatcher.Invoke(async () =>
+                    //                {
+                    //                    if (Application.Current.MainWindow is MainWindow mw)
+                    //                    {
+                    //                        await mw.ShowMessageAsync("Mass Effect 2 target is texture modded", $"The game located at {target.TargetPath} has had textures modified. {MERUI.GetRandomizerName()} cannot randomize texture modified games, as it adds package files. If you want to texture mod your game, it must be done after randomization.");
+                    //                        lock (o)
+                    //                        {
+                    //                            Monitor.Pulse(o);
+                    //                        }
+                    //                    }
+                    //                });
+                    //                lock (o)
+                    //                {
+                    //                    Monitor.Wait(o);
+                    //                }
+                    //            }
 
-                                    // We still set target so we can restore game if necessary
-                                    Locations.SetTarget(target);
-                                }
-                            }
-                        }
-                    }
+                    //            // We still set target so we can restore game if necessary
+                    //            Locations.SetTarget(target);
+                    //        }
+                    //    }
+                    //}
 
                     pd.SetMessage("Performing startup checks");
                     MERStartupCheck.PerformStartupCheck((title, message) =>
@@ -329,7 +323,7 @@ namespace RandomizerUI.Classes.Controllers
                 }
                 catch (Exception e)
                 {
-                    MERLog.Exception(e, @"There was an error starting up the framework!");
+                    MERUILog.Exception(e, @"There was an error starting up the framework!");
                 }
 
                 pd.SetMessage("Preparing interface");
@@ -347,7 +341,7 @@ namespace RandomizerUI.Classes.Controllers
             bw.RunWorkerCompleted += async (a, b) =>
                     {
                         // Post critical startup
-                        window.SelectedTarget = Locations.GetTarget();
+                        window.SelectedTarget = TargetHandler.GetTarget();
 
                         Random random = new Random();
                         var preseed = random.Next();
@@ -386,33 +380,6 @@ namespace RandomizerUI.Classes.Controllers
                     //mw.DLCComponentInstalled = dlcModPath != null ? Directory.Exists(dlcModPath) : false;
                 }
             });
-        }
-
-        private static void handleM3Passthrough()
-        {
-            if (PassthroughME1Path != null) handlePassthrough(MEGame.ME1, PassthroughME1Path);
-            if (PassthroughME2Path != null) handlePassthrough(MEGame.ME2, PassthroughME2Path);
-            if (PassthroughME3Path != null) handlePassthrough(MEGame.ME3, PassthroughME3Path);
-
-            PassthroughME1Path = PassthroughME2Path = PassthroughME3Path = null;
-
-            void handlePassthrough(MEGame game, string path)
-            {
-                if (path != null && Directory.Exists(path))
-                {
-                    GameTarget gt = new GameTarget(game, path, true, false);
-                    var passThroughValidationResult = gt.ValidateTarget(false);
-                    if (passThroughValidationResult != null)
-                    {
-                        MERLog.Error($@"{game} path passthrough failed game target validation: {passThroughValidationResult}");
-                    }
-                    else
-                    {
-                        MERLog.Information($@"Valid passthrough for game {game}. Assigning path.");
-                        Locations.SetTarget(gt);
-                    }
-                }
-            }
         }
 
         private static void RunOnUIThread(Action obj)

@@ -69,8 +69,9 @@ namespace RandomizerUI
 
         public App() : base()
         {
-            handleCommandLine();
             Log.Logger = MERLog.CreateLogger();
+            MERUILog.LogSessionStart();
+            handleCommandLine();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             POST_STARTUP = true;
         }
@@ -83,7 +84,7 @@ namespace RandomizerUI
         static void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             var errorMessage = $"{MERUI.GetRandomizerName()} has crashed! This is the exception that caused the crash:";
-            MERLog.Exception(e.Exception, errorMessage, true);
+            MERUILog.Exception(e.Exception, errorMessage, true);
         }
 
         /// <summary>
@@ -122,32 +123,20 @@ namespace RandomizerUI
                     {
                         // This is not in update mode. Create the logger.
                         Log.Logger = MERLog.CreateLogger();
-                        MERLog.Information(LogCollector.SessionStartString);
+                        MERUILog.Information(LogCollector.SessionStartString);
                         copyAndRebootUpdate(parsedCommandLineArgs.Value.UpdateRebootDest);
                         return;
                     }
 
-                    // Set passthroughs
-#if __GAME1__
-                    if (parsedCommandLineArgs.Value.PassthroughME1Path != null)
+                    // Set passthrough (if any)
+                    if (parsedCommandLineArgs.Value.PassthroughGamePath != null)
                     {
-                        StartupUIController.PassthroughME1Path = parsedCommandLineArgs.Value.PassthroughME1Path;
+                        TargetHandler.PassthroughGamePath = parsedCommandLineArgs.Value.PassthroughGamePath;
                     }
-#elif __GAME2__
-                    if (parsedCommandLineArgs.Value.PassthroughME2Path != null)
-                    {
-                        StartupUIController.PassthroughME2Path = parsedCommandLineArgs.Value.PassthroughME2Path;
-                    }
-#elif __GAME3__
-                    if (parsedCommandLineArgs.Value.PassthroughME3Path != null)
-                    {
-                        StartupUIController.PassthroughME3Path = parsedCommandLineArgs.Value.PassthroughME3Path;
-                    }
-#endif
                 }
                 else
                 {
-                    Log.Error("Could not parse command line arguments! Args: " + string.Join(' ', args));
+                    MERUILog.Error("Could not parse command line arguments! Args: " + string.Join(' ', args));
                 }
             }
         }
@@ -205,32 +194,9 @@ namespace RandomizerUI
                 HelpText = "Copies this program's executable to the specified location, runs the new executable, and then exits this process.")]
             public string UpdateRebootDest { get; private set; }
 
-#if __GAME1__
-            [Option("me1path",
-                HelpText = "Sets the path for Mass Effect on app boot. It must point to the game root directory.")]
-            public string PassthroughME1Path { get; private set; }
-
-            [Option("le1path",
-                HelpText = "Sets the path for Mass Effect (Legendary Edition) on app boot. It must point to the game root directory.")]
-            public string PassthroughLE1Path { get; private set; }
-#elif __GAME2__
-            [Option("me2path",
-                HelpText = "Sets the path for Mass Effect 2 on app boot. It must point to the game root directory.")]
-            public string PassthroughME2Path { get; private set; }
-
-            [Option("le2path",
-                HelpText = "Sets the path for Mass Effect 2 (Legendary Edition) on app boot. It must point to the game root directory.")]
-            public string PassthroughLE2Path { get; private set; }
-#elif __GAME3__
-            [Option("me3path",
-                HelpText = "Sets the path for Mass Effect 3 on app boot. It must point to the game root directory.")]
-            public string PassthroughME3Path { get; private set; }
-
-            [Option("le3path",
-                HelpText = "Sets the path for Mass Effect 3 (Legendary Edition) on app boot. It must point to the game root directory.")]
-            public string PassthroughLE3Path { get; private set; }
-#endif
-
+            [Option("gamepath",
+                HelpText = "Sets the path for game on app boot. It must point to the game root directory.")]
+            public string PassthroughGamePath { get; private set; }
 
             [Option("update-boot",
                 HelpText = "Indicates that the process should run in update mode for a single file .net core executable. The process will exit upon starting because the platform extraction process will have completed.")]

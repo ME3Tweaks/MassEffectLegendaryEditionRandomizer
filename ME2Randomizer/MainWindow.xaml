@@ -215,10 +215,10 @@
                     </Border.Background>
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,150">
                         <TextBlock VerticalAlignment="Stretch" SnapsToDevicePixels="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center">
-                            <fonts:OutlinedTextBlock Text="LOG UPLOADER" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="40" StrokeThickness="4" />
+                            <fonts:OutlinedTextBlock Text="LOGS &amp; DIAGNOSTICS" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="40" StrokeThickness="4" />
                         </TextBlock>
 
-                        <TextBlock x:Name="LogSelectorHeader" Width="350" HorizontalAlignment="Center" Margin="0,10,0,25" Foreground="Indigo" Text="Select a log file for upload. In most cases, you will want to use the most recent one." FontSize="16" TextWrapping="Wrap" TextAlignment="Center"/>
+                        <TextBlock x:Name="LogSelectorHeader" Width="350" HorizontalAlignment="Center" Margin="0,10,0,25" Foreground="Indigo" Text="Select a session log file for upload. In most cases, you will want to use the most recent one. A diagnostic will be included with your upload." FontSize="16" TextWrapping="Wrap" TextAlignment="Center"/>
                         <ComboBox x:Name="Combobox_LogSelector" ItemsSource="{Binding LogsAvailableForUpload}" SelectedItem="{Binding SelectedLogForUpload}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Margin="5,20,6,0" Content="Cancel" Width="95" HorizontalAlignment="Center" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Command="{Binding CloseLogUICommand}"/>
@@ -238,35 +238,35 @@
                             <TextBlock Text="{Binding IntroTitleText}" FontSize="30" FontWeight="Light" TextAlignment="Center"/>
                             <TextBlock TextWrapping="Wrap" Text="{Binding IntroTitleSubText}" FontSize="13" TextAlignment="Center"/>
                         </StackPanel>
-                        <StackPanel x:Name="FirstRun_MainContent">
-                            <TextBlock Text="Why do I need a game backup?" Margin="0,10,0,0" FontSize="20"/>
-                            <TextBlock FontSize="13">ME3Tweaks tools all use the same game backup, which allows quick restores. While a backup is not required to use ME2R, it will save you a lot of time, making restores and re-rolls take seconds instead of minutes or hours.</TextBlock>
-                            <TextBlock Margin="0,10,0,0" FontSize="20">Does ME2R work with mods?</TextBlock>
-                            <TextBlock FontSize="13">
-                                ME2R will randomize the files the game will use at the time of randomization. It should work with most mods, however none were tested beyond ME2Controller. Texture mods may crash the game due to memory limits.
-                            </TextBlock>
-                        </StackPanel>
+                        <TextBlock Text="Why do I need a game backup?" Margin="0,10,0,0" FontSize="20"/>
+                        <TextBlock FontSize="13">ME3Tweaks tools all use the same game backup, which allows quick restores. While a backup is not required to use this randomizer, it will save you a lot of time, making restores and re-randomization take seconds instead of minutes or hours.</TextBlock>
+                        <TextBlock Margin="0,10,0,0" FontSize="20">Does this work with other mods?</TextBlock>
+                        <TextBlock FontSize="13">This randomizer should be compatible with most mods, as it modifies existing files. Files that make wide changes to the game may not be compatible, see the NexusMods page for compatibility information.</TextBlock>
 
-                        <TextBlock Text="What versions of Mass Effect 2 are supported?" FontSize="20" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock Text="ME2R is tested and designed to work with the English Origin, Steam, and DVD release versions of Mass Effect 2, updated to their latest patch versions. Unofficial copies of the game, as well as games running in non-english, are not supported." FontSize="13"/>
+                        <TextBlock Text="What languages are supported?" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock Text="Development of this randomizer was done while playing in English. It should, in theory, work in other languages, but new audio may only play in English."/>
 
-                        <TextBlock Text="Can I stream this?" FontSize="20" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock Text="Absolutely. The original Mass Effect Randomizer was actually created for the streamer SizeSixteens." FontSize="13"/>
+                        <TextBlock Text="Is this stream-safe?" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock Text="Yes, this randomizer is designed to be stream safe. Options that change music are done with permission and won't get you DMCA'd." FontSize="13"/>
 
-
-                        <TextBlock  Text="Be sure to read the FAQ" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock  Text="Be sure to read the Frequently Asked Questions (FAQ)" FontSize="20" Margin="0,10,0,0"></TextBlock>
                         <TextBlock  Text="Failure to read the FAQ may lead you to have a bad experience. Read the FAQ by clicking the FAQ button at the bottom of the main window. You can also hover your mouse over items to get more information about them." FontSize="13"/>
-                        <Button HorizontalAlignment="Left" Margin="48,10,0,0" Click="Button_FirstTimeRunDismiss_Click">
-                            <fonts:OutlinedTextBlock Text="Continue" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
-                        </Button>
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="TextWrapping" Value="Wrap"/>
-                                <Setter Property="MaxWidth" Value="600"/>
-                                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-                            </Style>
-                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <Button HorizontalAlignment="Left" Margin="48,10,0,0" Click="FAQ_Click">
+                                <fonts:OutlinedTextBlock Text="View FAQ" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                            </Button>
+                            <Button HorizontalAlignment="Left" Margin="5,10,0,0" Click="Button_FirstTimeRunDismiss_Click">
+                                <fonts:OutlinedTextBlock Text="Continue" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                            </Button>
+                        </StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="MaxWidth" Value="600"/>
+                            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                        </Style>
+                    </StackPanel.Resources>
                     </StackPanel>
                 </Border>
             </Controls:Flyout>

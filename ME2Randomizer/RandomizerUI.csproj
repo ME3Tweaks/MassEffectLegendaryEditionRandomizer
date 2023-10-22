@@ -104,14 +104,12 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="MahApps.Metro" Version="2.4.10" />
-		<PackageReference Include="Microsoft-Windows10-APICodePack-Core" Version="1.1.5" />
-		<PackageReference Include="Microsoft.AppCenter" Version="5.0.2" />
-		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.2" />
-		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.2" />
+		<PackageReference Include="Microsoft-Windows10-APICodePack-Core" Version="1.1.8" />
+		<PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.3" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
 		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
 		<PackageReference Include="Serilog" Version="3.0.1" />
-		<PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 		<PackageReference Include="System.Management" Version="7.0.2" />
 	</ItemGroup>
 

@@ -804,11 +804,11 @@ namespace Randomizer.MER
         public static string GetRandomizerShortName()
         {
 #if __GAME1__
-            return "MER";
+            return "LE1R";
 #elif __GAME2__
-            return "ME2R";
+            return "LE2R";
 #else
-            return "ME3R";
+            return "LE3R";
 #endif
         }
 

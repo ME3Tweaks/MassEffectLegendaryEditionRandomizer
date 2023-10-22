@@ -30,7 +30,7 @@ namespace RandomizerUI.Classes.Controllers
             var os = Environment.OSVersion.Version;
             if (os < ME3TweaksCoreLib.MIN_SUPPORTED_OS)
             {
-                MERLog.Fatal($@"This operating system version is below the minimum supported version: {os}, minimum supported: {ME3TweaksCoreLib.MIN_SUPPORTED_OS}");
+                MERUILog.Fatal($@"This operating system version is below the minimum supported version: {os}, minimum supported: {ME3TweaksCoreLib.MIN_SUPPORTED_OS}");
                 messageCallback?.Invoke("This operating system is not supported", $"{MERUI.GetRandomizerName()} is not supported on this operating system. The application may not work. To ensure application compatibility or receive support from ME3Tweaks, upgrade to a version of Windows that is supported by Microsoft.");
             }
         }
@@ -54,7 +54,7 @@ namespace RandomizerUI.Classes.Controllers
                     foreach (ManagementBaseObject obj in query.Get())
                     {
                         string pagefileName = (string)obj.GetPropertyValue("Caption");
-                        MERLog.Information("Detected pagefile: " + pagefileName);
+                        MERUILog.Information("Detected pagefile: " + pagefileName);
                         pageFileLocations.Add(pagefileName.ToLower());
                     }
                 }
@@ -70,32 +70,32 @@ namespace RandomizerUI.Classes.Controllers
                         {
                             // Not system managed
                             pageFileLocations.RemoveAll(x => Path.GetFullPath(x).Equals(Path.GetFullPath(pagefileName)));
-                            MERLog.Error($"Pagefile has been modified by the end user. The maximum page file size on {pagefileName} is {max} MB. Does this user **actually** know what capping a pagefile does?");
+                            MERUILog.Error($"Pagefile has been modified by the end user. The maximum page file size on {pagefileName} is {max} MB. Does this user **actually** know what capping a pagefile does?");
                         }
                     }
                 }
 
                 if (pageFileLocations.Any())
                 {
-                    MERLog.Information("We have a usable system managed page file - OK");
+                    MERUILog.Information("We have a usable system managed page file - OK");
                 }
                 else
                 {
-                    MERLog.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
+                    MERUILog.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
                     messageCallback?.Invoke($"Pagefile is off or size has been capped", $"The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. Mass Effect 2 Randomizer uses significant amounts of memory and will crash if the system runs low on memory. You should always leave page files managed by Windows.");
                 }
             }
             catch (Exception e)
             {
-                MERLog.Exception(e, "Unable to check pagefile settings:");
+                MERUILog.Exception(e, "Unable to check pagefile settings:");
             }
 #endif
         }
 
         private static bool PerformWriteCheck(Action<string, string> messageCallback)
         {
-            MERLog.Information("Performing write check on game directory");
-            var target = Locations.GetTarget();
+            MERUILog.Information("Performing write check on game directory");
+            var target = TargetHandler.GetTarget();
             try
             {
                 List<string> directoriesToGrant = new List<string>();
@@ -135,12 +135,12 @@ namespace RandomizerUI.Classes.Controllers
                         int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
                         if (result == 0)
                         {
-                            MERLog.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                            MERUILog.Information("Elevated process returned code 0, directories are hopefully writable now.");
                             return true;
                         }
                         else
                         {
-                            MERLog.Error("Elevated process returned code " + result +
+                            MERUILog.Error("Elevated process returned code " + result +
                                       ", directories probably aren't writable.");
                             return false;
                         }
@@ -158,12 +158,12 @@ namespace RandomizerUI.Classes.Controllers
                         int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
                         if (result == 0)
                         {
-                            MERLog.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                            MERUILog.Information("Elevated process returned code 0, directories are hopefully writable now.");
                             return true;
                         }
                         else
                         {
-                            MERLog.Error($"Elevated process returned code {result}, directories probably aren't writable.");
+                            MERUILog.Error($"Elevated process returned code {result}, directories probably aren't writable.");
                             return false;
                         }
                     }
@@ -172,7 +172,7 @@ namespace RandomizerUI.Classes.Controllers
             }
             catch (Exception e)
             {
-                MERLog.Exception(e, "Error checking for write privileges. This may be a significant sign that an installed game is not in a good state.");
+                MERUILog.Exception(e, "Error checking for write privileges. This may be a significant sign that an installed game is not in a good state.");
                 return false;
             }
             return true;
@@ -190,11 +190,11 @@ namespace RandomizerUI.Classes.Controllers
             if (value != null)
             {
                 uacIsOn = value > 0;
-                MERLog.Information("UAC is on: " + uacIsOn);
+                MERUILog.Information("UAC is on: " + uacIsOn);
             }
             if (isAdmin && uacIsOn)
             {
-                MERLog.Warning("This session is running as administrator.");
+                MERUILog.Warning("This session is running as administrator.");
                 //await this.ShowMessageAsync($"{Utilities.GetAppPrefixedName()} Installer should be run as standard user", $"Running {Utilities.GetAppPrefixedName()} Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator unless directed by the developers.");
             }
         }

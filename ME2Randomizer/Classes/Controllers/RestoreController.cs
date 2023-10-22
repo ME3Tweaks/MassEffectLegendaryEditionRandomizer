@@ -33,12 +33,12 @@ namespace RandomizerUI.Classes.Controllers
                 if (isQuick)
                 {
                     // Nuke the DLC
-                    MERLog.Information(@"Quick restore started");
+                    MERUILog.Information(@"Quick restore started");
                     pd.SetMessage("Removing randomize DLC component");
                     var dlcModPath = MERFileSystem.GetDLCModPath(target);
                     if (Directory.Exists(dlcModPath))
                     {
-                        MERLog.Information($@"Deleting {dlcModPath}");
+                        MERUILog.Information($@"Deleting {dlcModPath}");
                         MUtilities.DeleteFilesAndFoldersRecursively(dlcModPath);
                     }
 
@@ -57,7 +57,7 @@ namespace RandomizerUI.Classes.Controllers
                         if (File.Exists(srcPath))
                         {
                             var destPath = Path.Combine(gameCookedPath, bgf);
-                            MERLog.Information($@"Restoring {bgf}");
+                            MERUILog.Information($@"Restoring {bgf}");
                             File.Copy(srcPath, destPath, true);
                         }
                         else
@@ -79,7 +79,7 @@ namespace RandomizerUI.Classes.Controllers
                 {
 
                     // Full restore
-                    MERLog.Information($@"Performing full game restore on {target.TargetPath} target after restore");
+                    MERUILog.Information($@"Performing full game restore on {target.TargetPath} target after restore");
 
                     object syncObj = new object();
                     var gr = new GameRestore(target.Game)
@@ -149,7 +149,7 @@ namespace RandomizerUI.Classes.Controllers
                     };
                     gr.PerformRestore(target, target.TargetPath);
                     mw.DLCComponentInstalled = false;
-                    MERLog.Information(@"Reloading target after restore");
+                    MERUILog.Information(@"Reloading target after restore");
                     target.ReloadGameTarget(false, false);
                     mw.SetupTargetDescriptionText();
                 }
