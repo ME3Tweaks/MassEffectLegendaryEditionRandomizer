@@ -14,11 +14,11 @@ namespace RandomizerUI.Classes
     {
         public const string RegistryKeyPath = @"HKEY_CURRENT_USER\Software\MassEffectRandomizer";
 #if __GAME1__
-        private const string SettingPrefix = "ME1-";
+        private const string SettingPrefix = "LE1-";
 #elif __GAME2__
-        private const string SettingPrefix = "ME2-";
+        private const string SettingPrefix = "LE2-";
 #elif __GAME3__
-        private const string SettingPrefix = "ME3-";
+        private const string SettingPrefix = "LE3-";
 #endif
 
         /// <summary>

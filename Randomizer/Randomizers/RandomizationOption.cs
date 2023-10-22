@@ -8,11 +8,12 @@ using PropertyChanged;
 
 namespace Randomizer.Randomizers
 {
-    public enum RandomizationMode
+    public enum OptionMode
     {
-        ERandomizationMode_SelectAny,
-        ERandomizationMode_Common,
-        ERandomizationMode_Screed,
+        EOptionMode_Fun,
+        EOptionMode_Gameplay,
+        EOptionMode_Recommended,
+        EOptionMode_Clear,
     }
     [AddINotifyPropertyChangedInterface]
     public class RandomizationOption
@@ -84,6 +85,10 @@ namespace Randomizer.Randomizers
         [AlsoNotifyFor(nameof(Self))]
         public bool OptionIsSelected { get; set; }
 
+        /// <summary>
+        /// If being chosen by a preset, this option will also be chosen
+        /// </summary>
+        public bool SelectOnPreset { get; set; }
         public void OnOptionIsSelectedChanged()
         {
             StateChangingDelegate?.Invoke(this);

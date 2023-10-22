@@ -69,10 +69,6 @@ namespace RandomizerUI.Classes.Controllers
                         attachments.Add(ErrorAttachmentLog.AttachmentWithBinary(compressedLog, "crashlog.txt.lzma", "application/x-lzma"));
                     }
 
-                    // Attach binary data.
-                    //var fakeImage = System.Text.Encoding.Default.GetBytes("Fake image");
-                    //ErrorAttachmentLog binaryLog = ErrorAttachmentLog.AttachmentWithBinary(fakeImage, "ic_launcher.jpeg", "image/jpeg");
-
                     return attachments;
                 };
                 AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
@@ -101,6 +97,7 @@ namespace RandomizerUI.Classes.Controllers
             {
                 // This is in a try catch because this is a critical no-crash zone that is before launch
                 window.Title = $"{MERUI.GetRandomizerName()} {MLibraryConsumer.GetAppVersion()}";
+                startTelemetry();
             }
             catch { }
 
@@ -259,43 +256,6 @@ namespace RandomizerUI.Classes.Controllers
                     MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
 
                     TargetHandler.LoadTargets(); // Load game target
-                    //target = Locations.GetTarget();
-                    //if (target == null)
-                    //{
-                    //    var gamePath = MEDirectories.GetDefaultGamePath(game);
-                    //    if (Directory.Exists(gamePath))
-                    //    {
-                    //        target = new GameTarget(MERFileSystem.Game, gamePath, true);
-                    //        var validationFailedReason = target.ValidateTarget();
-                    //        if (validationFailedReason == null)
-                    //        {
-                    //            // CHECK NOT TEXTURE MODIFIED
-                    //            if (target.TextureModded)
-                    //            {
-                    //                MERLog.Error($@"Game target is texture modded: {target.TargetPath}. This game target is not targetable");
-                    //                object o = new object();
-                    //                Application.Current.Dispatcher.Invoke(async () =>
-                    //                {
-                    //                    if (Application.Current.MainWindow is MainWindow mw)
-                    //                    {
-                    //                        await mw.ShowMessageAsync("Mass Effect 2 target is texture modded", $"The game located at {target.TargetPath} has had textures modified. {MERUI.GetRandomizerName()} cannot randomize texture modified games, as it adds package files. If you want to texture mod your game, it must be done after randomization.");
-                    //                        lock (o)
-                    //                        {
-                    //                            Monitor.Pulse(o);
-                    //                        }
-                    //                    }
-                    //                });
-                    //                lock (o)
-                    //                {
-                    //                    Monitor.Wait(o);
-                    //                }
-                    //            }
-
-                    //            // We still set target so we can restore game if necessary
-                    //            Locations.SetTarget(target);
-                    //        }
-                    //    }
-                    //}
 
                     pd.SetMessage("Performing startup checks");
                     MERStartupCheck.PerformStartupCheck((title, message) =>
@@ -354,10 +314,8 @@ namespace RandomizerUI.Classes.Controllers
                     window.SeedTextBox.Text = preseed.ToString();
 #endif
                         window.TextBlock_AssemblyVersion.Text = $"Version {MLibraryConsumer.GetAppVersion()}";
-                        window.SelectedRandomizeMode = RandomizationMode.ERandomizationMode_SelectAny;
 
-
-                        if (MERSettings.GetSettingBool(ESetting.SETTING_FIRSTRUN))
+                        if (!MERSettings.GetSettingBool(ESetting.SETTING_FIRSTRUN))
                         {
                             window.FirstRunFlyoutOpen = true;
                         }

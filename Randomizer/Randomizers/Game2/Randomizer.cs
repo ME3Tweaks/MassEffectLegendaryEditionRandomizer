@@ -668,7 +668,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = SizeSixteens.InstallSSChanges,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         RequiresTLK = true,
-                        GoodTimeRandomizer = true,
+                        // This is a specific 'Good Time'
                     },
                     new RandomizationOption() {HumanName = "NPC names",
                         Description = "Install a list of names into the game and renames some of the generic NPCs to them. You can install your stream chat members, for example. There are 48 name slots.",
@@ -852,6 +852,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformSpecificRandomizationDelegate = LazarusStation.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         GoodTimeRandomizer = true,
+                        IsRecommended = true,
                     },
                     //new RandomizationOption() {HumanName = "Tali Acquisition"}, //sfxgame tla damagetype
                     new RandomizationOption()
@@ -893,7 +894,7 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption()
                     {
-                        HumanName = "Suicide Mission", Description = "Greatly increases difficulty throughout the entire level, and revamps the final boss fight",
+                        HumanName = "Suicide Mission", Description = "Sharply increases difficulty throughout the entire level, and revamps the final boss fight. Try it on Insanity ;)",
                         PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         RequiresTLK = true,
@@ -978,7 +979,6 @@ namespace Randomizer.Randomizers.Game2
                                 SubOptionKey = HenchTalents.SUBOPTION_HENCHPOWERS_REMOVEGATING,
                                 HumanName = "Remove rank-up gating",
                                 Description = "Removes the unlock requirement for the second power slot. The final power slot will still be gated by loyalty.",
-                                GameplayRandomizer = true
                             }
                         }
                     },
@@ -998,6 +998,7 @@ namespace Randomizer.Randomizers.Game2
                         Description = "Enables weapons to damage friendlies (enemy and player)",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         GameplayRandomizer = true,
+                        IsRecommended = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -1006,6 +1007,8 @@ namespace Randomizer.Randomizers.Game2
                                 SubOptionKey = SFXGame.SUBOPTIONKEY_CARELESSFF,
                                 HumanName = "Careless mode",
                                 Description = "Attack enemies, regardless of friendly casualties",
+                                IsRecommended = true,
+                                SelectOnPreset = true,
                             }
                         }
                     },
@@ -1108,7 +1111,7 @@ namespace Randomizer.Randomizers.Game2
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
-                        GoodTimeRandomizer = true,
+                        GoodTimeRandomizer = new Random().Next(2) == 0, // Half the time this will be labeled as 'good time' so the auto picker will choose it instead
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
@@ -1121,11 +1124,13 @@ namespace Randomizer.Randomizers.Game2
                             }
                         }
                     },
-                    new RandomizationOption() {HumanName = "UwU",
+                    new RandomizationOption() {
+                        HumanName = "UwU",
                         Description="UwUifies all text in the game, often hilarious", PerformSpecificRandomizationDelegate = RSharedTexts.UwuifyText,
                         RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
                         IsPostRun = true,
+                        IsRecommended = true,
                         GoodTimeRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
@@ -1144,6 +1149,7 @@ namespace Randomizer.Randomizers.Game2
                                 Description = "Adds emoticons ^_^\n'Keep casing' recommended. Might break email or mission summaries, sowwy UwU",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 SubOptionKey = RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED,
+                                SelectOnPreset = true,
                             }
                         }
                     },
@@ -1202,14 +1208,14 @@ namespace Randomizer.Randomizers.Game2
                 {
                     new RandomizationOption()
                     {
-                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
+                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", 
+                        PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
                         Ticks = "0.1,0.2,0.3,0.4,0.5,0.75",
                         HasSliderOption = true,
                         SliderTooltip = "Values are added +/- to 1 to generate the range of allowed sizes. For example, 0.1 yields 90-110% size multiplier. Default value is 0.1.",
                         SliderToTextConverter = x=> $"Maximum size change: {Math.Round(x * 100)}%",
                         SliderValue = 0.1,
-                        GoodTimeRandomizer = true,
                     },
                     new RandomizationOption()
                     {
@@ -1222,19 +1228,18 @@ namespace Randomizer.Randomizers.Game2
                         SliderTooltip = "Higher settings yield more extreme position and rotational changes to interpolations. Values above 0.05 are very likely to make the game unplayable. Default value is 0.05.",
                         SliderToTextConverter = x=> $"Maximum interp change: {Math.Round(x * 100)}%",
                         SliderValue = 0.05,
-                        GoodTimeRandomizer = true,
                     },
                     new RandomizationOption()
                     {
                         HumanName = "Lots of sounds", PerformSpecificRandomizationDelegate = SFXGame.RandomizeWwiseEvents,
                         Description = "Shuffles sound references in the main game logic file. You'll probably get stuck with the squad select theme that mutes all other audio",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     new RandomizationOption()
                     {
                         HumanName = "Conversation Wheel", PerformRandomizationOnExportDelegate = RBioConversation.RandomizeExportReplies,
                         Description = "Changes replies in wheel. Can make conversations very hard to exit",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Unsafe
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     new RandomizationOption()
                     {
@@ -1242,7 +1247,7 @@ namespace Randomizer.Randomizers.Game2
                         PerformFileSpecificRandomization = RBioConversation.RandomizeActorsInConversation2,
                         Description = "Changes pawn roles in conversations. Somewhat buggy simply due to complexity and restrictions in engine, but can be entertaining",
                         IsRecommended = false,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Unsafe
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     new RandomizationOption()
                     {

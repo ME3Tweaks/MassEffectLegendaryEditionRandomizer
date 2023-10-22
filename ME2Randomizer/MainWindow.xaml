@@ -259,14 +259,14 @@
                                 <fonts:OutlinedTextBlock Text="Continue" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                         </StackPanel>
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <Setter Property="MaxWidth" Value="600"/>
-                            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-                        </Style>
-                    </StackPanel.Resources>
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="MaxWidth" Value="600"/>
+                                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                            </Style>
+                        </StackPanel.Resources>
                     </StackPanel>
                 </Border>
             </Controls:Flyout>
@@ -286,94 +286,97 @@
                             <ProgressBar Name="Progressbar_Bottom" Height="15" Value="{Binding CurrentProgressValue}" IsIndeterminate="{Binding ProgressBarIndeterminate}" Minimum="{Binding ProgressBar_Bottom_Min}" Maximum="{Binding ProgressBar_Bottom_Max}" />
                         </Border>
                     </StackPanel>
-                    <DockPanel LastChildFill="False" Margin="0,0,0,0" Visibility="{Binding ShowProgressPanel, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" 
-                               MinHeight="20">
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                </StackPanel>
+                <DockPanel Margin="35,0">
+                    <GroupBox Header="Presets" DockPanel.Dock="Left">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,0,5" IsEnabled="{Binding AllowOptionsChanging}">
+                            <Button Content="I want a good laugh" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="FunMode_Click"/>
+                            <Button Content="I want varied gameplay" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="GameplayMode_Click"/>
+                            <Button Content="Developer recommended" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="Recommended_Click"/>
+                            <Button Content="I'll pick my own, thanks" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="ClearAll_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="RUN" DockPanel.Dock="Right">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Bottom" Command="{Binding OptionTogglerCommand}">
+                                <fonts:OutlinedTextBlock Text="Option toggler" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                            </Button>
+                            <Button  Command="{Binding StartRandomizationCommand}" Margin="0,0,0,5">
+                            <fonts:OutlinedTextBlock Text="Run Randomizer" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                        </Button>
+
+                        </DockPanel>
+
+                    </GroupBox>
+                    <GroupBox Header="Special options"  DockPanel.Dock="Right">
+                        <StackPanel>
+                            <CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>
+                            <CheckBox Content="Show randomizer labels" IsChecked="{Binding ShowLabels}" 
+                                      Margin="0,5,0,0"
+                                      ToolTip="Shows category and safety labels on each randomizer"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Troubleshooting"  DockPanel.Dock="Right">
+                        <StackPanel>
                             <Button Click="Logs_Click" MinWidth="20" ToolTip="Generate a diagnostics log for troubleshooting">
                                 <fonts:OutlinedTextBlock Text="Logs" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
-                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" Margin="5,0,0,0" MinWidth="20">
+                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" MinWidth="20">
                                 <fonts:OutlinedTextBlock Text="{Binding BackupRestoreText, FallbackValue=Backup}" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
-                            <Button Visibility="{Binding ShowUninstallButton, Converter={StaticResource BoolToVisibilityConverter}}"  Margin="5,0,0,0" MinWidth="40" ToolTip="Uninstall the DLC mod component of the randomization. You must repair your game to complete the restore." Command="{Binding UninstallDLCCommand}">
+                            <Button Visibility="{Binding ShowUninstallButton, Converter={StaticResource BoolToVisibilityConverter}}" MinWidth="40" ToolTip="Uninstall the DLC mod component of the randomization. You must repair your game to complete the restore." Command="{Binding UninstallDLCCommand}">
                                 <fonts:OutlinedTextBlock Text="Remove randomization" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
+                            <Button Click="DebugWindow_Click" Visibility="{x:Static randomizerUi:App.IsDebugVisibility}">
+                                <fonts:OutlinedTextBlock Text="Debug Tools" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                            </Button>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="HELPFUL STUFF"  DockPanel.Dock="Right">
+                        <StackPanel>
                             <Button Name="FAQ_Button" Click="FAQ_Click" Margin="5,0,0,0" MinWidth="20" ToolTip="View the Mass Effect Randomizer FAQ">
                                 <fonts:OutlinedTextBlock Text="FAQ" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                             <Button Name="Discord_Button" Click="DiscordButton_Click" Margin="5,0,0,0" MinWidth="40" ToolTip="Join the ME3Tweaks Discord server">
-                                <Image Source="/images/shared/discord.png" Height="16" Width="16"/>
+                                <StackPanel Orientation="Horizontal">
+                                <Image Source="/images/shared/discord.png" Height="16" Width="16" Margin="0,-1,3,0"/>
+                                    <fonts:OutlinedTextBlock Text="ME3Tweaks Discord" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
+                                </StackPanel>
                             </Button>
                             <Button Name="FirstRunShow_Button" Click="FirstRunShowButton_Click" Margin="5,0,0,0" MinWidth="40" ToolTip="Show first run flyout" Visibility="{x:Static randomizerUi:App.IsDebugVisibility}">
                                 <fonts:OutlinedTextBlock Text="Show first run" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                         </StackPanel>
-                        <Button DockPanel.Dock="Right" Command="{Binding StartRandomizationCommand}"  Padding="20,0,20,0">
-                            <fonts:OutlinedTextBlock Text="Randomize" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
-                        </Button>
-                        <Button DockPanel.Dock="Right" Padding="20,0,20,0" Margin="0,0,5,0" Command="{Binding OptionTogglerCommand}">
-                            <fonts:OutlinedTextBlock Text="Option toggler" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
-                        </Button>
-                        <Button DockPanel.Dock="Right" Click="DebugWindow_Click" Padding="20,0,20,0" Margin="0,0,5,0" Visibility="{x:Static randomizerUi:App.IsDebugVisibility}">
-                            <fonts:OutlinedTextBlock Text="Debug Tools" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
-                        </Button>
-                    </DockPanel>
-                </StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Vertical" Grid.Column="0" Margin="0,0,0,5" IsEnabled="{Binding AllowOptionsChanging}">
-                        <RadioButton Content="Select what to randomize" Margin="4" GroupName="ERandomizationMode_SelectAny" Background="Transparent" ToolTip="Pick and choose what you want to randomize" 
-                                     IsChecked="{Binding Path=SelectedRandomizeMode, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ERandomizationMode_SelectAny}" />
-                        <RadioButton Content="Use recommended settings" Margin="4" GroupName="ERandomizationMode_Common" Background="Transparent" ToolTip="Randomize the game in a mostly safe way" 
-                                     IsChecked="{Binding Path=SelectedRandomizeMode, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ERandomizationMode_Common}" />
-                        <RadioButton Content="Burn this game to the ground" Margin="4" GroupName="ERAndomizationMode_Screed" Background="Transparent" ToolTip="You want to experience hell itself with full randomization" 
-                                IsChecked="{Binding Path=SelectedRandomizeMode, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ERandomizationMode_Screed}" />
-                    </StackPanel>
-                    <Grid Grid.Column="1" Margin="0,0,0,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Legend" FontWeight="Bold" Grid.ColumnSpan="2" TextAlignment="Center"/>
-                        <TextBlock Grid.Row="1" Text="Safe to use" Foreground="#a6ffbe"/>
-                        <TextBlock Grid.Row="2" Text="Safe but not 100% tested"/>
-                        <TextBlock Grid.Row="3" Text="Mostly safe, may cause a few issues" Foreground="#fff41f"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Potentially game breaking. Use at your own risk" Foreground="#ff871f"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="RIP. Entertaining, but very likely game breaking" Foreground="#ff1f1f"/>
-                    </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Legend"  DockPanel.Dock="Left">
+                        <StackPanel>
+                            <TextBlock Grid.Row="1" Text="Safe to use" Foreground="#a6ffbe"/>
+                            <TextBlock Grid.Row="2" Text="Safe but not 100% tested"/>
+                            <TextBlock Grid.Row="3" Text="Mostly safe, may cause a few issues" Foreground="#fff41f"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Potentially game breaking. Use at your own risk" Foreground="#ff871f"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="RIP. Entertaining, but very likely game breaking" Foreground="#ff1f1f"/>
+                        </StackPanel>
+                    </GroupBox>
+
                     <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Bottom"  IsEnabled="{Binding AllowOptionsChanging}">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Right">
                             <StackPanel>
-                                <CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" HorizontalAlignment="Right" Margin="0,0,10,5" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"
-                                />
-                                <!--<CheckBox Content="Multi-thread randomization" IsChecked="{Binding UseMultiThreadRNG}" HorizontalAlignment="Right" Margin="0,0,10,0" ToolTip="Enables faster randomization, but cannot be used with a seed."
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>-->
-                                <CheckBox Content="Show randomizer labels" IsChecked="{Binding ShowLabels}" HorizontalAlignment="Right" Margin="0,0,10,0" ToolTip="Shows category and safety labels on each randomizer"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
-                                          Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>
+
                             </StackPanel>
                             <TextBlock Text="RNG Seed: " VerticalAlignment="Bottom" Visibility="{Binding UseMultiThreadRNG, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Inverse'}"/>
                             <TextBox Name="SeedTextBox" MaxLength="11" Text="PLACEHOLDER" ToolTip="RNG seeds determine the output of the random number generator.&#xA;You can share seed values to produce the same results on another run of the program, assuming you chose the same options - however, this is not guaranteed." VerticalAlignment="Bottom"
                                      Visibility="{Binding UseMultiThreadRNG, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Inverse'}"/>
                         </StackPanel>
                     </StackPanel>
-                </Grid>
+                </DockPanel>
             </DockPanel>
             <TabControl Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MaxWidth="1800">
                 <TabControl.Resources>
@@ -381,7 +384,7 @@
                         <Setter Property="HorizontalAlignment" Value="Center" />
                     </Style>
                 </TabControl.Resources>
-                <TabItem Header="Options">
+                <TabItem Header="Randomization options">
                     <DockPanel HorizontalAlignment="Center">
                         <StackPanel Margin="5" DockPanel.Dock="Top" Width="Auto">
                             <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Text="Select randomization options and then choose Randomize to begin randomization." VerticalAlignment="Top" Visibility="{Binding DirectionsTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>

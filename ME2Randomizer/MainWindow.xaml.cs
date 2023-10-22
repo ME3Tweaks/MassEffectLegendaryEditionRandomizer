@@ -70,16 +70,10 @@ namespace RandomizerUI
 
         public string GamePathString { get; set; } = "Please wait";
         public bool ShowProgressPanel { get; set; }
-        public RandomizationMode SelectedRandomizeMode { get; set; }
 
         public ObservableCollectionExtended<ImageCredit> ImageCredits { get; } = new();
         public ObservableCollectionExtended<string> ContributorCredits { get; } = new();
         public ObservableCollectionExtended<LibraryCredit> LibraryCredits { get; } = new();
-
-        public void OnSelectedRandomizeModeChanged()
-        {
-            UpdateCheckboxSettings();
-        }
 
         /// <summary>
         /// The list of options shown
@@ -125,27 +119,57 @@ namespace RandomizerUI
 
             }
         }
-        private void UpdateCheckboxSettings()
+
+        private void UpdateOptionsForMode(OptionMode mode)
         {
             foreach (var group in RandomizationGroups)
             {
                 foreach (var option in group.Options)
                 {
-                    SetOptionOnRecommendation(option);
+                    SetOptionOnRecommendation(option, mode);
                 }
             }
+
         }
 
-        private void SetOptionOnRecommendation(RandomizationOption option)
+        private void SetOptionOnRecommendation(RandomizationOption option, OptionMode mode)
         {
-            if (SelectedRandomizeMode == RandomizationMode.ERandomizationMode_Screed) option.OptionIsSelected = option.Dangerousness < RandomizationOption.EOptionDangerousness.Danger_RIP;
-            if (SelectedRandomizeMode == RandomizationMode.ERandomizationMode_SelectAny) option.OptionIsSelected = false;
-            if (SelectedRandomizeMode == RandomizationMode.ERandomizationMode_Common) option.OptionIsSelected = option.IsRecommended;
+            if (mode == OptionMode.EOptionMode_Fun && option.GoodTimeRandomizer)
+            {
+                option.OptionIsSelected = true;
+            }
+            else if (mode == OptionMode.EOptionMode_Gameplay && option.GameplayRandomizer)
+            {
+                option.OptionIsSelected = true;
+            }
+            else if (mode == OptionMode.EOptionMode_Recommended && option.IsRecommended)
+            {
+                option.OptionIsSelected = true;
+            }
+            else
+            {
+                option.OptionIsSelected = false;
+            }
+
             if (option.SubOptions != null)
             {
                 foreach (var subOption in option.SubOptions)
                 {
-                    SetOptionOnRecommendation(subOption);
+                    if (option.OptionIsSelected)
+                    {
+                        if (subOption.SelectOnPreset)
+                        {
+                            subOption.OptionIsSelected = true;
+                        }
+                        else
+                        {
+                            SetOptionOnRecommendation(subOption, mode);
+                        }
+                    }
+                    else
+                    {
+                        subOption.OptionIsSelected = false;
+                    }
                 }
             }
         }
@@ -539,7 +563,7 @@ namespace RandomizerUI
             if (LogUploaderFlyoutOpen)
             {
                 LogsAvailableForUpload.ReplaceAll(LogCollector.GetLogsList(MERLog.CurrentLogFilePath));
-                SelectedLogForUpload = LogsAvailableForUpload.FirstOrDefault(x=> x.IsActiveLog);
+                SelectedLogForUpload = LogsAvailableForUpload.FirstOrDefault(x => x.IsActiveLog);
             }
             else
             {
@@ -568,7 +592,7 @@ namespace RandomizerUI
                     UpdateStatusCallback = s =>
                     {
                         pd.SetMessage(s);
-                    } 
+                    }
                 };
 
                 var response = LogCollector.SubmitDiagnosticLog(lup);
@@ -658,6 +682,26 @@ namespace RandomizerUI
                 ThemeManager.Current.ChangeTheme(this, "Dark.Green");
 #endif
             }
+        }
+
+        private void FunMode_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateOptionsForMode(OptionMode.EOptionMode_Fun);
+        }
+
+        private void GameplayMode_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateOptionsForMode(OptionMode.EOptionMode_Gameplay);
+        }
+
+        private void Recommended_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateOptionsForMode(OptionMode.EOptionMode_Recommended);
+        }
+
+        private void ClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateOptionsForMode(OptionMode.EOptionMode_Clear);
         }
     }
 }
