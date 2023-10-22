@@ -311,7 +311,7 @@
                     </GroupBox>
                     <GroupBox Header="Special options"  DockPanel.Dock="Right">
                         <StackPanel>
-                            <CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes"
+                            <CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes.&#10;Some changes can only occur in basegame files and will always stack unless you perform a restore (quick or full)"
                                       Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
                                       Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
                                       Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>
