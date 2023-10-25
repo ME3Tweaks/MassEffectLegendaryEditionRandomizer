@@ -15,6 +15,7 @@
 	<ItemGroup>
 		<None Remove="DebugTools\DebugWindow.xaml" />
 		<None Remove="DebugTools\MemoryAnalyzerUI.xaml" />
+		<None Remove="windows\OptionTogglerWindow.xaml" />
 		<Resource Include="fonts\aerolight.ttf" />
 	</ItemGroup>
 

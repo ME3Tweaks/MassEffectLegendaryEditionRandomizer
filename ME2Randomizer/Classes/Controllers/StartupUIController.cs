@@ -251,8 +251,10 @@ namespace RandomizerUI.Classes.Controllers
                 try
                 {
                     pd.SetMessage($"Loading {MERUI.GetRandomizerName()} framework");
-                    ToolTipService.ShowOnDisabledProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(true));
-                    ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(int.MaxValue));
+                    ToolTipService.ShowOnDisabledProperty.OverrideMetadata(typeof(Control),
+                        new FrameworkPropertyMetadata(true));
+                    ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
+                        new FrameworkPropertyMetadata(int.MaxValue));
                     MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
 
                     TargetHandler.LoadTargets(); // Load game target
@@ -279,7 +281,17 @@ namespace RandomizerUI.Classes.Controllers
                     }, x => pd.SetMessage(x));
 
                     // force initial refresh
-                    MERPeriodicRefresh(null, null);
+                    Application.Current.Dispatcher.Invoke(async () =>
+                    {
+                        if (Application.Current.MainWindow is MainWindow mw)
+                        {
+                            mw.MERPeriodicRefresh(null, null);
+
+                            // Start periodic
+                            PeriodicRefresh.OnPeriodicRefresh += mw.MERPeriodicRefresh;
+                            PeriodicRefresh.StartPeriodicRefresh();
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -301,10 +313,8 @@ namespace RandomizerUI.Classes.Controllers
             bw.RunWorkerCompleted += async (a, b) =>
                     {
                         // Post critical startup
-                        window.SelectedTarget = TargetHandler.GetTarget();
 
                         Random random = new Random();
-                        var preseed = random.Next();
                         window.ImageCredits.ReplaceAll(ImageCredit.LoadImageCredits("imagecredits.txt", false));
                         window.ContributorCredits.ReplaceAll(window.GetContributorCredits());
                         window.LibraryCredits.ReplaceAll(LibraryCredit.LoadLibraryCredits("librarycredits.txt"));
@@ -325,20 +335,6 @@ namespace RandomizerUI.Classes.Controllers
         }
 
         public static object Prop { get; set; }
-
-        private static void MERPeriodicRefresh(object? sender, EventArgs e)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (Application.Current.MainWindow is MainWindow mw)
-                {
-                    Debug.WriteLine("PERIODIC REFRESH NOT IMPLEMENTED");
-                    // Is DLC component installed?
-                    //var dlcModPath = MERFileSystem.GetDLCModPath();
-                    //mw.DLCComponentInstalled = dlcModPath != null ? Directory.Exists(dlcModPath) : false;
-                }
-            });
-        }
 
         private static void RunOnUIThread(Action obj)
         {

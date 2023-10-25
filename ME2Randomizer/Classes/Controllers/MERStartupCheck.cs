@@ -14,7 +14,7 @@ namespace RandomizerUI.Classes.Controllers
     class MERStartupCheck
     {
         /// <summary>
-        /// Performs startup checks. This should be run after the texture library has been initially loaded
+        /// Handles application framework startup checks
         /// </summary>
         /// <param name="messageCallback"></param>
         public static void PerformStartupCheck(Action<string, string> messageCallback, Action<string> setStartupMessageText)
@@ -41,7 +41,7 @@ namespace RandomizerUI.Classes.Controllers
             var installedRamGB = ramAmountsBytes * 1.0d / (2 ^ 30);
             if (ramAmountsBytes > 0 && installedRamGB < 10)
             {
-                messageCallback?.Invoke("System memory is less than 10 GB", "Randomization can use significant amounts of memory (up to 6GB) in multithreaded mode. It is recommended that you disable multithreaded randomization if your system has less than 10GB of memory. This will increase randomization time but will reduce the memory required to randomize.");
+                messageCallback?.Invoke("System memory is less than 8 GB", "Randomization can use significant amounts of memory (up to 3GB) in multithreaded mode. It is recommended that you disable multithreaded randomization if your system has less than 8GB of memory. This will increase randomization time but will reduce the memory required to randomize.");
             }
 #if WINDOWS
             //Check pagefile

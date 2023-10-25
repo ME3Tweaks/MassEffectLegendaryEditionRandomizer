@@ -30,6 +30,7 @@ using RandomizerUI.Classes;
 using RandomizerUI.Classes.Controllers;
 using RandomizerUI.DebugTools;
 using RandomizerUI.ui;
+using RandomizerUI.windows;
 
 namespace RandomizerUI
 {
@@ -49,12 +50,6 @@ namespace RandomizerUI
         private static string FaqLink = "https://me3tweaks.com/masseffect3lerandomizer/faq";
         public bool ShowGenerationSelector => false;
 #endif
-
-        /// <summary>
-        /// The current selected game target
-        /// </summary>
-        public GameTarget SelectedTarget { get; set; }
-
         public bool UseMultiThreadRNG { get; set; } = true;
 
 
@@ -203,11 +198,13 @@ namespace RandomizerUI
         internal List<string> GetContributorCredits()
         {
             var contributors = new List<string>();
-            contributors.Add("Kosh_Vader - Debugging");
+            contributors.Add("Kosh_Vader - Testing");
+            contributors.Add("Vegz - Testing");
             contributors.Add("Khaar - 3D modeling");
             contributors.Add("Clericofshadows - 3D modeling");
             contributors.Add("Mellin - 3D modeling");
-            contributors.Add("Not_Female - UwU Emoticons implementation");
+            contributors.Add("sinsofawindmill - UwU Emoticons implementation");
+            contributors.Add("benefactor - technical");
             contributors.Sort();
             return contributors;
         }
@@ -231,13 +228,19 @@ namespace RandomizerUI
 
         private void ShowOptionToggler()
         {
-
+            var ot = new OptionTogglerWindow();
+            ot.Owner = this;
+#if DEBUG
+            ot.Show();
+#else
+            ot.ShowDialog();
+#endif
         }
 
         private async void UninstallDLCComponent()
         {
-            var dlcModPath = MERFileSystem.GetDLCModPath(SelectedTarget);
-            if (Directory.Exists(dlcModPath))
+            var dlcModPath = MERFileSystem.GetDLCModPath(TargetHandler.Target);
+            if (dlcModPath != null && Directory.Exists(dlcModPath))
             {
                 var pd = await this.ShowProgressAsync("Deleting DLC component", "Please wait while the DLC mod component of your current randomization is deleted.");
                 pd.SetIndeterminate();
@@ -258,8 +261,8 @@ namespace RandomizerUI
 
         private bool CanUninstallDLCComponent()
         {
-            if (SelectedTarget == null) return false;
-            var status = BackupService.GetBackupStatus(SelectedTarget.Game);
+            if (TargetHandler.Target == null) return false;
+            var status = BackupService.GetBackupStatus(TargetHandler.Target.Game);
             var canUninstall = ShowUninstallButton = status != null && !status.BackedUp && DLCComponentInstalled;
             return canUninstall;
         }
@@ -277,7 +280,7 @@ namespace RandomizerUI
             }
         }
 
-        #endregion
+#endregion
 
 
         public async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -286,6 +289,7 @@ namespace RandomizerUI
         }
 
         public string BackupRestoreText { get; set; }
+        public string BackupRestoreToolTip { get; set; }
 
         public bool DirectionsTextVisible { get; set; }
 
@@ -329,22 +333,25 @@ namespace RandomizerUI
             if (SeedTextBox == null || !int.TryParse(SeedTextBox.Text, out var value) || value == 0)
                 return false;
 
-            // Target not found or texture modded
-            if (SelectedTarget == null || SelectedTarget.TextureModded)
+            // Target not found
+            if (TargetHandler.Target == null)
                 return false;
             return true;
         }
 
         private async void StartRandomization()
         {
-            if (MERUtilities.IsGameRunning(SelectedTarget.Game))
+            if (TargetHandler.Target == null)
+                return;
+
+            if (MERUtilities.IsGameRunning(MERFileSystem.Game))
             {
-                await this.ShowMessageAsync($"{SelectedTarget.Game.ToGameName()} is running", $"Cannot randomize the game while {SelectedTarget.Game.ToGameName()} is running. Please close the game and try again.");
+                await this.ShowMessageAsync($"{MERFileSystem.Game.ToGameName()} is running", $"Cannot randomize the game while {MERFileSystem.Game.ToGameName()} is running. Please close the game and try again.");
                 return;
             }
 
-            var modPath = MERFileSystem.GetDLCModPath(SelectedTarget);
-            var backupStatus = BackupService.GetBackupStatus(SelectedTarget.Game);
+            var modPath = MERFileSystem.GetDLCModPath(TargetHandler.Target);
+            var backupStatus = BackupService.GetBackupStatus(TargetHandler.Target.Game);
             if (!backupStatus.BackedUp && !Directory.Exists(modPath))
             {
                 var settings = new MetroDialogSettings()
@@ -383,7 +390,7 @@ namespace RandomizerUI
                     if (result == MessageDialogResult.Affirmative)
                     {
                         // Perform quick restore first
-                        RestoreController.StartRestore(this, SelectedTarget, true, InternalStartRandomization);
+                        RestoreController.StartRestore(this, TargetHandler.Target, true, InternalStartRandomization);
                         return; // Return, we will run randomization after this
                     }
 
@@ -413,7 +420,7 @@ namespace RandomizerUI
 
         private async void InternalStartRandomization()
         {
-            if (!MERUtilities.IsGameRunning(SelectedTarget.Game))
+            if (!MERUtilities.IsGameRunning(TargetHandler.Target.Game))
             {
 #if __GAME1__
                 var randomizer = new Randomizer.Randomizers.Game1.Randomizer();
@@ -429,7 +436,7 @@ namespace RandomizerUI
                     SelectedOptions = RandomizationGroups.SelectMany(x => x.Options.Where(x => x.OptionIsSelected)).ToList(),
                     UseMultiThread = UseMultiThreadRNG,
                     Reroll = PerformReroll,
-                    RandomizationTarget = SelectedTarget,
+                    RandomizationTarget = TargetHandler.Target,
                     SetCurrentOperationText = x => CurrentOperationText = x,
                     SetOperationProgressBarIndeterminate = x => ProgressBarIndeterminate = x,
                     NotifyDLCComponentInstalled = x => DLCComponentInstalled = x,
@@ -448,7 +455,7 @@ namespace RandomizerUI
             }
             else
             {
-                await this.ShowMessageAsync($"{SelectedTarget.Game.ToGameName()} is running", $"Cannot randomize the game while {SelectedTarget.Game.ToGameName()} is running. Please close the game and try again.");
+                await this.ShowMessageAsync($"{TargetHandler.Target.Game.ToGameName()} is running", $"Cannot randomize the game while {TargetHandler.Target.Game.ToGameName()} is running. Please close the game and try again.");
             }
         }
 
@@ -483,16 +490,16 @@ namespace RandomizerUI
 
         private async void BackupRestore_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedTarget == null)
+            if (TargetHandler.Target == null)
                 return; // Do not allow!
 
-            string path = BackupService.GetGameBackupPath(SelectedTarget.Game);
+            string path = BackupService.GetGameBackupPath(TargetHandler.Target.Game);
             if (path != null)
             {
 
-                if (SelectedTarget.TextureModded)
+                if (TargetHandler.Target.TextureModded)
                 {
-                    RestoreController.StartRestore(this, SelectedTarget, false);
+                    RestoreController.StartRestore(this, TargetHandler.Target, false);
                 }
                 else
                 {
@@ -508,7 +515,7 @@ namespace RandomizerUI
                     }
                     else
                     {
-                        RestoreController.StartRestore(this, SelectedTarget, result == MessageDialogResult.Affirmative);
+                        RestoreController.StartRestore(this, TargetHandler.Target, result == MessageDialogResult.Affirmative);
                     }
                 }
             }
@@ -587,7 +594,7 @@ namespace RandomizerUI
             {
                 LogUploadPackage lup = new LogUploadPackage()
                 {
-                    DiagnosticTarget = TargetHandler.LegendaryEditionTarget,
+                    DiagnosticTarget = TargetHandler.Target,
                     SelectedLog = SelectedLogForUpload,
                     UpdateStatusCallback = s =>
                     {
@@ -640,20 +647,20 @@ namespace RandomizerUI
 
         public void SetupTargetDescriptionText()
         {
-            if (SelectedTarget == null)
+            if (TargetHandler.Target == null)
             {
                 var gameName = Randomizer.MER.MERUtilities.GetGameUIName(false);
                 GamePathString = $"{gameName} not detected. Repair and run your game to fix detection.";
             }
-            else if (SelectedTarget.TextureModded)
-            {
-                // How true is this for LE?
-                GamePathString = "Cannot randomize, game is texture modded";
-            }
+            //else if (TargetHandler.Target.TextureModded)
+            //{
+            //    // How true is this for LE?
+            //    GamePathString = "Cannot randomize, game is texture modded";
+            //}
             else
             {
                 DirectionsTextVisible = true;
-                GamePathString = $"Randomization target: {SelectedTarget.TargetPath}";
+                GamePathString = $"Randomization target: {TargetHandler.Target.TargetPath}";
             }
         }
 
@@ -666,21 +673,19 @@ namespace RandomizerUI
             }
         }
 
-        private void OnSelectedTargetChanged()
+        internal void MERPeriodicRefresh(object sender, EventArgs eventArgs)
         {
-            if (SelectedTarget != null)
+            if (TargetHandler.Target != null)
             {
-                GameLocationTextbox.Text = SelectedTarget.TargetPath;
-                var backupStatus = BackupService.GetBackupStatus(SelectedTarget.Game);
+                // Update DLC component status (if its modified outside of MER)
+                // Is DLC component installed?
+                var dlcModPath = MERFileSystem.GetDLCModPath(TargetHandler.Target);
+                DLCComponentInstalled = dlcModPath != null && Directory.Exists(dlcModPath);
+                
+                // Update backup status
+                var backupStatus = BackupService.GetBackupStatus(TargetHandler.Target.Game);
                 BackupRestoreText = backupStatus?.BackupActionText;
-                BackupRestore_Button.ToolTip = backupStatus != null && backupStatus.BackedUp ? "Click to restore game/uninstall randomizer mod" : "Click to backup game";
-                //MERPeriodicRefresh();.OnPeriodicRefresh += MERPeriodicRefresh;
-#if __GAME1__
-#elif __GAME2__
-                ThemeManager.Current.ChangeTheme(this, "Dark.Blue");
-#elif __GAME3__
-                ThemeManager.Current.ChangeTheme(this, "Dark.Green");
-#endif
+                BackupRestoreToolTip = backupStatus != null && backupStatus.BackedUp ? "Click to restore game/uninstall randomizer mod" : "Click to backup game"; 
             }
         }
 

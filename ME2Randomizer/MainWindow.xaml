@@ -329,7 +329,7 @@
                             <Button Click="Logs_Click" MinWidth="20" ToolTip="Generate a diagnostics log for troubleshooting">
                                 <fonts:OutlinedTextBlock Text="Logs" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
-                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" MinWidth="20">
+                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" MinWidth="20" ToolTip="{Binding BackupRestoreToolTip}">
                                 <fonts:OutlinedTextBlock Text="{Binding BackupRestoreText, FallbackValue=Backup}" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                             <Button Visibility="{Binding ShowUninstallButton, Converter={StaticResource BoolToVisibilityConverter}}" MinWidth="40" ToolTip="Uninstall the DLC mod component of the randomization. You must repair your game to complete the restore." Command="{Binding UninstallDLCCommand}">
