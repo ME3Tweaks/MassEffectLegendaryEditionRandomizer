@@ -466,7 +466,7 @@ namespace Randomizer.Randomizers.Game2
 
                     new RandomizationOption()
                     {
-                        HumanName = "NPC faces",
+                        HumanName = MERRuntimeOption.RTO_TITLE_NPCFACES,
                         Ticks = "0.5,1.0,1.5,2.0,3.0,4.0",
                         HasSliderOption = true,
                         IsRecommended = true,
@@ -489,7 +489,8 @@ namespace Randomizer.Randomizers.Game2
                     //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                     //    PerformRandomizationOnExportDelegate = RMorphTarget.RandomizeGlobalExport
                     //},
-                    new RandomizationOption() {HumanName = "Eyes",
+                    new RandomizationOption() {
+                        HumanName = MERRuntimeOption.RTO_TITLE_EYES,
                         Description="Changes the types and colors of eyes",
                         IsRecommended = true,
                         //PerformSpecificRandomizationDelegate = RSharedEyes.Init,
@@ -526,7 +527,7 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true
                     },
                     new RandomizationOption() {
-                        HumanName = "NPC colors",
+                        HumanName = MERRuntimeOption.RTO_TITLE_NPCCOLORS,
                         Description="Changes NPC colors such as skin tone, hair, etc",
                         PerformSpecificRandomizationDelegate = RSharedNPC.InstallPawnColorRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
@@ -543,7 +544,7 @@ namespace Randomizer.Randomizers.Game2
                     //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal
                     //},
                     new RandomizationOption() {
-                        HumanName = "Romance",
+                        HumanName = MERRuntimeOption.RTO_TITLE_ROMANCE,
                         Description="Randomizes which romance you will get",
                         IsRuntimeRandomizer = true,
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
@@ -561,7 +562,7 @@ namespace Randomizer.Randomizers.Game2
                     //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                     //},
                     new RandomizationOption() {
-                        HumanName = "LookAt system",
+                        HumanName = MERRuntimeOption.RTO_TITLE_LOOKAT_SYSTEM,
                         Description="Changes how pawns look things, such as turning eyes, chest, neck",
                         IsConfigControlled = true,
                         IsRuntimeRandomizer = true,
@@ -604,7 +605,7 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption()
                     {
-                        HumanName = "Iconic faces",
+                        HumanName = MERRuntimeOption.RTO_TITLE_ICONICFACES,
                         Description="Changes the 'iconic' player faces - Note, this only properly works if you pick 'Custom' character with the default appearance. This modification will not carry into LE3.",
                         PerformSpecificRandomizationDelegate = CharacterCreator.InstallIconicRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
@@ -621,7 +622,7 @@ namespace Randomizer.Randomizers.Game2
                             new RandomizationOption()
                             {
                                 SubOptionKey = CharacterCreator.SUBOPTIONKEY_CHARCREATOR_ICONIC_PERSISTENCE,
-                                HumanName = "Keep face persistent",
+                                HumanName = MERRuntimeOption.RTO_TITLE_ICONICPERSISTENT,
                                 Description = "Selecting this option will make your face from the character creator persist through saves. You MUST keep your randomization installed for this to work.",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true
@@ -646,7 +647,8 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Miscellaneous",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "Hologram colors",
+                    new RandomizationOption() {
+                        HumanName = "Hologram colors",
                         Description="Changes colors of holograms",
                         PerformRandomizationOnExportDelegate = RSharedHolograms.RandomizeExport,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
@@ -687,7 +689,8 @@ namespace Randomizer.Randomizers.Game2
                 GroupName = "Movement & pawns",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "NPC movement speeds",
+                    new RandomizationOption() {
+                        HumanName = MERRuntimeOption.RTO_TITLE_NPCMOVEMENT,
                         Description = "Changes non-player movement stats",
                         PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizeNonPlayerMovementSpeed,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
@@ -695,7 +698,8 @@ namespace Randomizer.Randomizers.Game2
                         GameplayRandomizer = true,
                         IsRuntimeRandomizer = true,
                     },
-                    new RandomizationOption() {HumanName = "Player movement speeds",
+                    new RandomizationOption() {
+                        HumanName = MERRuntimeOption.RTO_TITLE_PLAYERMOVEMENT,
                         Description = "Changes player movement stats",
                         PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizePlayerMovementSpeed,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
@@ -727,7 +731,7 @@ namespace Randomizer.Randomizers.Game2
                 {
                     new RandomizationOption()
                     {
-                        HumanName = "Weapon stats",
+                        HumanName = MERRuntimeOption.RTO_TITLE_WEAPONSTATS,
                         IsRuntimeRandomizer = true,
                         Description = "Attempts to change gun stats in a way that makes game still playable",
                         PerformSpecificRandomizationDelegate = Weapons.RandomizeWeapons,
@@ -747,7 +751,7 @@ namespace Randomizer.Randomizers.Game2
 
             RandomizationGroups.Add(new RandomizationGroup()
             {
-                GroupName = "Enemy weapons",
+                GroupName = MERRuntimeOption.RTO_TITLE_ENEMYWEAPONS,
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
                     new RandomizationOption()
@@ -765,7 +769,7 @@ namespace Randomizer.Randomizers.Game2
                             new RandomizationOption()
                             {
                                 SubOptionKey = EnemyWeaponChanger.SUBOPTIONKEY_ENEMYWEAPONS_FORCERANDOMIZER,
-                                HumanName = "Force randomization",
+                                HumanName = MERRuntimeOption.RTO_TITLE_FORCERANDOMIZATION,
                                 Description = "Forces randomization on custom made randomizer enemies",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true,
@@ -774,7 +778,7 @@ namespace Randomizer.Randomizers.Game2
                             new RandomizationOption()
                             {
                                 SubOptionKey = EnemyWeaponChanger.SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE,
-                                HumanName = "Randomize once per loadout",
+                                HumanName = MERRuntimeOption.RTO_TITLE_RANDOMIZEONCEPERLOADOUT,
                                 Description =
                                     "Randomizes the weapon loadout of a pawn only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all enemies near each other (typically a level) will have the same weapons until the loadout object is dropped from memory",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
@@ -793,7 +797,7 @@ namespace Randomizer.Randomizers.Game2
                 {
                     new RandomizationOption()
                     {
-                        HumanName = "Enemy powers",
+                        HumanName = MERRuntimeOption.RTO_TITLE_ENEMYPOWERS,
                         Description = "Gives enemies different powers. May make some enemies very difficult to kill. Enemies that can softlock the game and custom made enemies for this randomzier will not be randomized",
                         IsRuntimeRandomizer = true,
                         PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport2,
@@ -805,7 +809,7 @@ namespace Randomizer.Randomizers.Game2
                                     new RandomizationOption()
                                     {
                                         SubOptionKey = EnemyPowerChanger.SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER,
-                                        HumanName = "Force randomization",
+                                        HumanName = MERRuntimeOption.RTO_TITLE_FORCERANDOMIZATION,
                                         Description = "Forces randomization on custom made randomizer enemies. A select few will not randomize as it will break their AI. Enemies that will softlock the game will not be randomized",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                         IsOptionOnly = true,
@@ -814,7 +818,7 @@ namespace Randomizer.Randomizers.Game2
                                     new RandomizationOption()
                                     {
                                         SubOptionKey = EnemyPowerChanger.SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE,
-                                        HumanName = "Randomize once per loadout",
+                                        HumanName = MERRuntimeOption.RTO_TITLE_RANDOMIZEONCEPERLOADOUT,
                                         Description = "Randomizes the powers of a pawn type only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all same enemies near each other (typically a level) will have the same powers until the loadout object is dropped from memory",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                         IsOptionOnly = true,
@@ -824,7 +828,7 @@ namespace Randomizer.Randomizers.Game2
                                     {
                                         SubOptionKey = EnemyPowerChanger.SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM,
                                         IsRecommended = true,
-                                        HumanName = "Give powers to all enemies",
+                                        HumanName = MERRuntimeOption.RTO_TITLE_GIVEPOWERSTOALLENEMIES,
                                         Description = "Ensures all enemies have at least 2 powers. Not all AI is equipped to use powers (e.g. husks). Significantly increases game difficulty",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                         IsOptionOnly = true,
@@ -894,7 +898,8 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption()
                     {
-                        HumanName = "Suicide Mission", Description = "Sharply increases difficulty throughout the entire level, and revamps the final boss fight. Try it on Insanity ;)",
+                        HumanName = MERRuntimeOption.RTO_TITLE_SUICIDEMISSION,
+                        Description = "Sharply increases difficulty throughout the entire level, and totally overhauls the final boss fight. Try it on Insanity ;)",
                         PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         RequiresTLK = true,
@@ -913,10 +918,11 @@ namespace Randomizer.Randomizers.Game2
                             },
                             new RandomizationOption()
                             {
-                                HumanName = "Use new music",
+                                HumanName = MERRuntimeOption.RTO_TITLE_USENEWFINALBOSSMUSIC,
                                 Description = "Replaces the final battle music to better match the combat tempo",
                                 IsRecommended = true,
                                 IsOptionOnly = true,
+                                IsRuntimeRandomizer = true,
                                 SubOptionKey = CollectorBase.SUBOPTIONKEY_NEWFINALBOSSMUSIC,
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                             }
@@ -1031,7 +1037,7 @@ namespace Randomizer.Randomizers.Game2
                     // Doesn't seem to work
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
                     new RandomizationOption() {
-                        HumanName = "Fog colors",
+                        HumanName = MERRuntimeOption.RTO_TITLE_FOGCOLORS,
                         Description = "Changes colors of fog",
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
@@ -1040,7 +1046,9 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true
                     },
                     // new RandomizationOption() {HumanName = "Particle Systems", Description = "Randomizes data used in particles systems", IsRecommended = false, PerformRandomizationOnExportDelegate = ArrivalDLC.RandomizeParticleSystems, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
-                    new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
+                    new RandomizationOption() {
+                        HumanName = MERRuntimeOption.RTO_TITLE_LIGHTCOLORS,
+                        Description = "Changes colors of dynamic lighting. Prebaked lighting won't be affected",
                         PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,

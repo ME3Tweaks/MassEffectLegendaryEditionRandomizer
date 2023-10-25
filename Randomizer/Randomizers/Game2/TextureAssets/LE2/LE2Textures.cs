@@ -109,6 +109,7 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
         {
             return new List<SourceTexture>()
             {
+                // Hologram screens
                 new SourceTexture()
                 {
                     Filename = "H_Graphs_mybrandamazon.png",
@@ -123,6 +124,22 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
                     IFPToBuildOff = "BioVFX_Env_Hologram.Textures.H_Graphs",
                     Id = "HoloScreensPizza"
                 },
+                new SourceTexture()
+                {
+                    Filename = "bsod_toasters.png",
+                    ContainingPackageName = "BioD_CitAsL.pcc",
+                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    Id = "HologramBSODToaster"
+                },
+                new SourceTexture()
+                {
+                    Filename = "sweat_burgerrecipe.png",
+                    ContainingPackageName = "BioD_CitAsL.pcc",
+                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    Id = "HoloscreenSweatBurger"
+                },
+
+                // Datapads
                 new SourceTexture()
                 {
                     Filename = "map.png",
@@ -151,6 +168,16 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
                     IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
                     Id = "DatapadThisIsFine"
                 },
+
+                // Picture frames
+
+
+                // EndGm3 Datapad
+
+
+                // H_Texts
+
+
             };
         }
 

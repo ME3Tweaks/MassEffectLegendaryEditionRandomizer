@@ -382,16 +382,6 @@ namespace Randomizer.Randomizers.Game2.Misc
         private static void GarrusHeadZFixDLC(SquadMate bodyInfo, ExportEntry newHead)
         {
             GarrusHeadZFix(bodyInfo, newHead);
-
-            var newHolo = newHead.FileRef.FindExport("BIOG_TUR_HED_PROGarrus_ALT_R.Garrus.Visor_Alt_Hologram");
-            if (newHolo != null)
-            {
-                var data = newHolo.Data;
-                //RandomizeRGBA(data, 0x70C, false);
-                RSharedHolograms.RandomizeRGBA(data, 0x54E, false);
-                MERLog.Information($@"Randomized Garrus DLC head material {newHolo.InstancedFullPath} in {newHolo.FileRef.FilePath}");
-                newHolo.Data = data;
-            }
         }
 
         /// <summary>
@@ -577,6 +567,13 @@ namespace Randomizer.Randomizers.Game2.Misc
                 headMeshExp.ObjectFlags |= UnrealFlags.EObjectFlags.DebugPostLoad; // Mark as modified so we do not re-randomize it
 
                 UpdateHeadMeshPosition(squadmateInfo, newMdl);
+
+                // Fix thane's DLC outfit having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
+                if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent") != null)
+                {
+                    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                }
+
                 newMdl.ObjectName = newMdl.ObjectName.Name + $"_{squadmateInfo.ClassName}ified";
 
                 // Get parent object

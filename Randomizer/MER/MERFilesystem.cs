@@ -52,6 +52,7 @@ namespace Randomizer.MER
 
 
         private static string dlcModPath { get; set; }
+
         /// <summary>
         /// The DLC mod's cookedpc path.
         /// </summary>
@@ -184,11 +185,11 @@ namespace Randomizer.MER
             metacmm.OptionsSelectedAtInstallTime.AddRange(allOptions);
 
 #if __GAME1__
-            var installedBy = $"Mass Effect Randomizer {MLibraryConsumer.GetAppVersion()}";
+            var installedBy = $"Mass Effect Legendary Edition Randomizer {MLibraryConsumer.GetAppVersion()}";
 #elif __GAME2__
-            var installedBy = $"Mass Effect 2 Randomizer {MLibraryConsumer.GetAppVersion()}";
+            var installedBy = $"Mass Effect 2 Legendary Edition Randomizer {MLibraryConsumer.GetAppVersion()}";
 #elif __GAME3__
-            var installedBy = $"Mass Effect 3 Randomizer {MLibraryConsumer.GetAppVersion()}";
+            var installedBy = $"Mass Effect 3 Legendary Edition Randomizer {MLibraryConsumer.GetAppVersion()}";
 #endif
 
             metacmm.WriteMetaCMM(metacmmFile, installedBy);
@@ -301,6 +302,11 @@ namespace Randomizer.MER
         }
 
         /// <summary>
+        /// The DLC folder name for this randomizer
+        /// </summary>
+        public static readonly string DLCModName = $"DLC_MOD_{MERFileSystem.Game}Randomizer";
+
+        /// <summary>
         /// Creates the DLC_MOD_RANDOMIZER folder
         /// </summary>
         /// <param name="game"></param>
@@ -334,11 +340,11 @@ namespace Randomizer.MER
         {
             if (postLoadTFC)
             {
-                return Path.Combine(DLCModCookedPath, $"Textures_DLC_MOD_{target.Game}Randomizer.tfc");
+                return Path.Combine(DLCModCookedPath, $"Textures_{DLCModName}.tfc");
             }
 
             // TFC that can be used safely before load
-            return Path.Combine(M3Directories.GetCookedPath(target), @"Textures_MER_PreDLCLoad.tfc");
+            return Path.Combine(target.GetCookedPath(), "Textures_MER_PreDLCLoad.tfc");
         }
 
         /// <summary>
@@ -347,10 +353,11 @@ namespace Randomizer.MER
         /// <returns></returns>
         public static string GetDLCModPath(GameTarget target)
         {
-            var dlcPath = MEDirectories.GetDLCPath(target.Game, target.TargetPath);
+            if (target == null) return null;
+            var dlcPath = target.GetDLCPath();
             if (dlcPath != null)
             {
-                return Path.Combine(dlcPath, $"DLC_MOD_{target.Game}Randomizer");
+                return Path.Combine(dlcPath, DLCModName);
             }
             return null;
         }
@@ -366,6 +373,11 @@ namespace Randomizer.MER
             return package;
         }
 
+        /// <summary>
+        /// Sets a package to read only - it will error if you try to save it with MERFileSystem.SavePackage()
+        /// </summary>
+        /// <param name="package"></param>
+        /// <param name="preventSaves"></param>
         public static void SetReadOnly(IMEPackage package, bool preventSaves)
         {
             if (preventSaves)
@@ -381,6 +393,16 @@ namespace Randomizer.MER
         public static void InstallAlways(string alwaysName)
         {
             MEREmbedded.ExtractEmbeddedBinaryFolder($"Packages.{Game}.Always_{alwaysName}");
+        }
+
+        /// <summary>
+        /// Gets the (presumed) path of where the DLC mod component's DLC Cooked directory will be. It does not verify its existence.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static string GetDLCModCookedPath(GameTarget target)
+        {
+            return Path.Combine(target.GetDLCPath(), DLCModName, target.Game.CookedDirName());
         }
     }
 }
