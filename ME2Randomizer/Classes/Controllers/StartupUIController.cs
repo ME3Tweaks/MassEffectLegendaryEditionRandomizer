@@ -318,10 +318,11 @@ namespace RandomizerUI.Classes.Controllers
                         window.ImageCredits.ReplaceAll(ImageCredit.LoadImageCredits("imagecredits.txt", false));
                         window.ContributorCredits.ReplaceAll(window.GetContributorCredits());
                         window.LibraryCredits.ReplaceAll(LibraryCredit.LoadLibraryCredits("librarycredits.txt"));
-#if DEBUG
+// Todo: remove seed textbox as it's not used anymore, we don't support deterministic randomization
+#if !DEBUG
                         window.SeedTextBox.Text = 529572808.ToString();
 #else
-                    window.SeedTextBox.Text = preseed.ToString();
+                    window.SeedTextBox.Text = random.Next().ToString();
 #endif
                         window.TextBlock_AssemblyVersion.Text = $"Version {MLibraryConsumer.GetAppVersion()}";
 
