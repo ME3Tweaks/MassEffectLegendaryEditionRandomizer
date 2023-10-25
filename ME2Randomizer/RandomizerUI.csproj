@@ -70,7 +70,7 @@
 		<Product>Mass Effect 2 Legendary Edition Randomizer</Product>
 		<Description>Randomizer for Mass Effect 2 Legendary Edition</Description>
 		<Copyright>2019-2023 ME3Tweaks</Copyright>
-		<Version>0.9.56</Version>
+		<Version>0.9.57</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
 		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
