@@ -76,6 +76,7 @@ namespace Randomizer.Randomizers.Shared
         /// <param name="p2"></param>
         public static Vector4 RandomizeRGBA(byte[] data, int startingOffset, bool randomizeAlpha)
         {
+            throw new Exception("THIS WILL CRASH THE GAME!!");
             float totalColor = 0;
             totalColor += BitConverter.ToSingle(data, startingOffset);
             totalColor += BitConverter.ToSingle(data, startingOffset + 4);
