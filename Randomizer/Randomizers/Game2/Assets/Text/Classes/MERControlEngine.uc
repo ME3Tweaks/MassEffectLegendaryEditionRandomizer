@@ -10,6 +10,7 @@ var config bool bNPCMovementSpeedRandomizer;
 var config bool bPawnLookatRandomizer;
 var config bool bEyeRandomizer;
 var config bool bPawnColorsRandomizer;
+var config bool bRandomizeWeaponStats;
 
 var config bool bEnemyWeaponRandomizer;
 var config bool bEnemyWeaponRandomizer_Force;
@@ -29,6 +30,9 @@ var config array<string> MEREyeIFPs;
 
 var config float fBioMorphFaceRandomization;
 var config float fIconicFaceRandomization;
+
+// Was the suicide randomization installed? required for Collector AI changes
+var config bool bSuicideMissionRandomizationInstalled;
 
 // Functions
 public static function float RandFloat(float minf, float maxf)

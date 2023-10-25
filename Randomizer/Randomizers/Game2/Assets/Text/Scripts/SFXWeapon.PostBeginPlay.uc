@@ -4,7 +4,7 @@
     
     Super(Actor).PostBeginPlay();
     ScaleWeapon(0);
-    if (TRUE)
+    if (class'MERControlEngine'.default.bRandomizeWeaponStats)
     {
         RangeMult = Rand(24) == 0 ? 8.0 : 2.0;
         Damage.X *= FRand() * RangeMult;
