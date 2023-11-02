@@ -74,6 +74,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 
         private static CoalesceProperty BuildLoadout(string pawnName)
         {
+            bool hasUsedPistolSlot = false;
             var isPlayer = pawnName.Contains("Player");
             string key = isPlayer ? "PlayerLoadoutInfo" : "HenchLoadoutInfo";
 
@@ -87,8 +88,14 @@ namespace Randomizer.Randomizers.Game2.Misc
             while (guns.Count < totalGuns)
             {
                 var nGun = LoadoutNames.RandomElement();
+                if (hasUsedPistolSlot && nGun is "LoadoutWeapons_AutoPistols" or "LoadoutWeapons_HeavyPistols")
+                {
+                    // Cannot have SMG and Pistol on same loadout - takes same slot it seems
+                    continue;
+                }
                 if (!guns.Contains(nGun))
                 {
+                    hasUsedPistolSlot |= nGun is "LoadoutWeapons_AutoPistols" or "LoadoutWeapons_HeavyPistols";
                     guns.Add(nGun);
                 }
             }
@@ -124,6 +131,9 @@ namespace Randomizer.Randomizers.Game2.Misc
             var sfxgame = SFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
             MERFileSystem.SavePackage(sfxgame);
+
+            // Enable runtime feature flag
+            CoalescedHandler.EnableFeatureFlag("bRandomizeWeaponStats");
             return true;
 
             // ME2R code

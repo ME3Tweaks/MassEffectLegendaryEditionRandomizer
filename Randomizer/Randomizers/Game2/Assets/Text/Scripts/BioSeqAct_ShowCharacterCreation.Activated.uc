@@ -27,6 +27,8 @@
             oNCHandler.SetOnCloseCallback(onScreenClosed);
             if (Class'MERControlEngine'.default.bIconicRandomizer)
             {
+                Class'MERIRFemshepFixer'.static.FixFemShepForIR('Iconic_Female_Template');
+                Class'MERIRFemshepFixer'.static.FixFemShepForIR('Custom_Female_Template');
                 PawnTagsToRandomize.AddItem('Iconic_Male_Template');
                 PawnTagsToRandomize.AddItem('Custom_Male_Template');
                 PawnTagsToRandomize.AddItem('Iconic_Female_Template');

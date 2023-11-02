@@ -35,8 +35,16 @@ namespace Randomizer.Randomizers.Game2.Levels
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
             MERFileSystem.SavePackage(sfxgame);
 
-            // Patch BioP_Char to randomize face on load
             var biop_char = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioP_Char.pcc"));
+            // We must first port in the femshep fixer
+            using var fsFixer = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "Headmorph.MERIRFemshepFixer.pcc"), "MERIRFemshepFixer.pcc");
+            var mgc = biop_char.FindEntry("MERGameContent") ?? ExportCreator.CreatePackageExport(biop_char, "MERGameContent");
+            foreach (var classx in fsFixer.Exports.Where(x => x.IsClass))
+            {
+                EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.CloneAllDependencies, classx, biop_char, classx.idxLink != 0 ? mgc : null, true, new RelinkerOptionsPackage(), out _);
+            }
+
+            // Patch BioP_Char to randomize face on load
             ScriptTools.InstallScriptToExport(target, biop_char.FindExport("SFXGameContent.BioSeqAct_ShowCharacterCreation.Activated"), "BioSeqAct_ShowCharacterCreation.Activated.uc");
             MERFileSystem.SavePackage(biop_char);
 

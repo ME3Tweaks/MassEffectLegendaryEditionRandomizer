@@ -92,11 +92,14 @@
         DamageMod_ShortRange *= FRand() * RangeMult;
         DamageMod_MediumRange *= FRand() * RangeMult;
         DamageMod_LongRange *= FRand() * RangeMult;
-        MinAdhesionDistance *= FRand() * RangeMult;
-        MaxAdhesionDistance *= FRand() * RangeMult;
-        MinAdhesionVelocity *= FRand() * RangeMult;
-        CamInputAdhesionDamping *= FRand() * RangeMult;
-        MaxLateralAdhesionDist *= FRand() * RangeMult;
+        
+        // This is aim assist I think - don't mess with it
+        //MinAdhesionDistance *= FRand() * RangeMult;
+        //MaxAdhesionDistance *= FRand() * RangeMult;
+        //MinAdhesionVelocity *= FRand() * RangeMult;
+        //CamInputAdhesionDamping *= FRand() * RangeMult;
+        //MaxLateralAdhesionDist *= FRand() * RangeMult;
+        
         MinZoomSnapDistance *= FRand() * RangeMult;
         MaxZoomSnapDistance *= FRand() * RangeMult;
         ZoomSnapDuration *= FRand() * RangeMult;

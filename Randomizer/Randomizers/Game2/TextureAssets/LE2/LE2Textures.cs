@@ -109,6 +109,23 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
         {
             return new List<SourceTexture>()
             {
+                // Feature: Citadel
+                new SourceTexture()
+                {
+                    Filename = "cursed.png",
+                    ContainingPackageName = "Startup_INT.pcc",
+                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.Holomod_11_Tex",
+                    Id = "CursedBC7"
+                },
+                new SourceTexture()
+                {
+                    Filename = "borgar.png",
+                    ContainingPackageName = "Startup_INT.pcc",
+                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.Holomod_11_Tex",
+                    Id = "BorgarBC7"
+                },
+
+
                 // Hologram screens
                 new SourceTexture()
                 {

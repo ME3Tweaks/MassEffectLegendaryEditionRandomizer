@@ -172,16 +172,15 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         internal static bool PerformRandomization(GameTarget target, RandomizationOption notUsed)
         {
-            //RandomizeEndorsements(target);
-            //RandomizeThaneInterrogation(target);
+            RandomizeEndorsements(target);
+            RandomizeThaneInterrogation(target);
 
-            //RandomizeCouncilConvo(target);
+            RandomizeCouncilConvo(target);
 
-            // Implement once gesture system is reimplemented
-            //RandomizeShepDance(target);
-            // InstallPackingHeat(target);
+            RandomizeShepDance(target);
+            InstallPackingHeat(target);
 
-            //MakeAdsCreepy(target);
+            MakeAdsCreepy(target);
             InstallBorgar(target);
             return true;
         }
@@ -475,9 +474,17 @@ namespace Randomizer.Randomizers.Game2.Levels
                 var interp1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.SeqAct_Interp_1");
 
                 // Make 2 additional dance options by cloning the interp and the data tree
-                var interp2 = MERSeqTools.CloneBasicSequenceObject(interp1);
-                var interp3 = MERSeqTools.CloneBasicSequenceObject(interp1);
+                var interp2 = KismetHelper.CloneObject(interp1);
+                var interp3 = KismetHelper.CloneObject(interp1);
 
+                var fadeToBlack = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_BlackScreen_1");
+                var setGestureMode = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_SetGestureMode_1");
+                KismetHelper.CreateOutputLink(interp2, "Completed", setGestureMode);
+                KismetHelper.CreateOutputLink(interp2, "Stopped", setGestureMode);
+                KismetHelper.CreateOutputLink(interp2, "ExitDance", fadeToBlack);
+                KismetHelper.CreateOutputLink(interp3, "Completed", setGestureMode);
+                KismetHelper.CreateOutputLink(interp3, "Stopped", setGestureMode);
+                KismetHelper.CreateOutputLink(interp3, "ExitDance", fadeToBlack);
 
                 // Clone the interp data for attaching to 2 and 3
                 var interpData1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.InterpData_1");
@@ -493,17 +500,12 @@ namespace Randomizer.Randomizers.Game2.Levels
 
 
                 // Chance the data for interp2/3
-                var id2 = SeqTools.GetVariableLinksOfNode(interp2);
-                id2[0].LinkedNodes[0] = interpData2;
-                SeqTools.WriteVariableLinksToNode(interp2, id2);
-
-                var id3 = SeqTools.GetVariableLinksOfNode(interp3);
-                id3[0].LinkedNodes[0] = interpData3;
-                SeqTools.WriteVariableLinksToNode(interp3, id3);
+                KismetHelper.CreateVariableLink(interp2, "Data", interpData2);
+                KismetHelper.CreateVariableLink(interp3, "Data", interpData3);
 
                 // Add additional finished states for fadetoblack when done
-                KismetHelper.CreateOutputLink(loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_BlackScreen_1"), "Finished", interp2, 2);
-                KismetHelper.CreateOutputLink(loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_BlackScreen_1"), "Finished", interp3, 2);
+                KismetHelper.CreateOutputLink(fadeToBlack, "Finished", interp2, 2);
+                KismetHelper.CreateOutputLink(fadeToBlack, "Finished", interp3, 2);
 
 
                 // Link up the random choice it makes

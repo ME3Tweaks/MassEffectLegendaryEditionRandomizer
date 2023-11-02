@@ -568,7 +568,18 @@ namespace Randomizer.Randomizers.Game2.Misc
 
                 UpdateHeadMeshPosition(squadmateInfo, newMdl);
 
-                // Fix thane's DLC outfit having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
+                // Todo: Loyalty and default
+                // Fix thane's outfits having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
+                if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent") != null)
+                {
+                    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                }
+
+                // This needs looked further into as the UV mapping seems to be different...?
+                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent") != null)
+                //{
+                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                //}
                 if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent") != null)
                 {
                     headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
@@ -701,14 +712,18 @@ namespace Randomizer.Randomizers.Game2.Misc
                     var targetMesh = (meshExp.GetProperty<ObjectProperty>("SkeletalMesh") ?? ((ExportEntry)meshExp.Archetype).GetProperty<ObjectProperty>("SkeletalMesh")).ResolveToEntry(headMeshExp.FileRef) as ExportEntry;
                     var newMDL = newMeshP.FindExport(targetMesh.InstancedFullPath);
 
-                    // Technically this should work
-                    //EntryImporter.ReplaceExportDataWithAnother(newMDL, targetMesh);
-                    // TODO: CACHE?
-                    var relinkFailures = EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.ReplaceSingular, newMDL, targetMesh.FileRef, targetMesh, true, new RelinkerOptionsPackage() { ErrorOccurredCallback = x => Debugger.Break() }, out _);
-                    if (relinkFailures.Any())
+                    // We check if it's null because custom outfits may change his mesh MDL. In the event we don't match,
+                    // we will not make changes.
+                    if (newMDL != null)
                     {
-                        MERLog.Fatal(@"FAILURE RELINKING THANE'S NO-EYELID MESH");
-                        Debugger.Break();
+                        var relinkFailures = EntryImporter.ImportAndRelinkEntries(
+                            EntryImporter.PortingOption.ReplaceSingular, newMDL, targetMesh.FileRef, targetMesh, true,
+                            new RelinkerOptionsPackage() { ErrorOccurredCallback = x => Debugger.Break() }, out _);
+                        if (relinkFailures.Any())
+                        {
+                            MERLog.Fatal(@"FAILURE RELINKING THANE'S NO-EYELID MESH");
+                            Debugger.Break();
+                        }
                     }
                 }
 

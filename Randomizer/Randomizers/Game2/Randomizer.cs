@@ -258,14 +258,14 @@ namespace Randomizer.Randomizers.Game2
                         SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizing game files [{currentFileNumber}/{files.Count}]");
 
 #if DEBUG
-                        if (false
-                        //&& false //uncomment to disable filtering
-                        // && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
-                        // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
-                        // && !file.Contains("Hub", StringComparison.InvariantCultureIgnoreCase)
-                        && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
-                        )
-                            return;
+                        //if (true
+                        ////&& false //uncomment to disable filtering
+                        //// && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
+                        //// && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
+                        ////&& !file.Contains("TwrHub", StringComparison.InvariantCultureIgnoreCase)
+                        //// && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
+                        //)
+                        //    return;
 #endif
                         try
                         {
@@ -357,6 +357,13 @@ namespace Randomizer.Randomizers.Game2
 
             // Create TOC
             TOCCreator.CreateTOCForGame(SelectedOptions.RandomizationTarget.Game, gameRootOverride: SelectedOptions.RandomizationTarget.TargetPath);
+
+            // Test for DLC merge folder.
+            // If it exists, we need to recreate it
+            if (SelectedOptions.RandomizationTarget.GetInstalledDLC().Contains("DLC_MOD_M3_MERGE"))
+            {
+                ModManagerIntegration.RequestM3Merge(SelectedOptions.RandomizationTarget.Game);
+            }
 
             // Re-throw the unhandled exception after MERFS has closed
             if (rethrowException != null)

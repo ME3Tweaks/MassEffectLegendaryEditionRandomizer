@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LegendaryExplorerCore.Packages;
@@ -39,8 +40,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
         private static bool RandomizeInstance(ExportEntry export)
         {
-            if (export.Archetype is ExportEntry archetype &&
-                archetype.ObjectFlags.HasFlag(UnrealFlags.EObjectFlags.DebugPostLoad))
+            if (export.Archetype is ExportEntry archetype && archetype.ObjectFlags.HasFlag(UnrealFlags.EObjectFlags.DebugPostLoad))
             {
                 var skmc = export.GetProperty<ObjectProperty>(@"SkeletalMeshComponent").ResolveToEntry(export.FileRef) as ExportEntry;
                 skmc?.RemoveProperty("AnimSets"); // Ensure AnimSets is not populated
@@ -52,28 +52,25 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
         private static bool RandomizeArchetype(GameTarget target, ExportEntry export)
         {
-            if (export.GetProperty<ObjectProperty>("SkeletalMeshComponent")?.ResolveToEntry(export.FileRef) is
-                ExportEntry smc)
+            if (export.GetProperty<ObjectProperty>("SkeletalMeshComponent")?.ResolveToEntry(export.FileRef) is ExportEntry smc)
             {
                 //Debug.WriteLine($"Installing new lite animations for {export.InstancedFullPath}");
                 var animsets = smc.GetProperty<ArrayProperty<ObjectProperty>>("AnimSets");
-                var animTreeTemplate =
-                    smc.GetProperty<ObjectProperty>("AnimTreeTemplate")?.ResolveToEntry(export.FileRef) as ExportEntry;
+                var animTreeTemplate = smc.GetProperty<ObjectProperty>("AnimTreeTemplate")?.ResolveToEntry(export.FileRef) as ExportEntry;
                 if (animsets != null && animTreeTemplate != null)
                 {
-                    int numAnimationsSupported = 0;
-                    // Count the total number of animations this litepawn supported
-                    // before we modify it - look at the animsets and count the number of 
-                    // sequences in each animset and total them up
-                    foreach (var animsetO in animsets)
-                    {
-                        var animset = animsetO.ResolveToEntry(export.FileRef) as ExportEntry;
-                        var sequences = animset.GetProperty<ArrayProperty<ObjectProperty>>("Sequences");
-                        numAnimationsSupported += sequences.Count;
-                    }
+                    var numAnimationsSupported = export.FileRef.Exports.Count(x => x.idxLink == animTreeTemplate.UIndex && x.IsA("AnimNodeSequence"));
+                    //// Count the total number of animations this litepawn supported
+                    //// before we modify it - look at the animsets and count the number of 
+                    //// sequences in each animset and total them up
+                    //foreach (var animsetO in animsets)
+                    //{
+                    //    var animset = animsetO.ResolveToEntry(export.FileRef) as ExportEntry;
+                    //    var sequences = animset.GetProperty<ArrayProperty<ObjectProperty>>("Sequences");
+                    //    numAnimationsSupported += sequences.Count;
+                    //}
 
-                    smc.RemoveProperty(
-                        "AnimSets"); // We want to force new animations. we'll waste a bit of memory doing this but oh well
+                    smc.RemoveProperty("AnimSets"); // We want to force new animations. we'll waste a bit of memory doing this but oh well
 
                     var installedGestures = new List<Gesture>();
                     var animationPackagesCache = new MERPackageCache(target, MERCaches.GlobalCommonLookupCache, true);
@@ -81,7 +78,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     {
                         // should we make sure they're unique?
 
-                        // Install gesture
+                        // Install gesture so the the SKM can use it
                         var randGest = GestureManager.InstallRandomFilteredGestureAsset(target, export.FileRef, 2,
                             filterKeywords: null, blacklistedKeywords: null, mainPackagesAllowed: null,
                             includeSpecial: true);
@@ -95,6 +92,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     var isSubfile = PackageTools.IsLevelSubfile(Path.GetFileName(export.FileRef.FilePath));
                     if (isSubfile)
                     {
+                        // Change the archetype name if this is a subfile - so it doesn't break imports
                         var newName = export.ObjectName + "_MER";
                         export.ObjectName = new NameReference(newName, ThreadSafeRandom.Next(25685462));
                     }
@@ -112,25 +110,35 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     {
                         animTreeTemplate = EntryCloner.CloneTree(animTreeTemplate, true);
                         animTreeTemplate.ObjectName = export.FileRef.GetNextIndexedName("MER_AnimTree"); // New name
-                        smc.WriteProperty(new ObjectProperty(animTreeTemplate,
-                            "AnimTreeTemplate")); // Write the template back
+                        smc.WriteProperty(new ObjectProperty(animTreeTemplate, "AnimTreeTemplate")); // Write the template back
+
+                        // Anim nodes will be changed due to clone. Update the referenced exports
                     }
                     else if (isSubfile)
                     {
                         // if it's a subfile it won't be used as an import
                         // Let's rename this object
-                        animTreeTemplate.ObjectName =
-                            new NameReference("MER_AnimTree", ThreadSafeRandom.Next(200000000)); // New name
+                        animTreeTemplate.ObjectName = new NameReference("MER_AnimTree", ThreadSafeRandom.Next(20000000)); // New name
                     }
 
+                    // Get the list of nodes to update under this anim tree export. This is the lazy way, technically...
+                    var animNodeSequences = export.FileRef.Exports.Where(x => x.idxLink == animTreeTemplate.UIndex && x.IsA("AnimNodeSequence")).ToList();
 
-                    var animNodeSequences = export.FileRef.Exports
-                        .Where(x => x.idxLink == animTreeTemplate.UIndex && x.IsA("AnimNodeSequence")).ToList();
+                    if (animNodeSequences.Count != installedGestures.Count)
+                    {
+                        Debugger.Break();
+                    }
                     for (int i = 0; i < installedGestures.Count; i++)
                     {
                         var installedG = installedGestures[i];
                         var ans = animNodeSequences[i];
+                        //if (ans.ObjectFlags.Has(UnrealFlags.EObjectFlags.DebugPostLoad))
+                        //{
+                        //    // Already edited!!
+                        //    // Debugger.Break();
+                        //}
                         ans.WriteProperty(new NameProperty(installedG.GestureAnim, "AnimSeqName"));
+                        ans.ObjectFlags |= UnrealFlags.EObjectFlags.DebugPostLoad; // Set as used
                     }
 
                     animTreeTemplate.ObjectFlags |= UnrealFlags.EObjectFlags.DebugPostLoad; // Set as used

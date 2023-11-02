@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime;
-using System.Threading;
-using System.Threading.Tasks;
 using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Kismet;
@@ -14,7 +10,6 @@ using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
-using PropertyChanged;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Talents;
 using Randomizer.Randomizers.Handlers;
@@ -25,6 +20,25 @@ namespace Randomizer.Randomizers.Game2.Misc
     public class HenchTalents
     {
         public const string SUBOPTION_HENCHPOWERS_REMOVEGATING = "SUBOPTION_HENCHPOWERS_REMOVEGATING";
+
+        /// <summary>
+        /// Creates a subclass of a class
+        /// </summary>
+        /// <param name="originalPowerClass"></param>
+        /// <param name="henchName"></param>
+        /// <returns></returns>
+        private static ExportEntry CreatePowerSubclass(ExportEntry originalPowerClass, string henchName)
+        {
+            MERLog.Information($"Subclassing {originalPowerClass} for power uniqueness");
+            var className = originalPowerClass.ObjectName + "_" + henchName;
+            var parentIfp = originalPowerClass.Parent.InstancedFullPath;
+            var destinationIFP = $"{parentIfp}.{className}";
+            //if (originalPowerClass.FileRef.FindExport(destinationIFP) != null)
+            //{
+            //    return originalPowerClass; // We are not going to subclass this - it already 
+            //}
+            return PackageTools.CreateNewClass(originalPowerClass.FileRef, className, $"class {className} extends {originalPowerClass.ObjectName};", originalPowerClass.Parent as ExportEntry);
+        }
 
         public static bool ShuffleSquadmateAbilitiesLE2(GameTarget target, RandomizationOption option)
         {
@@ -43,7 +57,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             using var allPowersP = MEPackageHandler.OpenMEPackageFromStream(allPowers, @"MERPowersBank.pcc");
 
             var henchBasePowers = PackageTools.GetExportList(allPowersP, "HenchPowersReferencer");
-            
+
             List<HTalent> talentPoolMaster = new List<HTalent>(); // The base powers list (should be half the size of evolvedTalentPoolMaster)
             List<HTalent> evolvedTalentPoolMaster = new List<HTalent>(); // The master list (DO NOT EDIT) of all rank 4 powers
             ConcurrentBag<string> passiveStrs = new ConcurrentBag<string>(); // The list of passive strings, resolved via TLK
@@ -86,6 +100,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 henchLoadouts.Add(new HenchLoadoutInfo() { LoadoutIFP = loadout.InstancedFullPath });
             }
 
+            var powersToSubclass = new List<string>();
             int baseAttempt = 0;
             bool powersConfigured = false; //if a solution was found
             while (!powersConfigured)
@@ -155,9 +170,27 @@ namespace Randomizer.Randomizers.Game2.Misc
                     continue; // Do a full retry
                 powersConfigured = true;
 
+                // Determine which powers need subclassed
+                var allPowersList = new List<string>();
+                foreach (var loadout in henchLoadouts)
+                {
+                    // Add all the items the list
+                    foreach (var ts in loadout.HenchTalentSet.Powers)
+                    {
+                        if (allPowersList.Contains(ts.PowerExport.InstancedFullPath))
+                        {
+                            powersToSubclass.Add(ts.PowerExport.InstancedFullPath);
+                        }
+                        allPowersList.Add(ts.PowerExport.InstancedFullPath);
+                    }
+                }
+
+
+
+
                 // Print results
                 MERLog.Information(
-                    $@"Found a power solution for basegame powers on henchmen in {baseAttempt} attempts:");
+                $@"Found a power solution for basegame powers on henchmen in {baseAttempt} attempts:");
                 foreach (var loadout in henchLoadouts)
                 {
                     MERLog.Information($"{loadout.LoadoutIFP}-----");
@@ -229,12 +262,19 @@ namespace Randomizer.Randomizers.Game2.Misc
                         var newProperties = talentSetBasePower.PowerExport.GetDefaults().GetProperties();
                         newProperties.RemoveNamedProperty(@"EvolvedPowerClass1"); // Do not bring over evos in this round
                         newProperties.RemoveNamedProperty(@"EvolvedPowerClass2"); // Do not bring over evos in this round
-                        var portedPower = PackageTools.PortExportIntoPackage(target, loadout.FileRef,
-                            talentSetBasePower.PowerExport);
-                        powersList.Add(new ObjectProperty(portedPower.UIndex));
 
+                        // Port in the base power
+                        var portedPower = PackageTools.PortExportIntoPackage(target, loadout.FileRef, talentSetBasePower.PowerExport);
+                        if (powersToSubclass.Contains(portedPower.InstancedFullPath))
+                        {
+                            portedPower = CreatePowerSubclass(portedPower, henchInfo.HenchUIName);
+                        }
+
+                        powersList.Add(new ObjectProperty(portedPower.UIndex));
                         talentSetBasePower.PowerExport.GetDefaults().WriteProperties(savedProperties); // restore properties
+                        talentSetBasePower.PowerExport = portedPower; // Use the custom ported version so we don't interfere with anything
                         option.IncrementProgressValue();
+
                         // For each power, change the evolutions
                         var defaults = portedPower.GetDefaults();
                         var props = defaults.GetProperties();
@@ -246,19 +286,31 @@ namespace Randomizer.Randomizers.Game2.Misc
                             EvolvedTalent1 = evolution1,
                             EvolvedTalent2 = evolution2
                         });
-                        if (portedPower.FileRef.FindExport(evolution1.PowerExport.InstancedFullPath) != null)
-                        {
-                            evolution1.SetUniqueName(henchInfo.HenchUIName);
-                        }
+                        //if (portedPower.FileRef.FindExport(evolution1.PowerExport.InstancedFullPath) != null)
+                        //{
+                        //    evolution1.SetUniqueName(henchInfo.HenchUIName);
+                        //}
 
-                        if (portedPower.FileRef.FindExport(evolution2.PowerExport.InstancedFullPath) != null)
-                        {
-                            evolution2.SetUniqueName(henchInfo.HenchUIName);
-                        }
+                        //if (portedPower.FileRef.FindExport(evolution2.PowerExport.InstancedFullPath) != null)
+                        //{
+                        //    evolution2.SetUniqueName(henchInfo.HenchUIName);
+                        //}
+
+                        // Porting in the evolutions that will be used
                         var evo1 = PackageTools.PortExportIntoPackage(target, portedPower.FileRef,
                             evolution1.PowerExport);
                         var evo2 = PackageTools.PortExportIntoPackage(target, portedPower.FileRef,
                             evolution2.PowerExport);
+
+                        // Create special subclasses
+                        if (powersToSubclass.Contains(evo1.InstancedFullPath))
+                        {
+                            evo1 = CreatePowerSubclass(evo1, henchInfo.HenchUIName);
+                        }
+                        if (powersToSubclass.Contains(evo2.InstancedFullPath))
+                        {
+                            evo2 = CreatePowerSubclass(evo2, henchInfo.HenchUIName);
+                        }
 
                         evolution1.ResetSourcePowerName();
                         evolution2.ResetSourcePowerName();
@@ -409,7 +461,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                     //    configuredPowers.Add(mp);
                     //}
 
-                    loadoutProps.AddOrReplaceProp(BuildAutoRankList(loadout, configuredPowers));
+                    loadoutProps.AddOrReplaceProp(BuildAutoRankList(option, loadout, configuredPowers));
 
                     // Finalize loadout export
                     loadout.WriteProperties(loadoutProps);
@@ -432,10 +484,10 @@ namespace Randomizer.Randomizers.Game2.Misc
                         properties.RemoveNamedProperty("Rank");
                         if (properties.RemoveNamedProperty("UnlockRequirements"))
                         {
-                            Debug.WriteLine("T");
+                            // Debug.WriteLine("T");
                         }
 
-                        // All squadmates have a piont in Slot 0 by default.
+                        // All squadmates have a point in Slot 0 by default.
                         // Miranda and Jacob have a point in slot 1
                         if (henchInfo.HenchUIName == "Kenson")
                         {
@@ -458,9 +510,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                             {
                                 // Has unlock dependency on the prior slotted item
                                 var dependencies = new ArrayProperty<StructProperty>("UnlockRequirements");
-                                dependencies.AddRange(GetUnlockRequirementsForPower(
-                                    loadout.FileRef.FindExport(talentSet.Powers[i - 1].PowerExport.InstancedFullPath),
-                                    false));
+                                dependencies.AddRange(GetUnlockRequirementsForPower(loadout.FileRef.FindExport(talentSet.Powers[i - 1].PowerExport.InstancedFullPath), false));
                                 properties.AddOrReplaceProp(dependencies);
                             }
                         }
@@ -482,16 +532,28 @@ namespace Randomizer.Randomizers.Game2.Misc
 
             #endregion
 
+            // Fix for Shadow Broker DLC - KasumiUnique being dropped out of memory for BioP_Exp1Lvl2
+            var kasumiunique = PackageTools.PortExportIntoPackage(target, loadoutPackageP, allPowersP.FindExport("SFXGameContentKasumi.SFXPower_KasumiUnique"));
+            PackageTools.AddToObjectReferencer(kasumiunique);
+
             // Save the new startup package
             MERFileSystem.SavePackage(loadoutPackageP);
 
             // Add the loadouts as a startup package to force overrides
             ThreadSafeDLCStartupPackage.AddStartupPackage(@"Startup_LE2R_HenchLoadouts");
 
-            // Patch the initialize function for henchmen to refund any lost points
-            ScriptTools.InstallScriptToPackage(target, @"SFXGame.pcc", "SFXPawn_Henchman.InitializeHenchman",
-                "InitializeHenchman.uc", false, true);
+            var sfxgame = SFXGame.GetSFXGame(target);
 
+            // Patch the initialize function for henchmen to refund any lost points
+            ScriptTools.InstallScriptToPackage(target, sfxgame, "SFXPawn_Henchman.InitializeHenchman", "InitializeHenchman.uc", false);
+
+            // Patch the squad select screen to show accurate powers list 
+            ScriptTools.InstallScriptToPackage(target, sfxgame, "BioSFHandler_PartySelection.SetInfo", "BioSFHandler_PartySelection.SetInfo.uc", false);
+
+            // Patch ChangeAI to pop the stack before AI switch - (hopefully) fixes game crash from two AIs running when only one has a pawn set (HenchShadowStrike)
+            ScriptTools.InstallScriptToPackage(target, sfxgame, "BioAiController.ChangeAI", "BioAiController.ChangeAI.uc", false);
+
+            MERFileSystem.SavePackage(sfxgame);
             // Patch the game tutorial to prevent softlock
             PatchOutTutorials(target);
 
@@ -1283,7 +1345,6 @@ namespace Randomizer.Randomizers.Game2.Misc
                     evolvedPower1 = baseDefaults.GetProperty<ObjectProperty>("EvolvedPowerClass1");
                 }
 
-
                 // Loyalty power has no unlock requirement beyond SFXPower_Loyalty
 
                 // Evolved power 1
@@ -1301,20 +1362,39 @@ namespace Randomizer.Randomizers.Game2.Misc
             return powerRequirements;
         }
 
-        private static ArrayProperty<StructProperty> BuildAutoRankList(ExportEntry loadout, List<MappedPower> mappedPowers)
+        /// <summary>
+        /// Builds the auto level up structure
+        /// </summary>
+        /// <param name="loadout"></param>
+        /// <param name="mappedPowers"></param>
+        /// <returns></returns>
+        private static ArrayProperty<StructProperty> BuildAutoRankList(RandomizationOption option, ExportEntry loadout, List<MappedPower> mappedPowers)
         {
+            // Auto level up system works as follows:
+            // when 'auto level up' is run, it attempts to purchase all items in the specified order
+            // Ranks already purchased are not spent on.
+            // Ranks not eligible (locked) are not spent on
+            // Order in this case may matter - locked powers should always have their unlock requirements go first
             ArrayProperty<StructProperty> alui = new ArrayProperty<StructProperty>("PowerLevelUpInfo");
             Dictionary<MappedPower, int> rankMap = mappedPowers.ToDictionary(x => x, x => 1);
+            bool hasUnlockedSecondSlot = option.HasSubOptionSelected(SUBOPTION_HENCHPOWERS_REMOVEGATING);
             while (rankMap.Any(x => x.Value != 4))
             {
                 // Add ranks
                 var mp = mappedPowers.RandomElement();
-                while (rankMap[mp] >= 4)
+                while (rankMap[mp] >= 4 || (!hasUnlockedSecondSlot && mappedPowers.IndexOf(mp) == 1)) // If it's already rank 4, repick
                 {
                     mp = mappedPowers.RandomElement(); // Repick
                 }
 
+
+
                 var newRank = rankMap[mp] + 1;
+
+                if (mappedPowers.IndexOf(mp) == 0 && newRank >= 2)
+                {
+                    hasUnlockedSecondSlot = true; // We have unlocked the second power slot
+                }
 
                 PropertyCollection props = new PropertyCollection();
                 props.Add(new ObjectProperty(loadout.FileRef.FindExport(mp.BaseTalent.PowerExport.InstancedFullPath).UIndex, "PowerClass"));

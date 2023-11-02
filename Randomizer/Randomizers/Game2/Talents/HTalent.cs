@@ -201,7 +201,7 @@ namespace Randomizer.Randomizers.Game2.Talents
         /// <summary>
         /// The usable power export
         /// </summary>
-        public ExportEntry PowerExport { get; }
+        public ExportEntry PowerExport { get; set; }
 
         /// <summary>
         /// The base name of the power that is used for mapping in config

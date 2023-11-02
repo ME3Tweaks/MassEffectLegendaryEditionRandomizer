@@ -26,10 +26,11 @@
                 if (ThePlayerRecord.bIsFemale)
                 {
                     PackageName = "BIOG_HMF_HED_PROMorph_R";
-                    Class'SFXGame'.static.LoadPackage(PackageName);
+                    Class'SFXGame'.static.LoadPackage("BIOG_Female_Player_C");
                     OuterPackage = Package(FindObject(PackageName, Class'Package'));
                     MorphHead = new (MorphHead.Outer) Class'BioMorphFace';
-                    MorphHead.m_oBaseHead = SkeletalMesh(FindObject(PackageName $ ".Sheppard.HMF_HED_PROSheppard_MDL", Class'SkeletalMesh'));
+                    MorphHead.m_oBaseHead = SkeletalMesh(DynamicLoadObject("BIOG_HMF_HED_PROMorph_R.PROSheppard.HMF_HED_PROSheppard_MDL", Class'SkeletalMesh'));
+                    MorphHead.m_oHairMesh = SkeletalMesh(DynamicLoadObject("BIOG_HMF_HIR_PRO.Hair_PROShepard.HMF_HIR_PROShepard_MDL", Class'SkeletalMesh'));
                 }
                 else
                 {

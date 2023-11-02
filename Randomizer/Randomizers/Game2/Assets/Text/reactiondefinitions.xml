@@ -1,5 +1,7 @@
 <ReactionDefinitions>
   <!--
+  Written by sinsofawindmill
+  
     face: 
       - each reaction can have multiple faces. they will be chosen at random.
     keyword: 
@@ -509,7 +511,7 @@
     <keyword>giving you</keyword>
     <keyword>gave you</keyword>
     <keyword>flower</keyword>
-    <keyword>old times</keyword>
+    <keyword>itemToClone times</keyword>
     <keyword>feel you</keyword>
     <keyword>together</keyword>
     <keyword> advantage</keyword>
