@@ -9,6 +9,7 @@
                       xmlns:classes1="clr-namespace:RandomizerUI.Classes"
                       xmlns:randomizers="clr-namespace:Randomizer.Randomizers;assembly=Randomizer"
                       xmlns:targets="clr-namespace:ME3TweaksCore.Targets;assembly=ME3TweaksCore"
+                      xmlns:mer="clr-namespace:Randomizer.MER;assembly=Randomizer"
                       x:Class="RandomizerUI.MainWindow" 
                       IconScalingMode="ScaleDownLargerFrame" 
                       mc:Ignorable="d" 
@@ -230,7 +231,8 @@
             <Controls:Flyout x:Name="FirstRunFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="Flyout_Doubleclick" MouseDown="Flyout_Mousedown" IsOpen="{Binding FirstRunFlyoutOpen}">
                 <Border Padding="10">
                     <Border.Background>
-                        <ImageBrush ImageSource="{Binding FirstRunBackgroundImage}" AlignmentY="Center" Stretch="UniformToFill"/>
+                        Black
+                        <!--<ImageBrush ImageSource="{Binding FirstRunBackgroundImage}" AlignmentY="Center" Stretch="UniformToFill"/>-->
                     </Border.Background>
                     <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Margin="0,95,0,0" Width="700">
                         <StackPanel Margin="0,0,0,40">
@@ -287,9 +289,9 @@
                         </Border>
                     </StackPanel>
                 </StackPanel>
-                <DockPanel Margin="35,0">
+                <DockPanel Margin="35,0" IsEnabled="{Binding AllowOptionsChanging}">
                     <GroupBox Header="Presets" DockPanel.Dock="Left">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,0,5" IsEnabled="{Binding AllowOptionsChanging}">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,0,5">
                             <Button Content="I want a good laugh" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="FunMode_Click"/>
                             <Button Content="I want varied gameplay" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="GameplayMode_Click"/>
                             <Button Content="Developer recommended" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="Recommended_Click"/>
@@ -366,7 +368,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Bottom"  IsEnabled="{Binding AllowOptionsChanging}">
+                    <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Bottom" IsEnabled="{Binding AllowOptionsChanging}">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Right">
                             <StackPanel>
 
@@ -460,7 +462,7 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Images">
+                        <TabItem Header="Images" Visibility="{Binding ShowImageCredits, Converter={StaticResource BoolToVisibilityConverter}}">
                             <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="1100">
                                 <TextBlock DockPanel.Dock="Top" Margin="0,5" Text="Mass Effect 2 Randomizer uses the following images from third party sources. Images that required explicit permission for use may not be reused without their own license." TextWrapping="Wrap" TextAlignment="Center"/>
                                 <ListBox ItemsSource="{Binding ImageCredits}" Background="Transparent" ItemTemplate="{StaticResource CreditTemplate}">
@@ -499,12 +501,12 @@
                             </Grid.ColumnDefinitions>
                             <Image Source="masseffectrandomizer.ico" Grid.Row="0" Grid.Column="0" Margin="4" ToolTip="Hello!" RenderOptions.BitmapScalingMode="HighQuality"/>
                             <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,3,0,0">
-                                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Text="Mass Effect 2 Randomizer" FontWeight="Light" />
+                                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Text="{Binding RandomizerName}" FontWeight="Light" />
                                 <TextBlock x:Name="TextBlock_AssemblyVersion" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="15" FontWeight="Light" Text="Version" />
                                 <Image HorizontalAlignment="Left" Height="32" VerticalAlignment="Top" Source="images/me3tweaks.png" Margin="8,0,0,0" Cursor="Hand" MouseDown="Image_ME3Tweaks_Click" ToolTip="Software developed with love by ME3Tweaks" RenderOptions.BitmapScalingMode="HighQuality" />
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Left" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3,0,0">
-                                <TextBlock Text="Copyright (C) 2019-2021 ME3Tweaks&#xA;&#xA;This program is free software: you can redistribute it and/or modify it under the terms of the&#xA;GNU General Public License as published by the Free Software Foundation, either version 3 of the&#xA;License, or (at your option) any later version.&#xA;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without&#xA;even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the&#xA;GNU General Public License for more details.&#xA;&#xA;Mass Effect 2 is a registered trademark of EA INTERNATIONAL (STUDIO&#xA;AND PUBLISHING) LTD. This program has no affiliation with BioWare&#xA;or Electronic Arts." />
+                                <TextBlock Text="{Binding CopyrightString}"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>

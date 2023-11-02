@@ -204,7 +204,8 @@ namespace RandomizerUI
             contributors.Add("Clericofshadows - 3D modeling");
             contributors.Add("Mellin - 3D modeling");
             contributors.Add("sinsofawindmill - UwU Emoticons implementation");
-            contributors.Add("benefactor - technical");
+            contributors.Add("benefactor - Technical");
+            contributors.Add("Audemus - ME2R images & templates");
             contributors.Sort();
             return contributors;
         }
@@ -323,12 +324,29 @@ namespace RandomizerUI
             }
         }
 
-        public string IntroTitleText => $"Welcome to {MERUtilities.GetGameUIName(true)} Legendary Edition Randomizer";
-        public string IntroTitleSubText => $"Please read the following information to help ensure you have the best experience\nwith {MERUtilities.GetGameUIName(true)} Legendary Edition Randomizer ({MERUtilities.GetRandomizerShortName()}).";
+        public string RandomizerName => $"{MERUtilities.GetGameUIName(true)} Legendary Edition Randomizer";
+        public string IntroTitleText => $"Welcome to {RandomizerName}";
+        public string IntroTitleSubText => $"Please read the following information to help ensure you have the best experience\nwith {RandomizerName} ({MERUtilities.GetRandomizerShortName()}).";
         public ICommand OptionTogglerCommand { get; set; }
 
+#if __GAME1__ || __GAME3__
+        public bool ShowImageCredits => true;
+#else
+        // LE2R does not use third party images
+        public bool ShowImageCredits => false;
+#endif
 
-        private bool CanStartRandomization()
+        /// <summary>
+        /// The displayed copyright string
+        /// </summary>
+        public string CopyrightString { get; set; }
+
+        public void SetupCopyrightString()
+        {
+            CopyrightString = $"Copyright (C) 2019-{(BuildHelper.BuildDate.Year > 2018 ? BuildHelper.BuildDate.Year : 2023)} ME3Tweaks\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the\nGNU General Public License as published by the Free Software Foundation, either version 3 of the\nLicense, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without\neven the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\nGNU General Public License for more details.\n\n{MERUtilities.GetGameUIName(true)} is a registered trademark of EA INTERNATIONAL (STUDIO AND PUBLISHING) LTD.\nThis program has no affiliation with BioWare or Electronic Arts.";
+        }
+
+    private bool CanStartRandomization()
         {
             if (SeedTextBox == null || !int.TryParse(SeedTextBox.Text, out var value) || value == 0)
                 return false;

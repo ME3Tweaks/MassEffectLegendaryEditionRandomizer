@@ -121,18 +121,15 @@ namespace RandomizerUI.Classes.Controllers
                     RunOnUiThreadDelegate = RunOnUIThread,
                     LoadAuxiliaryServices = false,
                     LECPackageSaveFailedCallback = x => MERLog.Error($@"Failed to save package: {x}"),
-#if __GAME1__
-                    PropertyDatabasesToLoad = new [] { MEGame.LE1 },
-#elif __GAME2__
-                    PropertyDatabasesToLoad = new[] { MEGame.LE2 },
-#elif __GAME3__
-                    PropertyDatabasesToLoad = new [] { MEGame.LE3 },
-#endif
+                    PropertyDatabasesToLoad = new[] { MERFileSystem.Game },
+                    AllowedSigners = new[] { new BuildHelper.BuildSigner() { SigningName = "Michael Perez", DisplayName = "ME3Tweaks" } },
+                    LoadBuildInfo = true
                 };
 
 
                 // Initialize core libraries
                 ME3TweaksCoreLib.Initialize(package);
+                window.SetupCopyrightString(); // We should now have loaded this
 
                 // Logger is now available
 
@@ -315,14 +312,17 @@ namespace RandomizerUI.Classes.Controllers
                         // Post critical startup
 
                         Random random = new Random();
+                        // LE2R does not use images like ME2R
+#if __GAME1__
                         window.ImageCredits.ReplaceAll(ImageCredit.LoadImageCredits("imagecredits.txt", false));
+#endif
                         window.ContributorCredits.ReplaceAll(window.GetContributorCredits());
                         window.LibraryCredits.ReplaceAll(LibraryCredit.LoadLibraryCredits("librarycredits.txt"));
-// Todo: remove seed textbox as it's not used anymore, we don't support deterministic randomization
+                        // Todo: remove seed textbox as it's not used anymore, we don't support deterministic randomization
 #if !DEBUG
                         window.SeedTextBox.Text = 529572808.ToString();
 #else
-                    window.SeedTextBox.Text = random.Next().ToString();
+                        window.SeedTextBox.Text = random.Next().ToString();
 #endif
                         window.TextBlock_AssemblyVersion.Text = $"Version {MLibraryConsumer.GetAppVersion()}";
 

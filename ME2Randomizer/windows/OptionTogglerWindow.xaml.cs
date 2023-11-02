@@ -44,6 +44,12 @@ namespace RandomizerUI.windows
     public partial class OptionTogglerWindow : MetroWindow
     {
         public ObservableCollection<MERRuntimeOption> InstalledOptions { get; } = new();
+
+        /// <summary>
+        /// Options that the user cannot modify
+        /// </summary>
+        private List<MERRuntimeOption> HiddenOptions { get; } = new();
+
         public OptionTogglerWindow()
         {
             MERUILog.Information($"OptionToggler: Opening window");
@@ -53,12 +59,18 @@ namespace RandomizerUI.windows
             GetInstalledOptions();
         }
 
+        public bool IsEmptyList { get; set; }
         public ICommand CancelCommand { get; set; }
         public ICommand SaveCommand { get; set; }
         private void LoadCommands()
         {
             CancelCommand = new GenericCommand(Close);
-            SaveCommand = new GenericCommand(SaveChanges);
+            SaveCommand = new GenericCommand(SaveChanges, CanSaveChanges);
+        }
+
+        private bool CanSaveChanges()
+        {
+            return InstalledOptions != null && InstalledOptions.Any(); // UI options must exist for this to save
         }
 
         private List<MERRuntimeOption> GetInstalledOptions()
@@ -74,13 +86,31 @@ namespace RandomizerUI.windows
                 // Only type 2 is supported - lists cannot be edited by this UI.
                 if (v.Value[0].ParseAction == CoalesceParseAction.Add)
                 {
-                    options.Add(new MERRuntimeOption(v.Key, v.Value));
+                    if (!IsHiddenOption(v.Key))
+                    {
+                        options.Add(new MERRuntimeOption(v.Key, v.Value));
+                    }
+                    else
+                    {
+                        HiddenOptions.Add(new MERRuntimeOption(v.Key, v.Value));
+                    }
                 }
             }
 
             InstalledOptions.ReplaceAll(options.OrderBy(x=>x.DisplayString));
-
+            IsEmptyList = InstalledOptions.Count == 0;
             return options;
+        }
+
+        private bool IsHiddenOption(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "bSuicideMissionRandomizationInstalled":
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private void SaveChanges()
@@ -90,7 +120,7 @@ namespace RandomizerUI.windows
             var section = engine.GetOrAddSection("Engine.MERControlEngine");
 
             section.RemoveAll(x => x.Value.Any(x => x.ParseAction == CoalesceParseAction.Add)); // 'Add' properties are removed. Add Uniques are lists which are not cleared or supported by this UI
-            foreach (var v in InstalledOptions)
+            foreach (var v in InstalledOptions.Concat(HiddenOptions))
             {
                 string valueStr = "";
                 if (v.IsBoolProperty)

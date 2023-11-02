@@ -136,6 +136,14 @@ namespace Randomizer.MER
                 case "bPawnColorsRandomizer":
                     DisplayString = RTO_TITLE_NPCCOLORS;
                     break;
+                case "bRandomizeWeaponStats":
+                    DisplayString = RTO_TITLE_WEAPONSTATS;
+                    break;
+
+                // Installed option flags - user cannot edit these
+                case "bSuicideMissionRandomizationInstalled":
+                    DisplayString = "Suicide Mission Randomizer: Installed";
+                    break;
 #endif
                 default:
                     DisplayString = $"Unknown property: {PropertyName}";
