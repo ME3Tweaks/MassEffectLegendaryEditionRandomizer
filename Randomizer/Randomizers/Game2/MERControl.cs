@@ -101,7 +101,6 @@ namespace Randomizer.Randomizers.Game2
             MERFileSystem.SavePackage(engine);
 
             var sfxgame = SFXGame.GetSFXGame(target);
-            // InstallObjectPinSystem(target, sfxgame); // Must come first as MERControl depends on this
             ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
             // MERFileSystem.SavePackage(sfxgame);
             return true;

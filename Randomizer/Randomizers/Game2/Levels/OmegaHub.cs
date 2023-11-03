@@ -64,6 +64,17 @@ namespace Randomizer.Randomizers.Game2.Levels
             var interp3 = KismetHelper.CloneObject(interp1);
 
 
+            var fadeToBlack = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_1");
+            var setGestureMode = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_SetGestureMode_1");
+            KismetHelper.CreateOutputLink(interp2, "Completed", setGestureMode);
+            KismetHelper.CreateOutputLink(interp2, "Stopped", setGestureMode);
+            KismetHelper.CreateOutputLink(interp2, "ExitDance", fadeToBlack);
+            KismetHelper.CreateOutputLink(interp3, "Completed", setGestureMode);
+            KismetHelper.CreateOutputLink(interp3, "Stopped", setGestureMode);
+            KismetHelper.CreateOutputLink(interp3, "ExitDance", fadeToBlack);
+
+
+
             // Clone the interp data for attaching to 2 and 3
             var interpData1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.InterpData_0");
             var interpData2 = KismetHelper.CloneObject(interpData1);

@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.TLK.ME2ME3;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers;
+using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Misc
@@ -48,6 +53,26 @@ namespace Randomizer.Randomizers.Game2.Misc
             MERFileSystem.SavePackage(sfxgame);
             return true;
         }
+
+        public static bool RandomizeGameOverString(GameTarget target, RandomizationOption option)
+        {
+            // Install rotation code for strref
+            MERControl.InstallMERControl(target);
+            var sfxgame = SFXGame.GetSFXGame(target);
+            ScriptTools.InstallScriptToPackage(target, sfxgame, "BioSFHandler_GameOver.HandleEvent", "BioSFHandler_GameOver.HandleEvent.uc", false);
+            MERFileSystem.SavePackage(sfxgame);
+
+            // Install TLK strings
+            var tlkData = MEREmbedded.GetEmbeddedAsset("Binary", "TLK.GameOverStrings_INT.tlk");
+            var tlk = new ME2ME3TalkFile(tlkData);
+            foreach (var str in tlk.StringRefs)
+            {
+                CoalescedHandler.SetProperty(new CoalesceProperty("srGameOverOptions", new CoalesceValue(str.StringID.ToString(), CoalesceParseAction.AddUnique)));
+            }
+
+            return true;
+        }
+
 
         public const string SUBOPTIONKEY_CARELESSFF = "CarelessMode";
 
@@ -141,7 +166,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 PackageTools.CreateNewClass(sfxGame, @"SFXLoadoutDataMER", classText);
 
                 // Patch the loadout generation method
-                ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc");
+                ScriptTools.InstallScriptToExport(target, sfxGame.FindExport("BioPawn.GenerateInventoryFromLoadout"), "GenerateInventoryFromLoadout.uc");
             }
 
             return sfxGame;

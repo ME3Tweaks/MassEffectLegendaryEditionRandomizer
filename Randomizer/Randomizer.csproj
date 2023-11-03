@@ -143,6 +143,7 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_AwardTreasure.Activated.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_ShowCharacterCreation.Activated.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_GameOver.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.ApplyNewCode.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc" />

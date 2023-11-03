@@ -519,11 +519,12 @@ public static function BioPawn_RandomizeLookAt(BioPawn BP)
     BP.m_fLookAtMinHoldTime *= FRand() * 2.0;
     BP.m_fLookAtMaxHoldTime *= FRand() * 2.0;
     BP.m_fLookAtMaxAngle *= FRand() * 2.0;
-    BP.ViewPitchMin *= FRand() * 2.0;
-    BP.ViewPitchMax *= FRand() * 2.0;
-    if (BP.m_oLookAtData != None)
+    
+    // Do not change player view pitch
+    if (SFXPawn_Player(BP) == None)
     {
-        LogInternal("Num look controllers: " $ BP.m_oLookAtData.m_Controllers.Length, );
+        BP.ViewPitchMin *= FRand() * 2.0;
+        BP.ViewPitchMax *= FRand() * 2.0;
     }
 }
 public static function float GetDefaultScalarMIC(Name ParameterName, MaterialInstanceConstant MIC)

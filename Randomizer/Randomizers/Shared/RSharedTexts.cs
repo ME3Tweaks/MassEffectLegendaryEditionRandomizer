@@ -76,6 +76,9 @@ namespace Randomizer.Randomizers.Shared
         /// <returns></returns>
         public static bool RandomizeGameOverText(GameTarget target, RandomizationOption arg)
         {
+#if __GAME2__
+            throw new Exception("No longer shared!");
+#endif
             string fileContents = MEREmbedded.GetEmbeddedTextAsset("gameovertexts.xml");
             XElement rootElement = XElement.Parse(fileContents);
             var gameoverTexts = rootElement.Elements("gameovertext").Select(x => x.Value).ToList();

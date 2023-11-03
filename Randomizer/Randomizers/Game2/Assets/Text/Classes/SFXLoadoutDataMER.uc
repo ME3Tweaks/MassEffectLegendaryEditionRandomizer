@@ -127,7 +127,7 @@ private final function RandomizePowers(BioPawn BP)
     local bool bHasDeathPower;
     local bool bHasMeleePower;
     local bool isLoadingMeleePower;
-
+    
     if (!CanRandomizePowers(BP))
     {
         return;
@@ -140,17 +140,23 @@ private final function RandomizePowers(BioPawn BP)
             continue;
         }
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
-        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && bHasDeathPower)
+        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death)
         {
-            continue;
+            if (bHasDeathPower)
+            {
+                continue;
+            }
+            if (BP.Controller != None && BP.Controller.IsA('SFXAI_Krogan'))
+            {
+                continue;
+            }
         }
         if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && BP.IsA('SFXPawn_Collector'))
         {
-            // This messes up their death thing when possessed
             continue;
         }
-        isLoadingMeleePower = InStr(PowerInfo.BasePowerName, "Melee", TRUE) >= 0;
-        if (!bHasMeleePower && !isLoadingMeleePower && BP.IsA('SFXPawn_HuskLite'))
+        isLoadingMeleePower = InStr(PowerInfo.BasePowerName, "Melee", TRUE, , ) >= 0;
+        if ((!bHasMeleePower && !isLoadingMeleePower) && BP.IsA('SFXPawn_HuskLite'))
         {
             continue;
         }
@@ -173,8 +179,9 @@ private final function RandomizePowers(BioPawn BP)
                 {
                     bHasDeathPower = TRUE;
                 }
-                if (isLoadingMeleePower){
-                    bHasMeleePower = true;
+                if (isLoadingMeleePower)
+                {
+                    bHasMeleePower = TRUE;
                 }
                 LogInternal("Set Power to " $ NewPower, );
             }

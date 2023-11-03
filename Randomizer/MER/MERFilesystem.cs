@@ -41,7 +41,7 @@ namespace Randomizer.MER
         /// </summary>
         public static MEGame Game = MEGame.LE2;
         public static readonly string[] filesToSkip = { "RefShaderCache-PC-D3D-SM5.upk", "IpDrv.pcc", "WwiseAudio.pcc", "SFXOnlineFoundation.pcc", "GFxUI.pcc" };
-        public static readonly string[] alwaysBasegameFiles = { "Startup_INT.pcc", "Engine.pcc", "GameFramework.pcc", "SFXGame.pcc", "EntryMenu.pcc", "BIOG_Male_Player_C.pcc" };
+        public static readonly string[] alwaysBasegameFiles = EntryImporter.FilesSafeToImportFrom(Game).Select(x=>Path.GetFileNameWithoutExtension(x).StripUnrealLocalization()).ToArray();
 #elif __GAME3__
         /// <summary>
         /// The game this randomizer supports - this is the authoritative game
@@ -254,10 +254,9 @@ namespace Randomizer.MER
                 {
                     packageNameNoLocalization = packageNameNoLocalization.Substring(0, packageNameNoLocalization.LastIndexOf("_", StringComparison.InvariantCultureIgnoreCase));
                 }
-                packageNameNoLocalization += Path.GetExtension(forcedFileName ?? package.FilePath);
 
                 // Todo: This might need to check for things like Startup_ESN!
-                if (!EntryImporter.FilesSafeToImportFrom(package.Game).Contains(packageNameNoLocalization, StringComparer.InvariantCultureIgnoreCase))
+                if (!alwaysBasegameFiles.Contains(packageNameNoLocalization, StringComparer.InvariantCultureIgnoreCase))
                 {
                     var fname = Path.GetFileName(forcedFileName ?? package.FilePath);
                     var packageNewPath = Path.Combine(DLCModCookedPath, fname);

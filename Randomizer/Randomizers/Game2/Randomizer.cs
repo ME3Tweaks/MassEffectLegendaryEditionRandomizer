@@ -13,6 +13,7 @@ using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
+using LegendaryExplorerCore.Misc.ME3Tweaks;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
@@ -362,7 +363,7 @@ namespace Randomizer.Randomizers.Game2
             // If it exists, we need to recreate it
             if (SelectedOptions.RandomizationTarget.GetInstalledDLC().Contains("DLC_MOD_M3_MERGE"))
             {
-                ModManagerIntegration.RequestM3Merge(SelectedOptions.RandomizationTarget.Game);
+                MERModManagerIntegration.RequestM3Merge(SelectedOptions.RandomizationTarget.Game);
             }
 
             // Re-throw the unhandled exception after MERFS has closed
@@ -1103,7 +1104,7 @@ namespace Randomizer.Randomizers.Game2
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
                     new RandomizationOption() {HumanName = "Game over text",
-                        PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeGameOverText,
+                        PerformSpecificRandomizationDelegate = SFXGame.RandomizeGameOverString,
                         RequiresTLK = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         IsRecommended = true,

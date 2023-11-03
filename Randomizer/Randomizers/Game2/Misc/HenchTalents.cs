@@ -523,6 +523,13 @@ namespace Randomizer.Randomizers.Game2.Misc
                             properties.AddOrReplaceProp(dependencies);
                         }
 
+                        // If no dependencies are set, we force them to be empty. This covers edge cases like Morinth's passive inheriting from Samara's.
+                        if (properties.GetProp<ArrayProperty<StructProperty>>("UnlockRequirements") == null)
+                        {
+                            var dependencies = new ArrayProperty<StructProperty>("UnlockRequirements");
+                            properties.AddOrReplaceProp(dependencies);
+                        }
+
                         defaults.WriteProperties(properties);
                     }
                 }

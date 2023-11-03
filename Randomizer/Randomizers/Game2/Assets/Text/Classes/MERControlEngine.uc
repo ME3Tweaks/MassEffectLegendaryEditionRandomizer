@@ -34,6 +34,8 @@ var config float fIconicFaceRandomization;
 // Was the suicide randomization installed? required for Collector AI changes
 var config bool bSuicideMissionRandomizationInstalled;
 
+var config array<stringref> srGameOverOptions;
+
 // Functions
 public static function float RandFloat(float minf, float maxf)
 {
@@ -101,6 +103,12 @@ public static function Actor FindActorByTag(Name m_sObjectTagToFind, optional bo
     return None;
 }
 
+public static function stringref GetRandomGameOverString(){
+    if (default.srGameOverOptions.Length > 0){
+        return default.srGameOverOptions[Rand(default.srGameOverOptions.Length)];
+    }
+    return $157152;
+}
 
 //class default properties can be edited in the Properties tab for the class's Default__ object.
 defaultproperties
