@@ -421,6 +421,10 @@ public static function BioPawn_RandomizeSpeed(BioPawn BP)
     local bool bAffectPlayer;
     local bool bAffectNonPlayer;
     
+    if ((BP.PawnType == None || BP.PawnType.m_oAppearance == None) || BP.PawnType.m_oAppearance.MovementInfo == None)
+    {
+        return;
+    }
     bAffectPlayer = Class'MERControlEngine'.default.bPlayerMovementSpeedRandomizer && SFXPawn_Player(BP) != None;
     bAffectNonPlayer = Class'MERControlEngine'.default.bNPCMovementSpeedRandomizer && SFXPawn_Player(BP) == None;
     if (bAffectPlayer || bAffectNonPlayer)
@@ -463,18 +467,28 @@ public static function BioPawn_RandomizeLookAt(BioPawn BP)
     {
         return;
     }
-    ApprChar = BP.PawnType.m_oAppearance;
-    if (BP.Mesh != None)
+    if (BP.PawnType == None)
     {
-        BP.Mesh.GetBoneNames(BoneNames);
+        return;
     }
+    ApprChar = BP.PawnType.m_oAppearance;
     if (ApprChar != None)
     {
+        if (BP.Mesh != None)
+        {
+            BP.Mesh.GetBoneNames(BoneNames);
+        }
+        if (BoneNames.Length == 0)
+        {
+            return;
+        }
         for (I = 0; I < ApprChar.m_aLookBoneDefs.Length; I++)
         {
             if (Rand(5) == 0 && BoneNames.Length > 0)
             {
-                ApprChar.m_aLookBoneDefs[I].m_nBoneName = BoneNames[Rand(BoneNames.Length)];
+                BoneName = BoneNames[Rand(BoneNames.Length)];
+                // LogInternal((((("Setting ApprChar " $ BP) $ " lookat bone ") $ I) $ " to ") $ BoneName, );
+                ApprChar.m_aLookBoneDefs[I].m_nBoneName = BoneName;
                 continue;
             }
             ApprChar.m_aLookBoneDefs[I].m_fLimit *= RandFloat(0.800000012, 1.20000005);
@@ -497,7 +511,9 @@ public static function BioPawn_RandomizeLookAt(BioPawn BP)
             {
                 if (Rand(5) == 0 && BoneNames.Length > 0)
                 {
-                    LookAtDef.BoneDefinitions[I].m_nBoneName = BoneNames[Rand(BoneNames.Length)];
+                    BoneName = BoneNames[Rand(BoneNames.Length)];
+                    // LogInternal((((("Setting ApprChar LookAtDef " $ BP) $ " lookat bone ") $ I) $ " to ") $ BoneName, );
+                    LookAtDef.BoneDefinitions[I].m_nBoneName = BoneName;
                     continue;
                 }
                 LookAtDef.BoneDefinitions[I].m_fLimit *= RandFloat(0.800000012, 1.20000005);
@@ -519,8 +535,6 @@ public static function BioPawn_RandomizeLookAt(BioPawn BP)
     BP.m_fLookAtMinHoldTime *= FRand() * 2.0;
     BP.m_fLookAtMaxHoldTime *= FRand() * 2.0;
     BP.m_fLookAtMaxAngle *= FRand() * 2.0;
-    
-    // Do not change player view pitch
     if (SFXPawn_Player(BP) == None)
     {
         BP.ViewPitchMin *= FRand() * 2.0;
