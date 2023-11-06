@@ -1062,7 +1062,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Random popup spot
             var rSwitch = reaperFightP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Reaper_Combat_Handler.SEQ_Reaper_Attack_Loop.SeqAct_Switch_1");
             rSwitch.ObjectName = new NameReference("SeqAct_RandomSwitch", rSwitch.ObjectName.Number);
-            rSwitch.Class = reaperFightP.FindEntry("Engine.SeqAct_RandomSwitch");
+            rSwitch.Class = EntryImporter.EnsureClassIsInFile(reaperFightP, "SeqAct_RandomSwitch", new RelinkerOptionsPackage(MERCaches.GlobalCommonLookupCache), gamePathOverride: target.TargetPath);
 
             // Add Ashley/Kaidan to introduce the fight
 

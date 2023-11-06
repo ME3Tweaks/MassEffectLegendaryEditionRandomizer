@@ -31,7 +31,7 @@ namespace Randomizer.Shared
         {
             var nSwitch = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "SeqAct_RandomSwitch", MERCaches.GlobalCommonLookupCache);
             KismetHelper.AddObjectToSequence(nSwitch, sequence);
-            var properties = nSwitch.GetProperties();
+            // var properties = nSwitch.GetProperties();
             //    var packageBin = MEREmbedded.GetEmbeddedPackage(target.Game, "PremadeSeqObjs.pcc");
             //    var premadeObjsP = MEPackageHandler.OpenMEPackageFromStream(packageBin);
 
