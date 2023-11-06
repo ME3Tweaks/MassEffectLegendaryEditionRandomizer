@@ -16,12 +16,10 @@ public function OnPowersLoaded()
         if (I <= CharacterLevel)
         {
             if (I > 20){
-            ExpectedTalentPoints +=  1;
-                
-                } else {
-            ExpectedTalentPoints +=2;
-                
-                }
+                ExpectedTalentPoints +=  1;
+            } else {
+                ExpectedTalentPoints +=2;
+            }
             LogInternal((((("Talent points for " $ Tag) $ ": ") $ ExpectedTalentPoints) $ ", level ") $ I, );
         }
     }
