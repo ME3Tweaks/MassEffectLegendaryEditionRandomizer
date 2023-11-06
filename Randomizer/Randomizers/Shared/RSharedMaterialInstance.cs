@@ -1,14 +1,19 @@
-﻿using LegendaryExplorerCore.Packages;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.ObjectInfo;
 using Randomizer.Randomizers.Utility;
+using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Shared
 {
     class RSharedMaterialInstance
     {
-        public static bool CanRandomize(ExportEntry export) => export.ClassName == @"MaterialInstanceConstant" || export.ClassName == "BioMaterialInstanceConstant";
+        public static bool CanRandomize(ExportEntry export) => export.IsA(@"MaterialInstanceConstant");
 
-        public static bool RandomizeExport(ExportEntry material, RandomizationOption option)
+        public static bool RandomizeExport(ExportEntry material, RandomizationOption option, string[] noRandomizeParameterNames = null)
         {
             if (!CanRandomize(material)) return false;
             var props = material.GetProperties();
@@ -19,6 +24,10 @@ namespace Randomizer.Randomizers.Shared
                 {
                     foreach (var vector in vectors)
                     {
+                        if (noRandomizeParameterNames != null && noRandomizeParameterNames.Contains(vector.GetProp<NameProperty>("ParameterName").Value.Name, StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            continue; // Do not randomize
+                        }
                         var pc = vector.GetProp<StructProperty>("ParameterValue");
                         if (pc != null)
                         {
@@ -33,7 +42,10 @@ namespace Randomizer.Randomizers.Shared
                     for (int i = 0; i < scalars.Count; i++)
                     {
                         var scalar = scalars[i];
-                        var parameter = scalar.GetProp<NameProperty>("ParameterName");
+                        if (noRandomizeParameterNames != null && noRandomizeParameterNames.Contains(scalar.GetProp<NameProperty>("ParameterName").Value.Name, StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            continue; // Do not randomize
+                        }
                         var currentValue = scalar.GetProp<FloatProperty>("ParameterValue");
                         if (currentValue > 1)
                         {

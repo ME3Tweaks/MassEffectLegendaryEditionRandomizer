@@ -34,8 +34,14 @@ namespace Randomizer.Randomizers.Shared.Classes
             "HMF_AM_Towny",
             "HMM_DL_HandChop",
             "HMM_DL_Smoking",
-            "HMM_FC_Angry"
+            "HMM_FC_Angry",
             // A lot more need to be added from the list
+            
+            "HMM_AM_DLC_FistPoundGlass",
+            "HMM_WI_CocktailParty",
+            "HMM_AM_HandsClap",
+            "HMM_FC_Injuried", // Yes injuried
+            "HMM_2P_ElectroTorture",
         };
 #endif
 
@@ -184,15 +190,29 @@ namespace Randomizer.Randomizers.Shared.Classes
             mapAnimSetOwners = new Dictionary<string, string>(gestMap.m_mapAnimSetOwners.Count);
             foreach (var v in gestMap.m_mapAnimSetOwners)
             {
+                // Key = Animation set name
+                // Value = Containing package
                 mapAnimSetOwners[v.Key] = v.Value;
                 if (loadGestures && RandomGesturePackages.Contains(v.Key.Name))
                 {
+                    MERLog.Information($"Preloading gesture package {v.Value.Name}.pcc");
                     _gesturePackageCache.GetCachedPackageEmbedded(target.Game,
                         $"Gestures.{v.Value.Name}.pcc"); // We don't capture the result - we just preload
                 }
+                else
+                {
+#if DEBUG
+                    // MERLog.Warning($@"Gesture package not used: {v.Key.Name}");
+#endif
+                }
             }
 
-
+#if DEBUG
+            foreach (var p in _gesturePackageCache.GetPackageList())
+            {
+                Debug.WriteLine(p.FilePath);
+            }
+#endif
         }
 
         /// <summary>
