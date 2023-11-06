@@ -12,40 +12,36 @@ using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.TextureAssets.LE2;
 
 namespace Randomizer.Randomizers.Handlers
 {
     class TextureHandler
     {
-        //public static TextureHandler ActiveBuilder;
-        public static List<RTexture2D> TextureRandomizations { get; private set; }
+        /// <summary>
+        /// List of all texture randomizations
+        /// </summary>
+        public static List<SourceTexture> TextureRandomizations { get; private set; }
+
+        /// <summary>
+        /// This is here for optimization since we will enumerate a lot of exports
+        /// </summary>
+        private static List<string> GeneralRandomizerIFPs { get; set; }
 
         /// <summary>
         /// Contains data to copy into packages
         /// </summary>
         private static IMEPackage PremadeTexturePackage { get; set; }
 
-        //// DLC (and basegame, if not using DLC mod) TFC ----
-        //public StructProperty DLCTFCGuidProp { get; private set; }
-        //public Guid DLCTFCGuid { get; private set; }
-        //public NameProperty DLCTFCNameProp { get; private set; }
-        //private FileStream DLCTfcStream { get; set; }
-
-        // BASEGAME FORCED TFC (for textures that MUST be stored in basegame like SFXGame.pcc) ----
-
-        //public StructProperty BGTFCGuidProp { get; private set; }
-        //public Guid BGTFCGuid { get; private set; }
-        //public NameProperty BGTFCNameProp { get; private set; }
-        //private FileStream BGTfcStream { get; set; }
-
         /// <summary>
         /// Opens a new TFC file for writing
         /// </summary>
         /// <param name="randomizations"></param>
         /// <param name="dlcTfcName"></param>
-        public static void StartHandler(GameTarget target, List<RTexture2D> randomizations)
+        public static void StartHandler(GameTarget target, List<SourceTexture> randomizations)
         {
             TextureRandomizations = randomizations;
+            GeneralRandomizerIFPs = randomizations.Where(x=>!x.SpecialUseOnly).SelectMany(x => x.IFPsToBuildOff).Distinct().ToList(); // To avoid a lot of enumeration
             // PremadeTFCName: CHANGE FOR OTHER GAMES
 #if __GAME2__
             var tfcStream = MEREmbedded.GetEmbeddedAsset("Binary", $"Textures.{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc");
@@ -63,17 +59,26 @@ namespace Randomizer.Randomizers.Handlers
         {
             instancedFullPath = null;
             if (export.IsDefaultObject || !export.IsTexture()) return false;
-            var fpath = instancedFullPath = export.InstancedFullPath;
-            return TextureRandomizations.Any(x => x.TextureInstancedFullPath == fpath);
+            instancedFullPath = export.InstancedFullPath;
+            return GeneralRandomizerIFPs.Contains(instancedFullPath, StringComparer.InvariantCultureIgnoreCase);
         }
 
         public static bool RandomizeExport(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export, out var instancedFullPath)) return false;
-
-            var r2d = TextureRandomizations.First(x => x.TextureInstancedFullPath == instancedFullPath);
-            InstallTexture(target, r2d, export);
+            InstallTexture(target, GetRandomTexture(instancedFullPath), export);
             return true;
+        }
+
+        /// <summary>
+        /// Gets a random texture for the given IFP - cannot 
+        /// </summary>
+        /// <param name="instancedFullPath"></param>
+        /// <returns></returns>
+        private static SourceTexture GetRandomTexture(string instancedFullPath, bool allowSpecialUse = false)
+        {
+            var options = TextureRandomizations.Where(x => (allowSpecialUse || !x.SpecialUseOnly) && x.IFPsToBuildOff.Contains(instancedFullPath, StringComparer.InvariantCultureIgnoreCase)).ToList();
+            return options.RandomElement();
         }
 
         /// <summary>
@@ -82,12 +87,9 @@ namespace Randomizer.Randomizers.Handlers
         /// <param name="r2d"></param>
         /// <param name="export"></param>
         /// <param name="id"></param>
-        public static void InstallTexture(GameTarget target, RTexture2D r2d, ExportEntry export, string id = null)
+        public static void InstallTexture(GameTarget target, SourceTexture r2d, ExportEntry export)
         {
-            // If no id was specified pick a random id
-            id ??= r2d.FetchRandomTextureId();
-
-            var sourceTexToCopy = PremadeTexturePackage.FindExport(id);
+            var sourceTexToCopy = PremadeTexturePackage.FindExport(r2d.Id); // ID is the export name
 #if DEBUG
             if (sourceTexToCopy == null)
             {
@@ -119,43 +121,44 @@ namespace Randomizer.Randomizers.Handlers
         }
     }
 
-    public class RTexture2D
-    {
-        /// <summary>
-        /// The full path of the memory instance. Textures that have this match will have their texture reference updated to one of the random allowed id names.
-        /// </summary>
-        public string TextureInstancedFullPath { get; set; }
+    //public class RTexture2D
+    //{
+    //    /// <summary>
+    //    /// The full path of the memory instance. Textures that have this match will have their texture reference updated to one of the random allowed id names.
+    //    /// </summary>
+    //    public string TextureInstancedFullPath { get; set; }
 
-        /// <summary>
-        /// List of assets that can be used for this texture (path in exe)
-        /// </summary>
-        public List<string> AllowedTextureIds { get; set; }
+    //    /// <summary>
+    //    /// List of assets that can be used for this texture (path in exe)
+    //    /// </summary>
+    //    public List<string> AllowedTextureIds { get; set; }
 
-        /// <summary>
-        /// Indicates that this texture must be stored in the basegame, as it will be cached into memory before DLC mount. Use this for textures in things like Startup and SFXGame
-        /// </summary>
-        public bool PreMountTexture { get; set; }
+    //    /// <summary>
+    //    /// Indicates that this texture must be stored in the basegame, as it will be cached into memory before DLC mount. Use this for textures in things like Startup and SFXGame
+    //    /// </summary>
+    //    public bool PreMountTexture { get; set; }
 
-        /// <summary>
-        /// Cached mip storage data - only populated on first install a texture
-        /// </summary>
-        // public ConcurrentDictionary<string, List<MipStorage>> StoredMips { get; set; }
+    //    /// <summary>
+    //    /// Cached mip storage data - only populated on first install a texture
+    //    /// </summary>
+    //    // public ConcurrentDictionary<string, List<MipStorage>> StoredMips { get; set; }
 
-        ///// <summary>
-        ///// Mapping of an id to it's instantiated/used data that should be placed into a usage of the texture
-        ///// </summary>
-        //public ConcurrentDictionary<string, (PropertyCollection props, UTexture2D texData)> InstantiatedItems = new ConcurrentDictionary<string, (PropertyCollection props, UTexture2D texData)>();
+    //    ///// <summary>
+    //    ///// Mapping of an id to it's instantiated/used data that should be placed into a usage of the texture
+    //    ///// </summary>
+    //    //public ConcurrentDictionary<string, (PropertyCollection props, UTexture2D texData)> InstantiatedItems = new ConcurrentDictionary<string, (PropertyCollection props, UTexture2D texData)>();
 
-        public string FetchRandomTextureId()
-        {
-            return AllowedTextureIds[ThreadSafeRandom.Next(AllowedTextureIds.Count)];
-        }
+    //    public string FetchRandomTextureId()
+    //    {
+    //        return AllowedTextureIds[ThreadSafeRandom.Next(AllowedTextureIds.Count)];
+    //    }
 
-        /// <summary>
-        /// Resets this RTexture2D, dropping the instantiatetd list
-        /// </summary>
-        public void Reset()
-        {
-        }
-    }
+    //    /// <summary>
+    //    /// Resets this RTexture2D, dropping the instantiatetd list
+    //    /// </summary>
+    //    public void Reset()
+    //    {
+    //        TextureRan
+    //    }
+    //}
 }
