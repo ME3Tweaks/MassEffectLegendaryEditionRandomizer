@@ -569,21 +569,36 @@ namespace Randomizer.Randomizers.Game2.Misc
                 UpdateHeadMeshPosition(squadmateInfo, newMdl);
 
                 // Todo: Loyalty and default
-                // Fix thane's outfits having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
-                if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent") != null)
+                if (squadmateInfo.InternalName == "Assassin")
                 {
-                    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                    // Correct the body materials. For some reason it includes the head
+                    Debug.WriteLine($">>>>>> {headMeshExp.InstancedFullPath}");
+                    var skmParent = headMeshExp.Parent as ExportEntry;
+                    var bodyMesh = skmParent.GetProperty<ObjectProperty>("Mesh").ResolveToExport(skmParent.FileRef);
+                    var bodyMaterials = bodyMesh.GetProperty<ArrayProperty<ObjectProperty>>("Materials");
+                    if (bodyMaterials != null)
+                    {
+                        bodyMaterials.RemoveAll(x =>
+                            x.ResolveToEntry(skmParent.FileRef).InstancedFullPath
+                                .Contains("_HED_")); // Remove head materials from body
+                        bodyMesh.WriteProperty(bodyMaterials);
+                    }
                 }
-
-                // This needs looked further into as the UV mapping seems to be different...?
-                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent") != null)
+                //Fix thane's outfits having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
+                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent") != null)
                 //{
-                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
                 //}
-                if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent") != null)
-                {
-                    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
-                }
+
+                //// This needs looked further into as the UV mapping seems to be different...?
+                ////if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent") != null)
+                ////{
+                ////    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                ////}
+                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent") != null)
+                //{
+                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                //}
 
                 newMdl.ObjectName = newMdl.ObjectName.Name + $"_{squadmateInfo.ClassName}ified";
 
@@ -697,16 +712,6 @@ namespace Randomizer.Randomizers.Game2.Misc
                     IMEPackage newMeshP;
                     var parent = headMeshExp.Parent as ExportEntry;
                     newMeshP = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "CorrectedMeshes.ChestsAndHeads.pcc"));
-                    /*
-                    if (parent.ObjectName == "Default__SFXPawn_Thane_02")
-                    {
-                        // Install DLC version of mesh
-                    }
-                    else
-                    {
-                        // Install basegame version of mesh
-                        newMeshP = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "correctedmeshes.body.ThaneBodyNoEyelids.pcc"));
-                    }*/
 
                     var meshExp = parent.GetProperty<ObjectProperty>("Mesh").ResolveToEntry(headMeshExp.FileRef) as ExportEntry;
                     var targetMesh = (meshExp.GetProperty<ObjectProperty>("SkeletalMesh") ?? ((ExportEntry)meshExp.Archetype).GetProperty<ObjectProperty>("SkeletalMesh")).ResolveToEntry(headMeshExp.FileRef) as ExportEntry;
@@ -717,7 +722,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                     if (newMDL != null)
                     {
                         var relinkFailures = EntryImporter.ImportAndRelinkEntries(
-                            EntryImporter.PortingOption.ReplaceSingular, newMDL, targetMesh.FileRef, targetMesh, true,
+                            EntryImporter.PortingOption.ReplaceSingularWithRelink, newMDL, targetMesh.FileRef, targetMesh, true,
                             new RelinkerOptionsPackage() { ErrorOccurredCallback = x => Debugger.Break() }, out _);
                         if (relinkFailures.Any())
                         {
