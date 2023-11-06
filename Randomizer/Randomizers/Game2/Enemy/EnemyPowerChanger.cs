@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LegendaryExplorerCore.Coalesced;
-using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
-using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
-using LegendaryExplorerCore.Unreal.BinaryConverters;
-using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
-using Newtonsoft.Json;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
@@ -65,6 +59,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
         public const string SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM = "SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM";
         public const string SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE = "SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE";
 
+#if LEGACY
         // ME2R - we have to put this into class changer code for LE2R
         private static string[] PowersToNotSwap = new[]
         {
@@ -92,6 +87,55 @@ namespace Randomizer.Randomizers.Game2.Enemy
             "SFXPower_BioticChargeLong_NPC",
             "SFXPower_BioticChargeLong_AsariSpectre",
         };
+#endif
+
+        internal static void PatchUsePowerOn(GameTarget target, RandomizationOption option)
+        {
+            // UsePowerOn uses names. We update these ones to use a random power instead since with power randomizer on they will be unlikely to work
+            var patches = new[]
+            {
+                // Gunship changes don't seem to work
+                ("BioD_Exp1Lvl1_400Office.pcc", "TheWorld.PersistentLevel.Main_Sequence.Baria_Frontiers.Combat.Upstairs.SFXSeqAct_UsePowerOn_1"), // FlashBang, Vasir Fight
+                //("BioD_OmgGrA_203Wave3.pcc","TheWorld.PersistentLevel.Main_Sequence.Gunship.Gunship_Matinees.Rocket_Strafe_Front_Window_0.SFXSeqAct_UsePowerOn_1"), // Garrus gunship - fire at player
+                //("BioD_OmgGrA_203Wave3.pcc","TheWorld.PersistentLevel.Main_Sequence.Gunship.Gunship_Matinees.Rocket_Strafe_Front_Window_0.SFXSeqAct_UsePowerOn_0"), // Garrus gunship - fire at target
+                //("BioD_OmgGrA_203Wave3.pcc","TheWorld.PersistentLevel.Main_Sequence.Gunship.Gunship_Matinees.Rocket_Strafe_Side_Window.SFXSeqAct_UsePowerOn_1"), // Garrus gunship - fire at target
+                //("BioD_OmgGrA_203Wave3.pcc","TheWorld.PersistentLevel.Main_Sequence.Gunship.Gunship_Matinees.Rocket_Strafe_Side_Window.SFXSeqAct_UsePowerOn_0"), // Garrus gunship - fire at target
+                ("BioD_ProCer_200Catwalk.pcc","TheWorld.PersistentLevel.Main_Sequence.Ambient.SFXSeqAct_UsePowerOn_1"), // Shoot rocket at person
+                //("BioD_PtyMtL_410Gunship.pcc", "TheWorld.PersistentLevel.Main_Sequence.Combat.Weapon_Control.SFXSeqAct_UsePowerOn_2"), // Kasumi Gunship
+                //("BioD_PtyMtL_410Gunship.pcc", "TheWorld.PersistentLevel.Main_Sequence.Combat.Weapon_Control.SFXSeqAct_UsePowerOn_3"), // Kasumi Gunship
+                ("BioD_SunTlA_205Colossus.pcc", "TheWorld.PersistentLevel.Main_Sequence.Combat.Colossus_Cover_System.Colossus_scripted_attack.SFXSeqAct_UsePowerOn_1"), // Fire at player, Tali mission
+                ("BioD_SunTlA_205Colossus.pcc", "TheWorld.PersistentLevel.Main_Sequence.Combat.Colossus_Cover_System.Colossus_scripted_attack.SFXSeqAct_UsePowerOn_0"), // Fire at Reegar, Tali mission
+                ("BioD_TwrMwA_201HangarAFight1.pcc", "TheWorld.PersistentLevel.Main_Sequence.Combat.SFXSeqAct_UsePowerOn_0"), // Warp NPC on interpactor?
+                //("BioD_TwrMwA_301HangarBFight.pcc", null) // Patch everything in here
+            };
+
+            MERPackageCache cache = new MERPackageCache(target, null, false);
+            foreach (var p in patches)
+            {
+                var package = cache.GetCachedPackage(p.Item1);
+                var merSeqActUseRandPower = EntryImporter.EnsureClassIsInFile(package, "MERSeqAct_UsePowerOn", new RelinkerOptionsPackage(), gamePathOverride: target.TargetPath);
+                if (p.Item2 != null)
+                {
+                    var exp = package.FindExport(p.Item2);
+                    exp.Class = merSeqActUseRandPower;
+                    exp.ObjectName = new NameReference("MERSeqAct_UsePowerOn", exp.ObjectName.Number);
+                }
+                else
+                {
+                    foreach (var exp in package.Exports.Where(x => !x.IsDefaultObject && x.ClassName == "SFXSeqAct_UsePowerOn"))
+                    {
+                        exp.Class = merSeqActUseRandPower;
+                        exp.ObjectName = new NameReference("MERSeqAct_UsePowerOn", exp.ObjectName.Number);
+                    }
+                }
+            }
+
+            foreach (var package in cache.GetPackages())
+            {
+                MERFileSystem.SavePackage(package);
+            }
+            cache.Dispose();
+        }
 
         internal class PowerInfo2
         {
@@ -154,6 +198,10 @@ namespace Randomizer.Randomizers.Game2.Enemy
             CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_Force", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_FORCERANDOMIZER));
             CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_EnforceMinPowerCount", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM));
             CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer_OneTime", option.HasSubOptionSelected(SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE));
+
+            // Needs more work
+            // PatchUsePowerOn(target, option);
+
             return true;
         }
 

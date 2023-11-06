@@ -43,7 +43,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 "SFXPawn_Legion",
                 "SFXPawn_Miranda",
                 "SFXPawn_Mordin",
-                "SFXPawn_Samara",
+                "SFXPawn_Samara", // Morinth?
                 "SFXPawn_Tali",
                 "SFXPawn_Thane",
                 "SFXPawn_Wilson", //Not used afaik
@@ -134,12 +134,16 @@ namespace Randomizer.Randomizers.Game2.Misc
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
             MERFileSystem.SavePackage(sfxgame);
 
+            // Randomize shotgun pellets
+            MERFileSystem.InstallAlways("WeaponStats");
+            ThreadSafeDLCStartupPackage.AddStartupPackage(@"Startup_LE2R_WeaponStats"); // Overrides SFXWeapon_Shotgun
+
             // Enable runtime feature flag
             CoalescedHandler.EnableFeatureFlag("bRandomizeWeaponStats");
             return true;
 
             // ME2R code
-#if false
+#if LEGACY
             var me2rbioweapon = CoalescedHandler.GetIniFile("BIOWeapon.ini");
 
             // We must manually fetch game files cause MERFS will return the ini from the dlc mod instead.
@@ -168,6 +172,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             return true;
         }
 
+#if LEGACY
 
         private static string[] KeysToNotRandomize = new[]
         {
@@ -372,7 +377,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                                         }
                                         catch (Exception e)
                                         {
-                                            Log.Error($"Cannot randomize weapon stat {objectname} {entry.Key}: {e.Message}");
+                                            MERLog.Error($"Cannot randomize weapon stat {objectname} {entry.Key}: {e.Message}");
                                         }
                                     }
                                 }
@@ -472,6 +477,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 }
             }
         }
+#endif
 
     }
 }

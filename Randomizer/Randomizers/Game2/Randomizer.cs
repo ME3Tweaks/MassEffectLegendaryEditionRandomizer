@@ -261,7 +261,8 @@ namespace Randomizer.Randomizers.Game2
 #if DEBUG
                         if (true
                         //&& false //uncomment to disable filtering
-                         && !file.Contains("BioH_Assassin", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("Pty", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("Zya", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
@@ -297,7 +298,7 @@ namespace Randomizer.Randomizers.Game2
                         }
                         catch (Exception e)
                         {
-                            Log.Error($@"Exception occurred in per-file/export randomization: {e.Message}");
+                            MERLog.Exception(e,$@"Exception occurred in per-file/export randomization:");
                             TelemetryInterposer.TrackError(new Exception("Exception occurred in per-file/export randomizer", e));
                             Debugger.Break();
                         }
@@ -368,7 +369,10 @@ namespace Randomizer.Randomizers.Game2
 
             // Re-throw the unhandled exception after MERFS has closed
             if (rethrowException != null)
+            {
+                TelemetryInterposer.TrackError(rethrowException);
                 throw rethrowException;
+            }
         }
 
         private void CleanupInstallTimeOnlyFiles(List<string> installTimeOnlyPackages)
@@ -1224,7 +1228,7 @@ namespace Randomizer.Randomizers.Game2
                 {
                     new RandomizationOption()
                     {
-                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", 
+                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things",
                         PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
                         Ticks = "0.1,0.2,0.3,0.4,0.5,0.75",

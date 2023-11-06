@@ -150,6 +150,11 @@ private final function RandomizePowers(BioPawn BP)
             I++;
             continue;
         }
+        if (Powers[I].default.PowerName == 'TK_Lift_PLC' || Powers[I].default.PowerName == 'KF_Barrier')
+        {
+            I++;
+            continue;
+        }
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
         if (((BP.Controller != None && BP.Controller.IsA('SFXAI_MechanicalTurret')) && !bHasDeathPower) && PowerInfo.CapabilityType != EBioCapabilityTypes.BioCaps_Death)
         {

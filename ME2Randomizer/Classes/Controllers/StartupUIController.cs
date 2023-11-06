@@ -50,7 +50,7 @@ namespace RandomizerUI.Classes.Controllers
 #if !DEBUG
             if (APIKeys.HasAppCenterKey && !telemetryStarted)
             {
-                Microsoft.AppCenter.Crashes.Crashes.GetErrorAttachments = (ErrorReport report) =>
+                Crashes.GetErrorAttachments = (ErrorReport report) =>
                 {
                     var attachments = new List<ErrorAttachmentLog>();
                     // Attach some text.

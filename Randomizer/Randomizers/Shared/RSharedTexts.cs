@@ -408,8 +408,6 @@ namespace Randomizer.Randomizers.Shared
                             if (skipRanges.Count > 0)
                             {
                                 // Lowercase string but skip skip regions
-                                if (sm.Contains("%pausemenu", StringComparison.InvariantCultureIgnoreCase))
-                                    Debugger.Break();
                                 var newStr = sm.ToArray();
                                 for (int stri = 0; stri < sm.Length; stri++) // For every letter
                                 {
