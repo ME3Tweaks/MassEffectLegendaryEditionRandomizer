@@ -51,12 +51,12 @@ namespace RandomizerUI
             return false;
         }
 
-        public static GameTarget LegendaryEditionTarget { get; set; }
+        public static GameTarget Target { get; set; }
 
         /// <summary>
         /// UI display string of the LE target path. Do not trust this value as a true path, use the target instead.
         /// </summary>
-        [DependsOn(nameof(LegendaryEditionTarget))] public static string LEGamePath => LegendaryEditionTarget?.TargetPath ?? "Not installed";
+        [DependsOn(nameof(Target))] public static string LEGamePath => Target?.TargetPath ?? "Not installed";
 
         private static bool internalSetTarget(MEGame game, string path)
         {
@@ -71,7 +71,7 @@ namespace RandomizerUI
             if (game.IsLEGame())
             {
                 MERUILog.Information($"Using game target {gt.TargetPath}");
-                LegendaryEditionTarget = gt;
+                Target = gt;
                 return true;
             }
 
@@ -80,7 +80,7 @@ namespace RandomizerUI
 
         public static GameTarget GetTarget()
         {
-            return LegendaryEditionTarget;
+            return Target;
         }
 
         public static void ReloadTarget()
@@ -92,7 +92,7 @@ namespace RandomizerUI
         public static void SetTarget(GameTarget gt)
         {
             if (gt.Game.IsLEGame())
-                LegendaryEditionTarget = gt;
+                Target = gt;
         }
     }
 }

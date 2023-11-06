@@ -269,12 +269,6 @@ namespace Randomizer.Randomizers.Game1.Misc
 
             texturePackageCache.GetCachedPackage("BioD_ZyaVTL_630Revenge.pcc"); // Flamethrower is in here
 
-            if (target.Game == MEGame.ME2)
-            {
-                // Have to open individual DLC packages..
-                // TODO: IDENTIFY WHICH DLC PACKAGES NEED THIS DONE
-            }
-
 
             option.ProgressValue = 0;
             option.ProgressMax = allRewards.Count;

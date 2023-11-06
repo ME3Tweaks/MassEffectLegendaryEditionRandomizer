@@ -96,6 +96,18 @@ namespace Randomizer.Randomizers.Handlers
             var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
             controlEngine.AddEntry(new CoalesceProperty(featureFlagName, new CoalesceValue(enabled ? "TRUE" : "FALSE", CoalesceParseAction.Add)));
         }
+
+        /// <summary>
+        /// Sets a property in MERControlEngine
+        /// </summary>
+        /// <param name="boolIdx"></param>
+        public static void SetProperty(CoalesceProperty prop)
+        {
+            var game = CoalescedHandler.GetIniFile("BioEngine");
+            var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
+            controlEngine.AddEntry(prop);
+        }
 #endif
+
     }
 }

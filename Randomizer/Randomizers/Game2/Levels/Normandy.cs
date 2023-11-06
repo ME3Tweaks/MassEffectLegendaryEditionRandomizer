@@ -110,7 +110,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             KismetHelper.CreateVariableLink(randomizeProbeSeqAct, "Probe", externProbe); // Link the probe to the new kismet object
 
             // Install the probe asset file
-            MEREmbedded.GetEmbeddedPackage(MEGame.LE2, "DynamicLoad.MERGameContent_Probes.pcc").WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, "MERGAmeContent_Probes.pcc"));
+            MEREmbedded.GetEmbeddedPackage(MEGame.LE2, "DynamicLoad.MERGameContent_Probes.pcc").WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, "MERGameContent_Probes.pcc"));
 
             // Add the dynamic load and config entries for it to use
             foreach (var v in GetProbeOptions())

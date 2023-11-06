@@ -494,7 +494,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                         }
                         else if (i == 1 || i == 3 || i == 4)
                         {
-                            // Has dependency
+                            // Has dependency on previous power slot
                             var dependencies = new ArrayProperty<StructProperty>("UnlockRequirements");
                             dependencies.AddRange(GetUnlockRequirementsForPower(loadout.FileRef.FindExport(talentSet.Powers[i - 1].PowerExport.InstancedFullPath)));
                             properties.Add(dependencies);
@@ -538,19 +538,18 @@ namespace Randomizer.Randomizers.Game2.Misc
                     }
 
                     TLKBuilder.ReplaceString(tlkStrRef, string.Join('\n', existingLines), MELocalization.INT);
-
-                    // Update the autolevel up s t ruct
-
-
                     MERFileSystem.SavePackage(loadout.FileRef);
                 });
 
             option.ProgressIndeterminate = true;
             option.CurrentOperation = "Adding fixes for class talent system";
             var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "PlayerOnPowersLoaded", "SFXPawn_Player");
-            
+            foreach (var className in ClasStrRefMap.Keys)
+            {
+                ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "PlayerOnPowersLoaded", $"SFXPawn_Player{className}");
+            }
             MERFileSystem.SavePackage(sfxgame);
+            SharedLE2Fixes.InstallLegionHereticChessFix(target); // This might affect it
             return true;
         }
 
@@ -569,7 +568,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         }
 
         /// <summary>
-        /// Generates the structs for UnlockRequirements that are used to setup a dependenc on this power
+        /// Generates the structs for UnlockRequirements that are used to setup a dependency on this power
         /// </summary>
         /// <param name="powerClass">The kit-power to depend on.</param>
         /// <returns></returns>
@@ -589,7 +588,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             PopulateProps(props, powerClass, 2);
             powerRequirements.Add(new StructProperty("UnlockRequirement", props));
 
-            // EVOLVED POWER
+            // EVOLVED POWERS--
 
             // Find base power
             var baseClass = powerClass;
@@ -603,6 +602,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             }
 
             // Evolved power 1
+            evolvedPower1.ResolveToExport(powerClass.FileRef).GetDefaults().WriteProperty(new ArrayProperty<StructProperty>("UnlockRequirements")); // Remove inheritance
             props = new PropertyCollection();
             PopulateProps(props, evolvedPower1.ResolveToEntry(powerClass.FileRef) as ExportEntry, 1);
             powerRequirements.Add(new StructProperty("UnlockRequirement", props));
@@ -612,6 +612,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             props = new PropertyCollection();
             PopulateProps(props, evolvedPower2.ResolveToEntry(powerClass.FileRef) as ExportEntry, 1);
             powerRequirements.Add(new StructProperty("UnlockRequirement", props));
+            evolvedPower2.ResolveToExport(powerClass.FileRef).GetDefaults().WriteProperty(new ArrayProperty<StructProperty>("UnlockRequirements")); // Remove inheritance
 
             return powerRequirements;
         }
@@ -628,16 +629,35 @@ namespace Randomizer.Randomizers.Game2.Misc
         {
             ArrayProperty<StructProperty> alui = new ArrayProperty<StructProperty>("PowerLevelUpInfo");
             Dictionary<MappedPower, int> rankMap = mappedPowers.ToDictionary(x => x, x => 1);
+            bool hasUnlockedSlot2 = false;
+            bool hasUnlockedSlot4 = false;
+            bool hasUnlockedSlot5 = false;
             while (rankMap.Any(x => x.Value != 4))
             {
                 // Add ranks
                 var mp = mappedPowers.RandomElement();
-                while (rankMap[mp] >= 4)
+                while (rankMap[mp] >= 4
+                      || (!hasUnlockedSlot2 && mappedPowers.IndexOf(mp) == 1)
+                      || (!hasUnlockedSlot4 && mappedPowers.IndexOf(mp) == 3)
+                      || (!hasUnlockedSlot5 && mappedPowers.IndexOf(mp) == 4))
                 {
                     mp = mappedPowers.RandomElement(); // Repick
                 }
 
                 var newRank = rankMap[mp] + 1;
+
+                if (mappedPowers.IndexOf(mp) == 0 && newRank >= 2)
+                {
+                    hasUnlockedSlot2 = true; // We have unlocked the second power slot
+                }
+                if (mappedPowers.IndexOf(mp) == 2 && newRank >= 2)
+                {
+                    hasUnlockedSlot4 = true; // We have unlocked the fourth power slot
+                }
+                if (mappedPowers.IndexOf(mp) == 3 && newRank >= 2)
+                {
+                    hasUnlockedSlot5 = true; // We have unlocked the fifth power slot
+                }
 
                 PropertyCollection props = new PropertyCollection();
                 props.Add(new ObjectProperty(loadout.FileRef.FindExport(mp.BaseTalent.PowerExport.InstancedFullPath).UIndex, "PowerClass"));

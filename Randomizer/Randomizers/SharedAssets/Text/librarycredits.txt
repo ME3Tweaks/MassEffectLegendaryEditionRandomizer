@@ -2,9 +2,9 @@
 Provides modding backend for opening, modifying, and saving packages
 https://github.com/ME3Tweaks/ME3Explorer
 
-ALOTInstallerCore
+ME3TweaksCore
 Provides ME3Tweaks backend tools
-https://github.com/ME3Tweaks/ALOTInstaller
+https://github.com/ME3Tweaks/ME3TweaksCore
 
 MahApps.Metro
 WPF user interface libary
@@ -21,3 +21,7 @@ https://github.com/Fody/Fody
 AppCenter
 Application crash telemetry
 https://appcenter.ms
+
+CommandLineParser
+Provides command line handling
+https://github.com/commandlineparser/commandline

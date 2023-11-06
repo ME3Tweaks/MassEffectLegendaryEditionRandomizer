@@ -68,6 +68,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             SharedLE2Fixes.InstallPowerUsageFixes();
 
             MERFileSystem.InstallAlways("SuicideMission");
+            CoalescedHandler.EnableFeatureFlag("bSuicideMissionRandomizationInstalled"); // Mark this as installed - needed for proper collector AI
             return true;
         }
 
@@ -721,7 +722,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             var flamerCollector = reaperFightPackage.FindExport("MERChar_Enemies.CollectorFlamerSpawnable");
 
             // The default list uses 4:1:1 distribution of enemy types
-            var list = MERSeqTools.CreateRandSeqVarList(seq, defCollector, defCollector, defCollector, defCollector, sniperCollector, flamerCollector );
+            var list = MERSeqTools.CreateRandSeqVarList(seq, defCollector, defCollector, defCollector, defCollector, sniperCollector, flamerCollector);
             list.WriteProperty(new NameProperty("CrawlingCombatPawnTypes", "VarName")); // Set as a variable
 
             var lowHPTrigger = MERSeqTools.CreateSeqEventRemoteActivated(seq, "ReaperLowHP");
@@ -1568,6 +1569,14 @@ namespace Randomizer.Randomizers.Game2.Levels
             {
                 mm.RemoveProperty("bBlocked"); // Get rid of it
             }
+
+            // Fix bad map design where platform C can be mantled onto even if it's gone
+            var nonFlyingSeq = reaper420Pathing.FindExport("TheWorld.PersistentLevel.Main_Sequence.NON_FLYING_PLATFORMS");
+            var platDestroyedEvent = reaper420Pathing.FindExport("TheWorld.PersistentLevel.Main_Sequence.NON_FLYING_PLATFORMS.SeqEvent_RemoteEvent_2");
+            var modifyCover = MERSeqTools.CreateAndAddToSequence(nonFlyingSeq, "SeqAct_ModifyCover");
+            modifyCover.WriteProperty(new ArrayProperty<IntProperty>(new[] { 0, 1, 2, 3 }.Select(x => new IntProperty(x)), "Slots"));
+            KismetHelper.CreateVariableLink(modifyCover, "Target", MERSeqTools.CreateObject(nonFlyingSeq, reaper420Pathing.FindExport("TheWorld.PersistentLevel.CoverLink_50")));
+            KismetHelper.CreateOutputLink(platDestroyedEvent, "Out", modifyCover, 1);
         }
 
         /// <summary>

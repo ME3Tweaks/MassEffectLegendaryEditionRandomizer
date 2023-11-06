@@ -34,11 +34,11 @@ namespace RandomizerUI.Classes.Controllers
                 {
                     // Nuke the DLC
                     MERUILog.Information(@"Quick restore started");
-                    pd.SetMessage("Removing randomize DLC component");
+                    pd.SetMessage("Removing Randomizer DLC component");
                     var dlcModPath = MERFileSystem.GetDLCModPath(target);
                     if (Directory.Exists(dlcModPath))
                     {
-                        MERUILog.Information($@"Deleting {dlcModPath}");
+                        MERUILog.Information($"Deleting {dlcModPath}");
                         MUtilities.DeleteFilesAndFoldersRecursively(dlcModPath);
                     }
 

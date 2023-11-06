@@ -42,7 +42,7 @@ namespace Randomizer.Shared
             {
                 var parent = targetPackage.FindExport("TheWorld");
                 lsk = ExportCreator.CreateExport(targetPackage, "LevelStreamingKismet", "LevelStreamingKismet", parent);
-                lsk.WriteProperty(new NameProperty(levelName));
+                lsk.WriteProperty(new NameProperty(levelName, "PackageName"));
             }
 
             var bwi = targetPackage.Exports.FirstOrDefault(x => !x.IsDefaultObject && x.ClassName == "BioWorldInfo");

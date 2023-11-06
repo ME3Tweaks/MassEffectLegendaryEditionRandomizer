@@ -4,7 +4,7 @@
     
     Super(Actor).PostBeginPlay();
     ScaleWeapon(0);
-    if (TRUE)
+    if (Owner.Tag != 'BOSS_ProtoReaper' && Class'MERControlEngine'.default.bRandomizeWeaponStats)
     {
         RangeMult = Rand(24) == 0 ? 8.0 : 2.0;
         Damage.X *= FRand() * RangeMult;
@@ -92,14 +92,20 @@
         DamageMod_ShortRange *= FRand() * RangeMult;
         DamageMod_MediumRange *= FRand() * RangeMult;
         DamageMod_LongRange *= FRand() * RangeMult;
-        MinAdhesionDistance *= FRand() * RangeMult;
-        MaxAdhesionDistance *= FRand() * RangeMult;
-        MinAdhesionVelocity *= FRand() * RangeMult;
-        CamInputAdhesionDamping *= FRand() * RangeMult;
-        MaxLateralAdhesionDist *= FRand() * RangeMult;
+        
+        // This is aim assist I think - don't mess with it
+        //MinAdhesionDistance *= FRand() * RangeMult;
+        //MaxAdhesionDistance *= FRand() * RangeMult;
+        //MinAdhesionVelocity *= FRand() * RangeMult;
+        //CamInputAdhesionDamping *= FRand() * RangeMult;
+        //MaxLateralAdhesionDist *= FRand() * RangeMult;
+        
         MinZoomSnapDistance *= FRand() * RangeMult;
         MaxZoomSnapDistance *= FRand() * RangeMult;
         ZoomSnapDuration *= FRand() * RangeMult;
+
+        // Adjust the low ammo threshhold so that Reload properly appears
+        LowAmmoSoundThreshold = Class'Object'.static.FFloor(MagSize.X * 0.3);
     }
     InitializeAmmo();
     InitDefaultDecalProperties();

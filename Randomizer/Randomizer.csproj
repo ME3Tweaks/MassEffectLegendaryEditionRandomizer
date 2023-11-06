@@ -91,14 +91,7 @@
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tfc" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.bk2" />
 		<EmbeddedResource Include="Randomizers\Game2\Assets\**\*.tlk" />
-
-		<Folder Include="Randomizers\Game2\Assets\Binary\ME2\" />
 		<Folder Include="Randomizers\Game2\Assets\Binary\LE2\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE2\Gestures\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME2\Gestures\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE1\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\LE3\" />
-		<Folder Include="Randomizers\Game2\Assets\Binary\Packages\ME1\" />
 		<Folder Include="Randomizers\Game2\Assets\Texture2D\" />
 	</ItemGroup>
 
@@ -145,13 +138,16 @@
 		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\ColonistsITM.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\ItsACollectorITM.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Properties\SSVeetor\SeekersFreezeITM.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioAiController.ChangeAI.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioPawn_RandomizeMorphHEad.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_AwardTreasure.Activated.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSeqAct_ShowCharacterCreation.Activated.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_GameOver.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.ApplyNewCode.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.HandleEvent.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc" />
+		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BioSFHandler_PartySelection.SetInfo.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\BurnFuel.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\Debug\BioAiController.AILog_Internal.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Scripts\GenerateInventoryFromLoadout.uc" />

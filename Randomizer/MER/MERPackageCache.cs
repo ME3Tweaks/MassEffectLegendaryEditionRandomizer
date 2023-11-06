@@ -130,7 +130,7 @@ namespace Randomizer.MER
                 var embeddedData = MEREmbedded.GetEmbeddedPackage(game, embeddedPath);
                 if (embeddedData != null)
                 {
-                    package = MEPackageHandler.OpenMEPackageFromStream(embeddedData);
+                    package = MEPackageHandler.OpenMEPackageFromStream(embeddedData, MEREmbedded.GetFilenameFromAssetName(embeddedPath));
                     MERFileSystem.SetReadOnly(package, PreventSaves);
                     Cache[embeddedPath] = package;
                     return package;

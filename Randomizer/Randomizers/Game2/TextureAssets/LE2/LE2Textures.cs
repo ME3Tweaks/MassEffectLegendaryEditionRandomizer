@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
@@ -48,13 +49,20 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
         public string ContainingPackageName { get; set; }
 
         /// <summary>
-        /// IFP in ContainingPackageName that can be used to trigger the texture replacement
+        /// List of IPs in ContainingPackageName that can be used to trigger the texture replacement
         /// </summary>
         [JsonIgnore]
-        public string IFPToBuildOff { get; set; }
+        public string[] IFPsToBuildOff { get; set; }
+
+        /// <summary>
+        /// Installed by specific randomizer, not general texture randomizer
+        /// </summary>
+        [JsonIgnore]
+        public bool SpecialUseOnly { get; set; }
 
         public void StoreTexture(IMEPackage premadePackage)
         {
+            Debug.WriteLine($"Storing texture {Id}");
             var sourceFile = FindFile();
             if (sourceFile == null)
             {
@@ -65,19 +73,75 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
             var loadedFiles = MELoadedFiles.GetFilesLoadedInGame(MERFileSystem.Game);
             var packageF = loadedFiles[ContainingPackageName];
             using var package = MEPackageHandler.OpenMEPackage(packageF);
-            var sourceTex = package.FindExport(IFPToBuildOff);
-            TextureTools.ReplaceTexture(sourceTex, sourceFileData, false, out var loadedImage);
-            EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.AddSingularAsChild, sourceTex,
-                premadePackage, null, true, new RelinkerOptionsPackage(), out var newEntry);
-            newEntry.ObjectName = Id;
+            var i = 0;
+            var stored = false;
+            while (i < IFPsToBuildOff.Length)
+            {
+                var sourceTex = package.FindExport(IFPsToBuildOff[i]);
+                if (sourceTex == null)
+                {
+                    i++;
+                    continue;
+                }
+
+                TextureTools.ReplaceTexture(sourceTex, sourceFileData, false, out var loadedImage);
+                EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.AddSingularAsChild, sourceTex, premadePackage, null, true, new RelinkerOptionsPackage(), out var newEntry);
+                newEntry.ObjectName = Id;
+                stored = true;
+                break;
+            }
+
+            if (!stored)
+            {
+                Debug.WriteLine($@"Failed to store texture: {stored}");
+                Debugger.Break();
+            }
         }
     }
 
     public static class LE2Textures
     {
+        private static string[] PictureFrameIFPs = new[]
+        {
+            "BioS_Exp1Apt.NRM_SR1", // Liara's Normandy picture
+            "BioVFX_Env_Hologram.Textures.Ashley_01", // Died on virmire? Romanced in ME1?
+            "BioVFX_Env_Hologram.Textures.Kaiden_01",
+            "BioVFX_Env_Hologram.Textures.Liara_1",
+            "biovfx_env_unc_pack01.Textures.archer_photograph", // UNC1 Archer
+        };
+
+        private static string[] HTextIFPs = new[]
+        {
+            "BioVFX_Env_Hologram.Textures.H_texts",
+            "BioVFX_Env_Hologram.Textures.H_texts_2",
+            "BioVFX_Env_Hologram.Textures.H_texts_3",
+            "BioVFX_Env_Hologram.Textures.HoloTextScroll"
+        };
+
+        private static string[] CitadelHolomodIFPs = new[]
+        {
+            "BioVFX_Env_Hologram.Textures.Holomod_11_Tex",
+        };
+
         /// <summary>
-        /// Rebuilds the pre-configured TFC for shipped textures
+        /// Dual half height images
         /// </summary>
+        private static string[] HGraphIFPs = new[]
+        {
+            "BioVFX_Env_Hologram.Textures.H_Graphs",
+            "BioVFX_Env_Hologram.Textures.H_Graphs3_5",
+        };
+
+        private static string[] DatapadIFPs = new[]
+        {
+            "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+        };
+
+        private static string[] EndGm3DatapadIFPs = new[]
+        {
+            "BioVFX_Env_End.Textures.Reaper_Display"
+        };
+
         public static void BuildPremadeTFC()
         {
 #if DEBUG
@@ -111,54 +175,197 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
         {
             return new List<SourceTexture>()
             {
+                // Feature: Citadel
                 new SourceTexture()
                 {
-                    Filename = "H_Graphs_bsodtoasters.png",
-                    ContainingPackageName = "BioA_N7Mmnt1.pcc",
-                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.H_Graphs",
-                    Id = "HoloScreensBSODToasters"
+                    Filename = "cursed.png",
+                    ContainingPackageName = "Startup_INT.pcc",
+                    IFPsToBuildOff = CitadelHolomodIFPs,
+                    Id = "CursedBC7",
+                    SpecialUseOnly = true,
                 },
+                new SourceTexture()
+                {
+                    Filename = "borgar.png",
+                    ContainingPackageName = "Startup_INT.pcc",
+                    IFPsToBuildOff = CitadelHolomodIFPs,
+                    Id = "BorgarBC7",
+                    SpecialUseOnly = true,
+                },
+
+
+                // Hologram screens
                 new SourceTexture()
                 {
                     Filename = "H_Graphs_mybrandamazon.png",
                     ContainingPackageName = "BioA_N7Mmnt1.pcc",
-                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.H_Graphs",
+                    IFPsToBuildOff = HGraphIFPs,
                     Id = "HoloScreensAmazon"
                 },
                 new SourceTexture()
                 {
                     Filename = "H_Graphs_pizzaonion.png",
                     ContainingPackageName = "BioA_N7Mmnt1.pcc",
-                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.H_Graphs",
+                    IFPsToBuildOff = HGraphIFPs,
                     Id = "HoloScreensPizza"
                 },
                 new SourceTexture()
                 {
+                    Filename = "bsod_toasters.png",
+                    ContainingPackageName = "BioA_N7Mmnt1.pcc",
+                    IFPsToBuildOff = HGraphIFPs,
+                    Id = "HologramBSODToaster"
+                },
+                new SourceTexture()
+                {
+                    Filename = "sweat_burgerrecipe.png",
+                    ContainingPackageName = "BioA_N7Mmnt1.pcc",
+                    IFPsToBuildOff = HGraphIFPs,
+                    Id = "HoloscreenSweatBurger"
+                },
+                new SourceTexture()
+                {
+                    // This had to be recovered from ME2R as the source image was lost
+                    Filename = "sonicburger_me2r.png",
+                    ContainingPackageName = "BioA_N7Mmnt1.pcc",
+                    IFPsToBuildOff = HGraphIFPs,
+                    Id = "HoloscreenSonicBurgerME2R"
+                },
+
+                // Datapads
+                new SourceTexture()
+                {
                     Filename = "map.png",
                     ContainingPackageName = "BioD_CitAsL.pcc",
-                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    IFPsToBuildOff = DatapadIFPs,
                     Id = "DatapadMap"
                 },
                 new SourceTexture()
                 {
                     Filename = "monsterplan.png",
                     ContainingPackageName = "BioD_CitAsL.pcc",
-                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    IFPsToBuildOff = DatapadIFPs,
                     Id = "DatapadMonsterPlan"
                 },
                 new SourceTexture()
                 {
                     Filename = "sizebounty.png",
                     ContainingPackageName = "BioD_CitAsL.pcc",
-                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    IFPsToBuildOff = DatapadIFPs,
                     Id = "DatapadSizeBounty"
                 },
                 new SourceTexture()
                 {
                     Filename = "thisisfine.png",
                     ContainingPackageName = "BioD_CitAsL.pcc",
-                    IFPToBuildOff = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
+                    IFPsToBuildOff = DatapadIFPs,
                     Id = "DatapadThisIsFine"
+                },
+
+
+                // EndGm3 Datapad
+                new SourceTexture()
+                {
+                    Filename = "audemus_fishdog_food_shack.png",
+                    ContainingPackageName = "BioP_EndGm3.pcc",
+                    IFPsToBuildOff = EndGm3DatapadIFPs,
+                    Id = "FishdogFoodShack"
+                },
+                new SourceTexture()
+                {
+                    Filename = "mgamerz_me3_mp.png",
+                    ContainingPackageName = "BioP_EndGm3.pcc",
+                    IFPsToBuildOff = EndGm3DatapadIFPs,
+                    Id = "LE3MPTeaser"
+                },
+
+
+                // H_Texts
+                new SourceTexture()
+                {
+                    Filename = "H_Text_3_vim.png",
+                    ContainingPackageName = "BioA_ProCer_350.pcc",
+                    IFPsToBuildOff = HTextIFPs,
+                    Id = "H_Text_Vim"
+                },
+                new SourceTexture()
+                {
+                    Filename = "newspaper.png",
+                    ContainingPackageName = "BioA_ProCer_350.pcc",
+                    IFPsToBuildOff = HTextIFPs,
+                    Id = "H_Text_Newspaper"
+                },
+                new SourceTexture()
+                { // This reference doesn't make as much sense outside the pandemic that ME2R was launched in
+                    Filename = "sourdough.png",
+                    ContainingPackageName = "BioA_ProCer_350.pcc",
+                    IFPsToBuildOff = HTextIFPs,
+                    Id = "H_Text_Sourdough"
+                },
+                new SourceTexture()
+                { 
+                    Filename = "khaarsgame.png",
+                    ContainingPackageName = "BioA_ProCer_350.pcc",
+                    IFPsToBuildOff = HTextIFPs,
+                    Id = "H_Text_KhaarsGame"
+                },
+                new SourceTexture()
+                {
+                    Filename = "screenpresso.png",
+                    ContainingPackageName = "BioA_ProCer_350.pcc",
+                    IFPsToBuildOff = HTextIFPs,
+                    Id = "H_Text_Screenpresso"
+                },
+
+                // Picture frames
+                new SourceTexture()
+                {
+                    Filename = "garage.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "HereInMyGarage"
+                },
+                new SourceTexture()
+                {
+                    Filename = "digsite.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "UnderControl"
+                },
+                new SourceTexture()
+                {
+                    Filename = "ohno.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "BigMistake"
+                },
+                new SourceTexture()
+                {
+                    Filename = "salarian.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "SalarianEyes"
+                },
+                new SourceTexture()
+                {
+                    Filename = "aria.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "BigEyesAria"
+                },
+                new SourceTexture()
+                {
+                    Filename = "bighead.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "BigHeadModeEngaged"
+                },
+                new SourceTexture()
+                {
+                    Filename = "monkaAnderson.png",
+                    ContainingPackageName = "BioD_Exp1Lvl1_100Apartment.pcc",
+                    IFPsToBuildOff = PictureFrameIFPs,
+                    Id = "SideEyeAnderson"
                 },
             };
         }
@@ -170,224 +377,7 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
 
         public static void SetupLE2Textures(GameTarget target)
         {
-            var options = new List<RTexture2D>
-            {
-                    new RTexture2D
-                    {
-                        // The orange datapad you see everyone holding
-                        TextureInstancedFullPath = "BioApl_Dec_DataPad01.Materials.Datapad01_Screen",
-                        AllowedTextureIds = new List<string>
-                        {
-                            "DatapadMap",
-                            "DatapadMonsterPlan",
-                            "DatapadSizeBounty",
-                            "DatapadThisIsFine",
-                        }
-                    },
-                //new RTexture2D
-                //{
-                //    // The end-of-game datapad texture
-                //    TextureInstancedFullPath = "BioVFX_Env_End.Textures.Reaper_Display",
-                //    "audemus_fishdog_food_shack.png",
-                //    AllowedTextureIds = new List<string>
-                //    {
-                //        "DatapadScreens.Reaper_Display.fishdog_foodshack.bin",
-                //    }
-                //},
-            
-                new RTexture2D
-                {
-                    // The graphs that scroll by (H_Graphs)
-                    TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_Graphs",
-                    AllowedTextureIds = new List<string>
-                    {
-                        "HoloScreensPizza",
-                        "HoloScreensAmazon",
-                    },
-                    // PreMountTexture = true
-                }
-                //    new RTexture2D
-            //    {
-            //        // The graphs that scroll by, line and bar rchargs (H_Graphs3_5)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_Graphs2",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "HoloScreens.H_Graphs2.neonbolt.bin",
-            //        },
-            //        PreMountTexture = false // Texture isn't used anywhere before DLC mount
-            //    },
-            //    new RTexture2D
-            //    {
-            //        // The graphs that scroll by, line and bar rchargs (H_Graphs3_5)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_Graphs3_5",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "HoloScreens.H_Graphs3_5.sonicburger.bin",
-            //        },
-            //        PreMountTexture = false // Texture isn't used anywhere before DLC mount
-            //    },
-            //    new RTexture2D
-            //    {
-            //        // Vertically scrolling text (1)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_texts",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "HoloScreens.H_texts.sourdough.bin",
-            //            "HoloScreens.H_texts.newspaper.bin",
-            //        },
-            //        PreMountTexture = true
-            //    },
-            //    new RTexture2D
-            //    {
-            //        // Vertically scrolling text (2)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_texts_2",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "HoloScreens.H_texts_2.vim.bin",
-            //        },
-            //        PreMountTexture = true
-            //    },
-            //    new RTexture2D
-            //    {
-            //        // Vertically scrolling text (2)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.H_texts_3",
-            //        // purposely lower res than others.
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "HoloScreens.H_texts_3.visualstudio.bin",
-            //        },
-            //        PreMountTexture = false
-            //    },
-            //    new RTexture2D
-            //    {
-            //        // The picture frame that archer holds up in Overlord DLC act 2 start
-            //        TextureInstancedFullPath = "BioVFX_Env_UNC_Pack01.Textures.archer_photograph",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "PictureFrames.scarymiranda.bin",
-            //            "PictureFrames.creepyshep.bin",
-            //            "PictureFrames.hungryillusiveman.bin",
-            //            "PictureFrames.monkaanderson.bin",
-            //            "PictureFrames.longfaceudina.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        // The picture shown on the screen in the beginning of overlord DLC
-            //        TextureInstancedFullPath = "BioVFX_Env_UNC_Pack01.Textures.UNC_1_Dish_Display",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_Promotional", 0),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Overlord.satimg1.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        // Liara Love Interest Pic (Only if no romance is chosen)
-            //        TextureInstancedFullPath = "BioVFX_Env_Hologram.Textures.Liara_1",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "PictureFrames.LoveInterests.steak.bin",
-            //        }
-            //    },
-            //    #region LOTSB
-            //    new RTexture2D()
-            //    {
-            //        // Liara Diploma
-            //        TextureInstancedFullPath = "BioS_Exp1Apt.APT_LIARADIP",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_VFX", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "LOTSB.LiaraDiploma.diploma.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        // ILOS painting
-            //        TextureInstancedFullPath = "BioS_Exp1Apt.APT_ILOSPAINTING",
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "LOTSB.Painting.edge.bin",
-            //            "LOTSB.Painting.me1stylesp.bin",
-            //            "LOTSB.Painting.outsidethecity.bin",
-            //            "LOTSB.Painting.thesource.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        // What picture frame shep picks up turns into
-            //        TextureInstancedFullPath = "BioS_Exp1Apt.APT_PROTHDIG",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_Environment", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "LOTSB.PictureFrame.digsite.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        // Picture frame shep picks up
-            //        TextureInstancedFullPath = "BioS_Exp1Apt.NRM_SR1",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_Environment", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "LOTSB.PictureFrame.garage.bin",
-            //        }
-            //    },
-            //    #endregion
-            //    #region Burger
-            //    new RTexture2D()
-            //    {
-            //        TextureInstancedFullPath = "Edmonton_Burger_Delux2go.Textures.Burger_Norm",
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Burger.Norm.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        TextureInstancedFullPath = "Edmonton_Burger_Delux2go.Textures.Burger_Spec",
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Burger.Spec.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        TextureInstancedFullPath = "Edmonton_Burger_Delux2go.Textures.Burger_Diff",
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Burger.Diff.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        TextureInstancedFullPath = "BioAPL_Dec_PlatesCup_Ceramic.Materials.Plates_NotUgly_Norm",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_APL", 513),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Burger.Plates_Norm.bin",
-            //        }
-            //    },
-            //    new RTexture2D()
-            //    {
-            //        TextureInstancedFullPath = "BioAPL_Dec_PlatesCup_Ceramic.Materials.Plates_NotUgly_Diff",
-            //        LODGroup = new EnumProperty(new NameReference("TEXTUREGROUP_APL", 1025),"TextureGroup", MEGame.ME2, "LODGroup"), // A bit higher quality
-            //        AllowedTextureIds = new List<string>
-            //        {
-            //            "Burger.Plates_Diff.bin",
-            //        }
-            //    },
-            //    #endregion
-            };
-
-            TextureHandler.StartHandler(target, options);
+            TextureHandler.StartHandler(target, getShippedTextures());
         }
     }
 }

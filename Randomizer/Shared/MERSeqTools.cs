@@ -137,29 +137,6 @@ namespace Randomizer.Shared
             return referencingNodes.Distinct().ToList();
         }
 
-        /// <summary>
-        /// Clones basic data type objects. Do not use with complicated types.
-        /// </summary>
-        /// <param name="itemToClone"></param>
-        /// <returns></returns>
-        public static ExportEntry CloneBasicSequenceObject(ExportEntry itemToClone)
-        {
-            ExportEntry exp = EntryCloner.CloneEntry(itemToClone);
-            //needs to have the same index to work properly
-            if (exp.ClassName == "SeqVar_External")
-            {
-                // Probably shouldn't clone these...
-                exp.indexValue = itemToClone.indexValue;
-            }
-
-            itemToClone.FileRef.AddExport(exp);
-
-            var sequence = itemToClone.GetProperty<ObjectProperty>("ParentSequence").ResolveToEntry(itemToClone.FileRef) as ExportEntry;
-            KismetHelper.AddObjectToSequence(exp, sequence);
-            return exp;
-        }
-
-
         public static void WriteOriginator(ExportEntry export, IEntry originator)
         {
             export.WriteProperty(new ObjectProperty(originator.UIndex, "Originator"));
@@ -1021,22 +998,22 @@ namespace Randomizer.Shared
             return comp;
         }
 
-            /// <summary>
-            /// Makes a new MERSeqVar_RandObjectList in the given sequence with the given values in ObjList.
-            /// </summary>
-            /// <param name="objects"></param>
-            /// <param name="sequence"></param>
-            /// <returns></returns>
-            public static ExportEntry CreateRandSeqVarList(ExportEntry sequence, params ExportEntry[] objects)
-            {
-                var list = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "MERSeqVar_RandObjectList", MERCaches.GlobalCommonLookupCache);
-                KismetHelper.AddObjectToSequence(list, sequence);
+        /// <summary>
+        /// Makes a new MERSeqVar_RandObjectList in the given sequence with the given values in ObjList.
+        /// </summary>
+        /// <param name="objects"></param>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        public static ExportEntry CreateRandSeqVarList(ExportEntry sequence, params ExportEntry[] objects)
+        {
+            var list = SequenceObjectCreator.CreateSequenceObject(sequence.FileRef, "MERSeqVar_RandObjectList", MERCaches.GlobalCommonLookupCache);
+            KismetHelper.AddObjectToSequence(list, sequence);
 
-                ArrayProperty<ObjectProperty> objList = new ArrayProperty<ObjectProperty>("ObjList");
-                objList.ReplaceAll(objects.Select(x => new ObjectProperty(x)));
-                list.WriteProperty(objList);
+            ArrayProperty<ObjectProperty> objList = new ArrayProperty<ObjectProperty>("ObjList");
+            objList.ReplaceAll(objects.Select(x => new ObjectProperty(x)));
+            list.WriteProperty(objList);
 
-                return list;
-            }
+            return list;
+        }
     }
 }

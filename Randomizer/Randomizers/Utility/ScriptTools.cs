@@ -54,7 +54,7 @@ namespace Randomizer.Randomizers.Utility
         {
             MERLog.Information($@"Installing script {scriptFilename} to export {targetExport.InstancedFullPath}");
             string scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptFilename}", shared);
-            InstallScriptTextToExport(target,targetExport, scriptText, scriptFilename, cache);
+            InstallScriptTextToExport(target, targetExport, scriptText, scriptFilename, cache);
         }
 
         /// <summary>
@@ -185,11 +185,11 @@ namespace Randomizer.Randomizers.Utility
                 }
 
                 throw new Exception($"Error compiling {className}: {string.Join(Environment.NewLine, log.AllErrors)}");
-}
+            }
 
-return parentExport != null
-    ? packageToInstallTo.FindExport($"{parentExport.InstancedFullPath}.{className}")
-    : packageToInstallTo.FindExport(className);
+            return parentExport != null
+                ? packageToInstallTo.FindExport($"{parentExport.InstancedFullPath}.{className}")
+                : packageToInstallTo.FindExport(className);
         }
 
         /// <summary>
@@ -201,55 +201,55 @@ return parentExport != null
         /// <param name="classIFP"></param>
         /// <exception cref="Exception"></exception>
         public static void AddToClassInPackageFromEmbedded(GameTarget target, IMEPackage packageToInstallTo, string scriptName, string classIFP)
-{
-    var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptName}.uc");
-    AddToClassInPackage(target, packageToInstallTo, scriptText, classIFP);
-}
-
-public static void AddToClassInPackage(GameTarget target, IMEPackage packageToInstallTo, string scriptText, string classIFP)
-{
-    var classExp = packageToInstallTo.FindExport(classIFP);
-    var fl = new FileLib(packageToInstallTo);
-    bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
-    if (!initialized)
-    {
-        MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
-        foreach (var v in fl.InitializationLog.AllErrors)
         {
-            MERLog.Error(v.Message);
+            var scriptText = MEREmbedded.GetEmbeddedTextAsset($"Scripts.{scriptName}.uc");
+            AddToClassInPackage(target, packageToInstallTo, scriptText, classIFP);
         }
 
-        throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
-    }
-    MessageLog log = UnrealScriptCompiler.AddOrReplaceInClass(classExp, scriptText, fl);
-    if (log.HasErrors)
-    {
-        Debugger.Break();
-    }
-}
-public static void CompileEmbeddedPropertiesToPackage(GameTarget target, IMEPackage packageToInstallTo, string textAssetName)
-{
-    var propertiesText = MEREmbedded.GetEmbeddedTextAsset($"Properties.{textAssetName}.uc");
-    var ifp = propertiesText.SplitToLines().First().TrimStart('/');
-    var targetExport = packageToInstallTo.FindExport(ifp);
-
-    var fl = new FileLib(packageToInstallTo);
-    bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
-    if (!initialized)
-    {
-        MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
-        foreach (var v in fl.InitializationLog.AllErrors)
+        public static void AddToClassInPackage(GameTarget target, IMEPackage packageToInstallTo, string scriptText, string classIFP)
         {
-            MERLog.Error(v.Message);
-        }
+            var classExp = packageToInstallTo.FindExport(classIFP);
+            var fl = new FileLib(packageToInstallTo);
+            bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
+            if (!initialized)
+            {
+                MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
+                foreach (var v in fl.InitializationLog.AllErrors)
+                {
+                    MERLog.Error(v.Message);
+                }
 
-        throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
-    }
-    var log = UnrealScriptCompiler.CompileDefaultProperties(targetExport, propertiesText, fl);
-    if (log.log.HasErrors)
-    {
-        Debugger.Break();
-    }
-}
+                throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
+            }
+            MessageLog log = UnrealScriptCompiler.AddOrReplaceInClass(classExp, scriptText, fl);
+            if (log.HasErrors)
+            {
+                Debugger.Break();
+            }
+        }
+        public static void CompileEmbeddedPropertiesToPackage(GameTarget target, IMEPackage packageToInstallTo, string textAssetName)
+        {
+            var propertiesText = MEREmbedded.GetEmbeddedTextAsset($"Properties.{textAssetName}.uc");
+            var ifp = propertiesText.SplitToLines().First().TrimStart('/');
+            var targetExport = packageToInstallTo.FindExport(ifp);
+
+            var fl = new FileLib(packageToInstallTo);
+            bool initialized = fl.Initialize(gameRootPath: target.TargetPath, packageCache: MERCaches.GlobalCommonLookupCache);
+            if (!initialized)
+            {
+                MERLog.Error($@"FileLib loading failed for package {packageToInstallTo.FileNameNoExtension}:");
+                foreach (var v in fl.InitializationLog.AllErrors)
+                {
+                    MERLog.Error(v.Message);
+                }
+
+                throw new Exception($"Failed to initialize FileLib for package {packageToInstallTo.FilePath}");
+            }
+            var log = UnrealScriptCompiler.CompileDefaultProperties(targetExport, propertiesText, fl);
+            if (log.log.HasErrors)
+            {
+                Debugger.Break();
+            }
+        }
     }
 }

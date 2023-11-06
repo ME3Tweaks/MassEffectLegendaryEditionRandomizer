@@ -9,6 +9,7 @@
                       xmlns:classes1="clr-namespace:RandomizerUI.Classes"
                       xmlns:randomizers="clr-namespace:Randomizer.Randomizers;assembly=Randomizer"
                       xmlns:targets="clr-namespace:ME3TweaksCore.Targets;assembly=ME3TweaksCore"
+                      xmlns:mer="clr-namespace:Randomizer.MER;assembly=Randomizer"
                       x:Class="RandomizerUI.MainWindow" 
                       IconScalingMode="ScaleDownLargerFrame" 
                       mc:Ignorable="d" 
@@ -239,12 +240,12 @@
                             <TextBlock TextWrapping="Wrap" Text="{Binding IntroTitleSubText}" FontSize="13" TextAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="Why do I need a game backup?" Margin="0,10,0,0" FontSize="20"/>
-                        <TextBlock FontSize="13">ME3Tweaks tools all use the same game backup, which allows quick restores. While a backup is not required to use this randomizer, it will save you a lot of time, making restores and re-randomization take seconds instead of minutes or hours.</TextBlock>
+                        <TextBlock FontSize="13">ME3Tweaks tools all use the same game backup, which allows quick restores. While a backup is not required to use this randomizer, it will save you a lot of time, making restores and re-randomization take seconds instead of minutes or hours. Make a backup before modding!</TextBlock>
                         <TextBlock Margin="0,10,0,0" FontSize="20">Does this work with other mods?</TextBlock>
-                        <TextBlock FontSize="13">This randomizer should be compatible with most mods, as it modifies existing files. Files that make wide changes to the game may not be compatible, see the NexusMods page for compatibility information.</TextBlock>
+                        <TextBlock FontSize="13">This randomizer should be compatible with most mods, as it modifies existing files. Files that make wide changes to the game may not be compatible, see the NexusMods page for compatibility information. Due to the scope of Randomizer, mod-specific compatibility cannot be guaranteed. A randomization should be installed after all content mods as it will modify installed files.</TextBlock>
 
                         <TextBlock Text="What languages are supported?" FontSize="20" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock Text="Development of this randomizer was done while playing in English. It should, in theory, work in other languages, but new audio may only play in English."/>
+                        <TextBlock Text="Development of this randomizer was done while playing in English. While the randomizer will work on other languages, changes to text and audio added by Randomizer may not work."/>
 
                         <TextBlock Text="Is this stream-safe?" FontSize="20" Margin="0,10,0,0"></TextBlock>
                         <TextBlock Text="Yes, this randomizer is designed to be stream safe. Options that change music are done with permission and won't get you DMCA'd." FontSize="13"/>
@@ -287,9 +288,9 @@
                         </Border>
                     </StackPanel>
                 </StackPanel>
-                <DockPanel Margin="35,0">
+                <DockPanel Margin="35,0" IsEnabled="{Binding AllowOptionsChanging}">
                     <GroupBox Header="Presets" DockPanel.Dock="Left">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,0,5" IsEnabled="{Binding AllowOptionsChanging}">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,0,5">
                             <Button Content="I want a good laugh" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="FunMode_Click"/>
                             <Button Content="I want varied gameplay" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="GameplayMode_Click"/>
                             <Button Content="Developer recommended" Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" HorizontalAlignment="Stretch" Click="Recommended_Click"/>
@@ -299,7 +300,7 @@
 
                     <GroupBox Header="RUN" DockPanel.Dock="Right">
                         <DockPanel>
-                            <Button DockPanel.Dock="Bottom" Command="{Binding OptionTogglerCommand}">
+                            <Button DockPanel.Dock="Bottom" Command="{Binding OptionTogglerCommand}" ToolTip="Turn currently-installed runtime randomizers on or off">
                                 <fonts:OutlinedTextBlock Text="Option toggler" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                             <Button  Command="{Binding StartRandomizationCommand}" Margin="0,0,0,5">
@@ -311,10 +312,10 @@
                     </GroupBox>
                     <GroupBox Header="Special options"  DockPanel.Dock="Right">
                         <StackPanel>
-                            <CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes.&#10;Some changes can only occur in basegame files and will always stack unless you perform a restore (quick or full)"
+                            <!--<CheckBox Content="Re-roll randomization" IsChecked="{Binding PerformReroll}" ToolTip="Checking this box will regenerate the DLC component, as if you performed a new randomization.&#10;Unchecking this box will make randomization occur on top of the existing randomization, effectively stacking your changes.&#10;Some changes can only occur in basegame files and will always stack unless you perform a restore (quick or full)"
                                       Controls:CheckBoxHelper.CheckGlyphForegroundChecked="White"
                                       Controls:CheckBoxHelper.CheckGlyphForegroundCheckedMouseOver="White"
-                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>
+                                      Controls:CheckBoxHelper.CheckGlyphForegroundCheckedPressed="Gray"/>-->
                             <CheckBox Content="Show randomizer labels" IsChecked="{Binding ShowLabels}" 
                                       Margin="0,5,0,0"
                                       ToolTip="Shows category and safety labels on each randomizer"
@@ -329,7 +330,7 @@
                             <Button Click="Logs_Click" MinWidth="20" ToolTip="Generate a diagnostics log for troubleshooting">
                                 <fonts:OutlinedTextBlock Text="Logs" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
-                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" MinWidth="20">
+                            <Button Name="BackupRestore_Button" Click="BackupRestore_Click" MinWidth="20" ToolTip="{Binding BackupRestoreToolTip}">
                                 <fonts:OutlinedTextBlock Text="{Binding BackupRestoreText, FallbackValue=Backup}" Fill="#f3fbfe" Stroke="Black" FontFamily="{StaticResource AeroLight}" FontSize="12" StrokeThickness="2" />
                             </Button>
                             <Button Visibility="{Binding ShowUninstallButton, Converter={StaticResource BoolToVisibilityConverter}}" MinWidth="40" ToolTip="Uninstall the DLC mod component of the randomization. You must repair your game to complete the restore." Command="{Binding UninstallDLCCommand}">
@@ -366,7 +367,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Bottom"  IsEnabled="{Binding AllowOptionsChanging}">
+                    <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Bottom" IsEnabled="{Binding AllowOptionsChanging}">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Right">
                             <StackPanel>
 
@@ -460,7 +461,7 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Images">
+                        <TabItem Header="Images" Visibility="{Binding ShowImageCredits, Converter={StaticResource BoolToVisibilityConverter}}">
                             <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="1100">
                                 <TextBlock DockPanel.Dock="Top" Margin="0,5" Text="Mass Effect 2 Randomizer uses the following images from third party sources. Images that required explicit permission for use may not be reused without their own license." TextWrapping="Wrap" TextAlignment="Center"/>
                                 <ListBox ItemsSource="{Binding ImageCredits}" Background="Transparent" ItemTemplate="{StaticResource CreditTemplate}">
@@ -499,12 +500,12 @@
                             </Grid.ColumnDefinitions>
                             <Image Source="masseffectrandomizer.ico" Grid.Row="0" Grid.Column="0" Margin="4" ToolTip="Hello!" RenderOptions.BitmapScalingMode="HighQuality"/>
                             <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,3,0,0">
-                                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Text="Mass Effect 2 Randomizer" FontWeight="Light" />
+                                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Text="{Binding RandomizerName}" FontWeight="Light" />
                                 <TextBlock x:Name="TextBlock_AssemblyVersion" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="15" FontWeight="Light" Text="Version" />
                                 <Image HorizontalAlignment="Left" Height="32" VerticalAlignment="Top" Source="images/me3tweaks.png" Margin="8,0,0,0" Cursor="Hand" MouseDown="Image_ME3Tweaks_Click" ToolTip="Software developed with love by ME3Tweaks" RenderOptions.BitmapScalingMode="HighQuality" />
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Left" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3,0,0">
-                                <TextBlock Text="Copyright (C) 2019-2021 ME3Tweaks&#xA;&#xA;This program is free software: you can redistribute it and/or modify it under the terms of the&#xA;GNU General Public License as published by the Free Software Foundation, either version 3 of the&#xA;License, or (at your option) any later version.&#xA;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without&#xA;even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the&#xA;GNU General Public License for more details.&#xA;&#xA;Mass Effect 2 is a registered trademark of EA INTERNATIONAL (STUDIO&#xA;AND PUBLISHING) LTD. This program has no affiliation with BioWare&#xA;or Electronic Arts." />
+                                <TextBlock Text="{Binding CopyrightString}"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>

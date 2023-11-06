@@ -382,16 +382,6 @@ namespace Randomizer.Randomizers.Game2.Misc
         private static void GarrusHeadZFixDLC(SquadMate bodyInfo, ExportEntry newHead)
         {
             GarrusHeadZFix(bodyInfo, newHead);
-
-            var newHolo = newHead.FileRef.FindExport("BIOG_TUR_HED_PROGarrus_ALT_R.Garrus.Visor_Alt_Hologram");
-            if (newHolo != null)
-            {
-                var data = newHolo.Data;
-                //RandomizeRGBA(data, 0x70C, false);
-                RSharedHolograms.RandomizeRGBA(data, 0x54E, false);
-                MERLog.Information($@"Randomized Garrus DLC head material {newHolo.InstancedFullPath} in {newHolo.FileRef.FilePath}");
-                newHolo.Data = data;
-            }
         }
 
         /// <summary>
@@ -577,6 +567,39 @@ namespace Randomizer.Randomizers.Game2.Misc
                 headMeshExp.ObjectFlags |= UnrealFlags.EObjectFlags.DebugPostLoad; // Mark as modified so we do not re-randomize it
 
                 UpdateHeadMeshPosition(squadmateInfo, newMdl);
+
+                // Todo: Loyalty and default
+                if (squadmateInfo.InternalName == "Assassin")
+                {
+                    // Correct the body materials. For some reason it includes the head
+                    Debug.WriteLine($">>>>>> {headMeshExp.InstancedFullPath}");
+                    var skmParent = headMeshExp.Parent as ExportEntry;
+                    var bodyMesh = skmParent.GetProperty<ObjectProperty>("Mesh").ResolveToExport(skmParent.FileRef);
+                    var bodyMaterials = bodyMesh.GetProperty<ArrayProperty<ObjectProperty>>("Materials");
+                    if (bodyMaterials != null)
+                    {
+                        bodyMaterials.RemoveAll(x =>
+                            x.ResolveToEntry(skmParent.FileRef).InstancedFullPath
+                                .Contains("_HED_")); // Remove head materials from body
+                        bodyMesh.WriteProperty(bodyMaterials);
+                    }
+                }
+                //Fix thane's outfits having materials in the wrong order and somehow breaking his outfit. Not sure how this works as it's on body, not head
+                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent") != null)
+                //{
+                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                //}
+
+                //// This needs looked further into as the UV mapping seems to be different...?
+                ////if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent") != null)
+                ////{
+                ////    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_01.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                ////}
+                //if (headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent") != null)
+                //{
+                //    headMeshExp.FileRef.FindExport("SFXGamePawnsDLC_CON_Pack01.Default__SFXPawn_Thane_02.BioPawnSkeletalMeshComponent").RemoveProperty("Materials");
+                //}
+
                 newMdl.ObjectName = newMdl.ObjectName.Name + $"_{squadmateInfo.ClassName}ified";
 
                 // Get parent object
@@ -689,29 +712,23 @@ namespace Randomizer.Randomizers.Game2.Misc
                     IMEPackage newMeshP;
                     var parent = headMeshExp.Parent as ExportEntry;
                     newMeshP = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "CorrectedMeshes.ChestsAndHeads.pcc"));
-                    /*
-                    if (parent.ObjectName == "Default__SFXPawn_Thane_02")
-                    {
-                        // Install DLC version of mesh
-                    }
-                    else
-                    {
-                        // Install basegame version of mesh
-                        newMeshP = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, "correctedmeshes.body.ThaneBodyNoEyelids.pcc"));
-                    }*/
 
                     var meshExp = parent.GetProperty<ObjectProperty>("Mesh").ResolveToEntry(headMeshExp.FileRef) as ExportEntry;
                     var targetMesh = (meshExp.GetProperty<ObjectProperty>("SkeletalMesh") ?? ((ExportEntry)meshExp.Archetype).GetProperty<ObjectProperty>("SkeletalMesh")).ResolveToEntry(headMeshExp.FileRef) as ExportEntry;
                     var newMDL = newMeshP.FindExport(targetMesh.InstancedFullPath);
 
-                    // Technically this should work
-                    //EntryImporter.ReplaceExportDataWithAnother(newMDL, targetMesh);
-                    // TODO: CACHE?
-                    var relinkFailures = EntryImporter.ImportAndRelinkEntries(EntryImporter.PortingOption.ReplaceSingular, newMDL, targetMesh.FileRef, targetMesh, true, new RelinkerOptionsPackage() { ErrorOccurredCallback = x => Debugger.Break() }, out _);
-                    if (relinkFailures.Any())
+                    // We check if it's null because custom outfits may change his mesh MDL. In the event we don't match,
+                    // we will not make changes.
+                    if (newMDL != null)
                     {
-                        MERLog.Fatal(@"FAILURE RELINKING THANE'S NO-EYELID MESH");
-                        Debugger.Break();
+                        var relinkFailures = EntryImporter.ImportAndRelinkEntries(
+                            EntryImporter.PortingOption.ReplaceSingularWithRelink, newMDL, targetMesh.FileRef, targetMesh, true,
+                            new RelinkerOptionsPackage() { ErrorOccurredCallback = x => Debugger.Break() }, out _);
+                        if (relinkFailures.Any())
+                        {
+                            MERLog.Fatal(@"FAILURE RELINKING THANE'S NO-EYELID MESH");
+                            Debugger.Break();
+                        }
                     }
                 }
 

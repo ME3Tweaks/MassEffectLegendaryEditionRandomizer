@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
@@ -7,6 +8,7 @@ using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
+using Randomizer.Shared;
 
 namespace Randomizer.Randomizers.Game2.Misc
 {
@@ -16,13 +18,15 @@ namespace Randomizer.Randomizers.Game2.Misc
         {
             MERControl.InstallBioPawnMERControl(target);
             CoalescedHandler.EnableFeatureFlag("bNPCMovementSpeedRandomizer"); // Non Player
+
+            SharedLE2Fixes.InstallLegionHereticChessFix(target);
             return true;
         }
 
         public static bool RandomizePlayerMovementSpeed(GameTarget target, RandomizationOption option)
         {
             MERControl.InstallBioPawnMERControl(target);
-            CoalescedHandler.EnableFeatureFlag("bPlayerMovementSpeedRandomizer"); 
+            CoalescedHandler.EnableFeatureFlag("bPlayerMovementSpeedRandomizer");
 
             // Todo: Put into BioPawn randomizer
             var biogame = CoalescedHandler.GetIniFile("BIOGame.ini");

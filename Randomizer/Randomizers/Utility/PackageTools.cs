@@ -21,7 +21,7 @@ namespace Randomizer.Randomizers.Utility
     public static class PackageTools
     {
         private static Regex isLevelPersistentPackage = new Regex("Bio([ADPS]|Snd)_[A-Za-z0-9]+.pcc", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static Regex isSublevelPackage = new Regex("Bio([ADPS]|Snd)_[A-Za-z0-9]+_[A-Za-z0-9]+.pcc", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex isSublevelPackage = new Regex("Bio([ADPS]|Snd)_[A-Za-z0-9]+_[A-Za-z0-9_]+.pcc", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Is this a localization file?

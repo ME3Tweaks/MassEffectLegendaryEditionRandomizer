@@ -16,7 +16,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 {
     public static class OmegaHub
     {
-        private static string[] danceKeywords = new[] { "Dancing", "Dismiss", "Across_The_Throat", "Begging", "Sexy", "ROM", };
+        private static string[] danceKeywords = new[] { "Dancing", "Dismiss", "Across_The_Throat", "Begging", "Sexy", "Point", "Angry", "Flirting", "Hostage", "Drug", "DrinkTalking", "Clap", "Dead" };
         public readonly static string[] notDanceKeywords = new[] { "Idle", "Base", "Standing", "Twitch", };
 
         private static void RandomizeVIPShepDance(GameTarget target)
@@ -60,16 +60,25 @@ namespace Randomizer.Randomizers.Game2.Levels
             var interp1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.SeqAct_Interp_0");
 
             // Make 2 additional dance options by cloning the interp and the data tree
-            var interp2 = MERSeqTools.CloneBasicSequenceObject(interp1);
-            var interp3 = MERSeqTools.CloneBasicSequenceObject(interp1);
+            var interp2 = KismetHelper.CloneObject(interp1, cloneChildren: true);
+            var interp3 = KismetHelper.CloneObject(interp1, cloneChildren: true);
+
+
+            var fadeToBlack = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_1");
+            var setGestureMode = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_SetGestureMode_1");
+            KismetHelper.CreateOutputLink(interp2, "Completed", setGestureMode);
+            KismetHelper.CreateOutputLink(interp2, "Stopped", setGestureMode);
+            KismetHelper.CreateOutputLink(interp2, "Stop", fadeToBlack);
+            KismetHelper.CreateOutputLink(interp3, "Completed", setGestureMode);
+            KismetHelper.CreateOutputLink(interp3, "Stopped", setGestureMode);
+            KismetHelper.CreateOutputLink(interp3, "Stop", fadeToBlack);
+
 
 
             // Clone the interp data for attaching to 2 and 3
             var interpData1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.InterpData_0");
-            var interpData2 = EntryCloner.CloneTree(interpData1);
-            var interpData3 = EntryCloner.CloneTree(interpData2);
-            KismetHelper.AddObjectToSequence(interpData2, sequence);
-            KismetHelper.AddObjectToSequence(interpData3, sequence);
+            var interpData2 = KismetHelper.CloneObject(interpData1, cloneChildren: true);
+            var interpData3 = KismetHelper.CloneObject(interpData1, cloneChildren: true);
 
             // Load ID for randomization
             interpDatas.Add(new InterpTools.InterpData(interpData1));
@@ -78,13 +87,8 @@ namespace Randomizer.Randomizers.Game2.Levels
 
 
             // Chance the data for interp2/3
-            var id2 = SeqTools.GetVariableLinksOfNode(interp2);
-            id2[0].LinkedNodes[0] = interpData2;
-            SeqTools.WriteVariableLinksToNode(interp2, id2);
-
-            var id3 = SeqTools.GetVariableLinksOfNode(interp3);
-            id3[0].LinkedNodes[0] = interpData3;
-            SeqTools.WriteVariableLinksToNode(interp3, id3);
+            KismetHelper.CreateVariableLink(interp2, "Data", interpData2);
+            KismetHelper.CreateVariableLink(interp3, "Data", interpData3);
 
             // Add additional finished states for fadetoblack when done
             KismetHelper.CreateOutputLink(loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Ambients.Dance.BioSeqAct_BlackScreen_1"), "Finished", interp2, 2);
