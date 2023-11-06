@@ -127,6 +127,7 @@ private final function RandomizePowers(BioPawn BP)
     local bool bHasDeathPower;
     local bool bHasMeleePower;
     local bool isLoadingMeleePower;
+    local bool isLoadingDeathPower;
     
     if (!CanRandomizePowers(BP))
     {
@@ -139,7 +140,21 @@ private final function RandomizePowers(BioPawn BP)
             I++;
             continue;
         }
+        if (Powers[I].default.PowerName == 'BioticCharge_NPC')
+        {
+            I++;
+            continue;
+        }
+        if (Powers[I].default.PowerName == 'Maw_Spit')
+        {
+            I++;
+            continue;
+        }
         PowerInfo = RandomPowerOptions[Rand(RandomPowerOptions.Length)];
+        if (((BP.Controller != None && BP.Controller.IsA('SFXAI_MechanicalTurret')) && !bHasDeathPower) && PowerInfo.CapabilityType != EBioCapabilityTypes.BioCaps_Death)
+        {
+            continue;
+        }
         if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death)
         {
             if (bHasDeathPower)
@@ -150,10 +165,10 @@ private final function RandomizePowers(BioPawn BP)
             {
                 continue;
             }
-        }
-        if (PowerInfo.CapabilityType == EBioCapabilityTypes.BioCaps_Death && BP.IsA('SFXPawn_Collector'))
-        {
-            continue;
+            if (BP.IsA('SFXPawn_Collector'))
+            {
+                continue;
+            }
         }
         isLoadingMeleePower = InStr(PowerInfo.BasePowerName, "Melee", TRUE, , ) >= 0;
         if ((!bHasMeleePower && !isLoadingMeleePower) && BP.IsA('SFXPawn_HuskLite'))
