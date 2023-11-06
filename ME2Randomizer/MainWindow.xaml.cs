@@ -202,10 +202,12 @@ namespace RandomizerUI
             contributors.Add("Vegz - Testing");
             contributors.Add("Khaar - 3D modeling");
             contributors.Add("Clericofshadows - 3D modeling");
+            contributors.Add("Tajfun403 - Technical, custom weapons");
             contributors.Add("Mellin - 3D modeling");
             contributors.Add("sinsofawindmill - UwU Emoticons implementation");
             contributors.Add("benefactor - Technical");
             contributors.Add("Audemus - ME2R images & templates");
+            contributors.Add("D. Senji - Music");
             contributors.Sort();
             return contributors;
         }
