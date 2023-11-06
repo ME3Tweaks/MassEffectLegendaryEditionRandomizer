@@ -75,7 +75,9 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
 
     public static class LE2Textures
     {
-
+        /// <summary>
+        /// Rebuilds the pre-configured TFC for shipped textures
+        /// </summary>
         public static void BuildPremadeTFC()
         {
 #if DEBUG
@@ -109,6 +111,13 @@ namespace Randomizer.Randomizers.Game2.TextureAssets.LE2
         {
             return new List<SourceTexture>()
             {
+                new SourceTexture()
+                {
+                    Filename = "H_Graphs_bsodtoasters.png",
+                    ContainingPackageName = "BioA_N7Mmnt1.pcc",
+                    IFPToBuildOff = "BioVFX_Env_Hologram.Textures.H_Graphs",
+                    Id = "HoloScreensBSODToasters"
+                },
                 new SourceTexture()
                 {
                     Filename = "H_Graphs_mybrandamazon.png",
