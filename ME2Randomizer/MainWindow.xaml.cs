@@ -44,7 +44,8 @@ namespace RandomizerUI
         private static string FaqLink = "https://me3tweaks.com/masseffectlerandomizer/faq";
         public bool ShowGenerationSelector => true;
 #elif __GAME2__
-        private static string FaqLink = "https://me3tweaks.com/masseffect2lerandomizer/faq";
+        // update once the page exists
+        private static string FaqLink = "https://www.nexusmods.com/masseffectlegendaryedition/mods/1952";
         public bool ShowGenerationSelector => true;
 #elif __GAME3__
         private static string FaqLink = "https://me3tweaks.com/masseffect3lerandomizer/faq";
