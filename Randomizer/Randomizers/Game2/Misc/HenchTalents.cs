@@ -355,7 +355,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                                 }
                             }
 
-                            // Update Rank 4 unevolved text
+                            // Update Rank 4 unevolved text (when the power is not yet at rank 4)
                             {
                                 var evolveRank = ranksSource[3];
                                 var descriptionProp = evolveRank.Properties.GetProp<StringRefProperty>("Description");
@@ -373,10 +373,30 @@ namespace Randomizer.Randomizers.Game2.Misc
                                     rankUnlockBlurb.Value = newStringID; // written below by addreplaceRanksSource
                                 }
                             }
+
+                            // Update Rank 4 for evolved powers
+                            {
+                                foreach (var rank4 in new[] { evo1, evo2 })
+                                {
+                                    var rank4Defaults = rank4.GetDefaults();
+                                    var rank4Props = rank4Defaults.GetProperties();
+                                    var descriptionProp = rank4Props.GetProp<StringRefProperty>("TalentDescription"); // Used during the pick an evolution dialog
+                                    var rank4Struct = rank4Props.GetProp<ArrayProperty<StructProperty>>("Ranks");
+                                    if (descriptionProp != null && rank4Struct != null && !TLKBuilder.IsAssignedMERString(descriptionProp.Value))
+                                    {
+                                        var description = TLKBuilder.TLKLookupByLang(descriptionProp.Value, MELocalization.INT, alsoLookedUpMER: true);
+                                        description = henchInfo.GenderizeString(description);
+                                        var newStringID = TLKBuilder.GetNewTLKID();
+                                        TLKBuilder.ReplaceString(newStringID, description);
+                                        descriptionProp.Value = newStringID;
+                                        rank4Struct[3].GetProp<StringRefProperty>("Description").Value = newStringID;
+                                        rank4Defaults.WriteProperties(rank4Props);
+                                    }
+                                }
+                            }
                         }
 
-                        props.AddOrReplaceProp(
-                            ranksSource); // copy the source rank info into our power with the modification
+                        props.AddOrReplaceProp(ranksSource); // copy the source rank info into our power with the modification
 
                         #endregion
 
@@ -387,27 +407,27 @@ namespace Randomizer.Randomizers.Game2.Misc
                             lock (tlkSync)
                             {
                                 // Talent Description
-                                var talentDescriptionProp =
-                                    talentSetBasePower.CondensedProperties.GetProp<StringRefProperty>(
-                                        "TalentDescription");
+                                var talentDescriptionProp = talentSetBasePower.CondensedProperties.GetProp<StringRefProperty>("TalentDescription");
                                 if (!TLKBuilder.IsAssignedMERString(talentDescriptionProp.Value))
                                 {
                                     var newStringID = TLKBuilder.GetNewTLKID();
-                                    TLKBuilder.ReplaceString(newStringID,
-                                        henchInfo.GenderizeString(talentSetBasePower.PassiveTalentDescriptionString));
+                                    TLKBuilder.ReplaceString(newStringID, henchInfo.GenderizeString(talentSetBasePower.PassiveTalentDescriptionString));
                                     talentDescriptionProp.Value = newStringID;
                                 }
 
                                 props.AddOrReplaceProp(talentDescriptionProp);
 
-                                var descriptionProp =
-                                    talentSetBasePower.CondensedProperties.GetProp<StringRefProperty>("Description");
+                                var descriptionProp = talentSetBasePower.CondensedProperties.GetProp<StringRefProperty>("Description");
                                 if (!TLKBuilder.IsAssignedMERString(descriptionProp.Value))
                                 {
                                     var newStringID = TLKBuilder.GetNewTLKID();
                                     TLKBuilder.ReplaceString(newStringID,
                                         henchInfo.GenderizeString(talentSetBasePower.PassiveDescriptionString));
                                     descriptionProp.Value = newStringID;
+                                }
+                                else
+                                {
+                                    Debugger.Break();
                                 }
 
                                 props.AddOrReplaceProp(descriptionProp);
@@ -563,6 +583,8 @@ namespace Randomizer.Randomizers.Game2.Misc
             MERFileSystem.SavePackage(sfxgame);
             // Patch the game tutorial to prevent softlock
             PatchOutTutorials(target);
+
+            SharedLE2Fixes.InstallLegionHereticChessFix(target); // This might affect it
 
             return true;
         }
