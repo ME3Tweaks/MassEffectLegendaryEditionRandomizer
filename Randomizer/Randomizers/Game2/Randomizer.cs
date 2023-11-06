@@ -46,8 +46,8 @@ namespace Randomizer.Randomizers.Game2
         private static List<string> SpecializedFiles { get; } = new List<string>()
         {
             "BioP_Char",
-            "BioD_Nor_103aGalaxyMap",
-            "BioG_UIWorld" // Char creator lighting
+            "BioD_Nor_103aGalaxyMap", // Galaxy Map
+            "BioG_UIWorld", // Char creator lighting
         };
 
         public Randomizer()
@@ -259,14 +259,14 @@ namespace Randomizer.Randomizers.Game2
                         SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizing game files [{currentFileNumber}/{files.Count}]");
 
 #if DEBUG
-                        //if (true
-                        ////&& false //uncomment to disable filtering
-                        //// && !file.Contains("BioH", StringComparison.InvariantCultureIgnoreCase)
-                        //// && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
-                        ////&& !file.Contains("TwrHub", StringComparison.InvariantCultureIgnoreCase)
-                        //// && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
-                        //)
-                        //    return;
+                        if (true
+                        //&& false //uncomment to disable filtering
+                         && !file.Contains("BioH_Assassin", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
+                        )
+                            return;
 #endif
                         try
                         {
@@ -387,8 +387,8 @@ namespace Randomizer.Randomizers.Game2
             RSharedMorphTarget.ResetClass();
             SquadmateHead.ResetClass();
             PawnPorting.ResetClass();
-            NPCHair.ResetClass();
             MERControl.ResetClass();
+            SharedLE2Fixes.ResetClass();
             MERCaches.Cleanup();
         }
 
@@ -437,7 +437,7 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true
                     },
                     new RandomizationOption() {HumanName = "Squadmate heads",
-                        Description = "Changes the heads of your squadmates",
+                        Description = "Changes the heads of your squadmates. Their facial animation will be a bit broken",
                         PerformSpecificRandomizationDelegate = SquadmateHead.ApplyFixes,
                         PerformRandomizationOnExportDelegate = SquadmateHead.RandomizeExport2,
                         // PerformFileSpecificRandomization = SquadmateHead.FilePrerun, // Miranda/Jacob fixes for ProCer
@@ -483,7 +483,7 @@ namespace Randomizer.Randomizers.Game2
                         SliderValue = 1.5, // This must come after the converter
                         PerformSpecificRandomizationDelegate = RBioMorphFace.RandomizeBioMorphFace2,
                         Description="Changes the face morphs on most pawns",
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRuntimeRandomizer = true,
                         GoodTimeRandomizer = true,
                     },
@@ -674,7 +674,7 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true
                     },
                     new RandomizationOption() {HumanName = "SizeSixteens mode",
-                        Description = "This option installs a change specific for the streamer SizeSixteens. If you watched his ME1 Randomizer streams, you'll understand the change.",
+                        Description = "This option installs a change specific for the streamer SizeSixteens. The original Randomizer was made for him!",
                         PerformSpecificRandomizationDelegate = SizeSixteens.InstallSSChanges,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         RequiresTLK = true,
@@ -768,7 +768,7 @@ namespace Randomizer.Randomizers.Game2
                         Description = "Gives enemies different guns. Enemies custom made for this randomizer will not have their weapons randomized",
                         PerformRandomizationOnExportDelegate = EnemyWeaponChanger.RandomizeExport,
                         PerformSpecificRandomizationDelegate = EnemyWeaponChanger.Init,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true,
                         GameplayRandomizer = true,
                         IsRuntimeRandomizer = true,
@@ -788,7 +788,7 @@ namespace Randomizer.Randomizers.Game2
                                 SubOptionKey = EnemyWeaponChanger.SUBOPTIONKEY_ENEMYWEAPONS_ONETIMERANDOMIZE,
                                 HumanName = MERRuntimeOption.RTO_TITLE_RANDOMIZEONCEPERLOADOUT,
                                 Description =
-                                    "Randomizes the weapon loadout of a pawn only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all enemies near each other (typically a level) will have the same weapons until the loadout object is dropped from memory",
+                                    "Randomizes the weapon loadout of a pawn only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all enemies near each other (typically a level) will have the same weapons until the loadout object is dropped from memory. This option can reduce load stuttering",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 IsOptionOnly = true,
                                 IsRuntimeRandomizer = true
@@ -810,7 +810,7 @@ namespace Randomizer.Randomizers.Game2
                         IsRuntimeRandomizer = true,
                         PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport2,
                         PerformSpecificRandomizationDelegate = EnemyPowerChanger.InitLE2R,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true,
                         GameplayRandomizer = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>(){
@@ -827,7 +827,7 @@ namespace Randomizer.Randomizers.Game2
                                     {
                                         SubOptionKey = EnemyPowerChanger.SUBOPTIONKEY_ENEMYPOWERS_ONETIMERANDOMIZE,
                                         HumanName = MERRuntimeOption.RTO_TITLE_RANDOMIZEONCEPERLOADOUT,
-                                        Description = "Randomizes the powers of a pawn type only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all same enemies near each other (typically a level) will have the same powers until the loadout object is dropped from memory",
+                                        Description = "Randomizes the powers of a pawn type only once; loadouts are often shared between multiple pawns of the same type. This will randomize it only once (rather than for each pawn), so all same enemies near each other (typically a level) will have the same powers until the loadout object is dropped from memory. This option can reduce load stuttering",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                         IsOptionOnly = true,
                                         IsRuntimeRandomizer = true
@@ -837,7 +837,7 @@ namespace Randomizer.Randomizers.Game2
                                         SubOptionKey = EnemyPowerChanger.SUBOPTIONKEY_ENEMYPOWERS_ENFORCEMINIMUM,
                                         IsRecommended = true,
                                         HumanName = MERRuntimeOption.RTO_TITLE_GIVEPOWERSTOALLENEMIES,
-                                        Description = "Ensures all enemies have at least 2 powers. Not all AI is equipped to use powers (e.g. husks). Significantly increases game difficulty",
+                                        Description = "Ensures all enemies have at least 2 powers. Not all AI is equipped to use powers (e.g. husks). This option may increase load stuttering. Significantly increases game difficulty",
                                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                         IsOptionOnly = true,
                                         IsRuntimeRandomizer = true
@@ -909,7 +909,7 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = MERRuntimeOption.RTO_TITLE_SUICIDEMISSION,
                         Description = "Sharply increases difficulty throughout the entire level, and totally overhauls the final boss fight. Try it on Insanity ;)",
                         PerformSpecificRandomizationDelegate = CollectorBase.PerformRandomization,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         RequiresTLK = true,
                         IsRecommended = true,
                         GameplayRandomizer = true,
@@ -1124,7 +1124,7 @@ namespace Randomizer.Randomizers.Game2
                         Description="Changes vowels in text in a consistent manner, making a 'new' language",
                         PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeVowels,
                         RequiresTLK = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
                         GoodTimeRandomizer = new Random().Next(2) == 0, // Half the time this will be labeled as 'good time' so the auto picker will choose it instead
@@ -1142,7 +1142,7 @@ namespace Randomizer.Randomizers.Game2
                     },
                     new RandomizationOption() {
                         HumanName = "UwU",
-                        Description="UwUifies all text in the game, often hilarious", PerformSpecificRandomizationDelegate = RSharedTexts.UwuifyText,
+                        Description="UwUifies all text in the game, often hiwwarious", PerformSpecificRandomizationDelegate = RSharedTexts.UwuifyText,
                         RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, MutualExclusiveSet="AllText",
                         StateChangingDelegate=optionChangingDelegate,
                         IsPostRun = true,
@@ -1162,7 +1162,7 @@ namespace Randomizer.Randomizers.Game2
                             {
                                 IsOptionOnly = true,
                                 HumanName = "Emoticons",
-                                Description = "Adds emoticons ^_^\n'Keep casing' recommended. Might break email or mission summaries, sowwy UwU",
+                                Description = "Adds emoticons ^_^ based on sentence context <(._.<)",
                                 Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                                 SubOptionKey = RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED,
                                 SelectOnPreset = true,
@@ -1181,7 +1181,7 @@ namespace Randomizer.Randomizers.Game2
                         HumanName = "Actors in cutscenes",
                         Description="Swaps pawns around in animated cutscenes. May break some due to complexity, but often hilarious",
                         PerformRandomizationOnExportDelegate = Cutscene.ShuffleCutscenePawns3,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true,
                         GoodTimeRandomizer = true
                         // This technically could be disabled post-install with modification of the pre-shuffler class...
