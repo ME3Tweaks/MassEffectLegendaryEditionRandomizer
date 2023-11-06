@@ -48,10 +48,10 @@ namespace Randomizer.Randomizers.Game2.Enemy
         /// How strong this pawn is
         /// </summary>
         public EPortablePawnClassification Classification { get; set; }
-        /// <summary>
-        /// List of textures that should be installed when this pawn is ported in. Key is the full asset path, value is the texture to install
-        /// </summary>
-        public RTexture2D[] TextureUpdates { get; set; }
+        ///// <summary>
+        ///// List of textures that should be installed when this pawn is ported in. Key is the full asset path, value is the texture to install
+        ///// </summary>
+        //public RTexture2D[] TextureUpdates { get; set; }
     }
     public class PawnPorting
     {
@@ -62,20 +62,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
         public static PortablePawn[] PortablePawns = new[]
         {
-            // YMIR Mech
-            //new PortablePawn()
-            //{
-            //    PackageFilename = "BioP_ProCer.pcc",
-            //    BioPawnTypeIFP = "BioChar_Mechs.SUB_HeavyWeaponMech",
-            //    AssetToPortIn = "BioChar_Mechs.SUB_HeavyWeaponMech",
-            //    AssetPaths = new[] {
-            //        "BIOG_CBT_MHV_NKD_R.NKDa.CBT_MHV_NKDa_MDL",
-            //    },
-            //    PawnClassPath = "SFXGamePawns.SFXPawn_HeavyMech",
-            //    Classification = EPortablePawnClassification.Subboss,
-            //    IsCorrectedPackage = false
-            //},
-
             // Bombinatiton
             new PortablePawn()
             {
@@ -105,20 +91,20 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 IsCorrectedPackage = true
             },
 
-            // Husk
-            new PortablePawn()
-            {
-                PackageFilename = "BioD_ShpCr2_170HubRoom2.pcc",
-                BioPawnTypeIFP = "BioChar_Collectors.SWARM_BlueHusk",
-                AssetToPortIn = "BioChar_Collectors.SWARM_BlueHusk",
-                AssetPaths = new[] {
-                    "BIOG_ZMB_ARM_NKD_R.NKDa.ZMBLite_ARM_NKDa_MDL",
-                    "BIOG_ZMB_ARM_NKD_R.NKDa.ZMB_ARM_NKDa_MAT_1a"
-                },
-                PawnClassPath = "SFXGamePawns.SFXPawn_HuskLite",
-                Classification = EPortablePawnClassification.Mook,
-                IsCorrectedPackage = false
-            },
+            // Husk - Not used
+            //new PortablePawn()
+            //{
+            //    PackageFilename = "BioD_ShpCr2_170HubRoom2.pcc",
+            //    BioPawnTypeIFP = "BioChar_Collectors.SWARM_BlueHusk",
+            //    AssetToPortIn = "BioChar_Collectors.SWARM_BlueHusk",
+            //    AssetPaths = new[] {
+            //        "BIOG_ZMB_ARM_NKD_R.NKDa.ZMBLite_ARM_NKDa_MDL",
+            //        "BIOG_ZMB_ARM_NKD_R.NKDa.ZMB_ARM_NKDa_MAT_1a"
+            //    },
+            //    PawnClassPath = "SFXGamePawns.SFXPawn_HuskLite",
+            //    Classification = EPortablePawnClassification.Mook,
+            //    IsCorrectedPackage = false
+            //},
 
             // Charging husk - charges immediately
             new PortablePawn()
@@ -164,25 +150,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 IsCorrectedPackage = true
             },
 
-            // Varren - they don't work properly when flown in
-            new PortablePawn()
-            {
-                PackageFilename = "SFXPawn_Varren.pcc",
-                BioPawnTypeIFP = "MERChar_Enemies.Animal.VarrenSpawnable",
-                AssetToPortIn = "MERChar_Enemies.Animal.VarrenSpawnable",
-                AssetPaths = new[] {
-                    "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MAT_2a",
-                    "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MAT_2b",
-                    "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MDL",
-                    "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MAT_3a",
-                    "BIOG_CBT_VAR_NKD_R.NKDa.CBT_VAR_NKDa_MAT_3b"
-                },
-                PawnClassPath = "MERGamePawns.SFXPawn_VarrenFull",
-                IsCorrectedPackage = true
-            },
-
             // collector sniper
-            
             new PortablePawn()
             {
                 PackageFilename = "SFXPawn_CollectorNeedler.pcc",
@@ -194,7 +162,6 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 PawnClassPath = "SFXGamePawns.SFXPawn_CollectorDrone",
                 IsCorrectedPackage = true
             },
-
 
             // collector flamer
             new PortablePawn()
@@ -209,6 +176,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 IsCorrectedPackage = true
             },
 
+            // Collector Kaidan
             new PortablePawn()
             {
                 PackageFilename = "SFXPawn_Kaidan.pcc",
@@ -220,6 +188,8 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 PawnClassPath = "MERGamePawns.SFXPawn_horcr1_kaidan",
                 IsCorrectedPackage = true
             },
+
+            // Collector Ashley
             new PortablePawn()
             {
                 PackageFilename = "SFXPawn_Ashley.pcc",
@@ -235,20 +205,22 @@ namespace Randomizer.Randomizers.Game2.Enemy
 
         public static void ResetClass()
         {
-            foreach (var pp in PortablePawns)
-            {
-                if (pp.TextureUpdates != null)
-                {
-                    foreach (var tu in pp.TextureUpdates)
-                    {
-                        tu.Reset();
-                    }
-                }
-            }
+            //foreach (var pp in PortablePawns)
+            //{
+            //    if (pp.TextureUpdates != null)
+            //    {
+            //        foreach (var tu in pp.TextureUpdates)
+            //        {
+            //            tu.Reset();
+            //        }
+            //    }
+            //}
         }
 
         internal static void PortHelper(GameTarget target)
         {
+#if LEGACY
+            // This is ME2R
             var pName = "BioPawn_CollectorAsari_S1.pcc";
             var afUindex = 2914;
 
@@ -259,6 +231,7 @@ namespace Randomizer.Randomizers.Game2.Enemy
                 var resolved = v.ResolveToEntry(package);
                 Debug.WriteLine($"\"{resolved.InstancedFullPath}\",");
             }
+#endif
         }
 
         public static bool IsPawnAssetInPackageAlready(PortablePawn pawn, IMEPackage targetPackage)
@@ -301,14 +274,14 @@ namespace Randomizer.Randomizers.Game2.Enemy
                     }
                 }
 
-                if (pawn.TextureUpdates != null)
-                {
-                    foreach (var tu in pawn.TextureUpdates)
-                    {
-                        var targetTextureExp = targetPackage.FindExport(tu.TextureInstancedFullPath);
-                        TextureHandler.InstallTexture(target, tu, targetTextureExp);
-                    }
-                }
+                //if (pawn.TextureUpdates != null)
+                //{
+                //    foreach (var tu in pawn.TextureUpdates)
+                //    {
+                //        var targetTextureExp = targetPackage.FindExport(tu.TextureInstancedFullPath);
+                //        TextureHandler.InstallTexture(target, tu, targetTextureExp);
+                //    }
+                //}
 
                 return true;
             }
