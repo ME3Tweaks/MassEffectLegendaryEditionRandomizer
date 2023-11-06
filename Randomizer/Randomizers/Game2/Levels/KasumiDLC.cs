@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if LEGACY
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -223,3 +224,4 @@ namespace Randomizer.Randomizers.Game2.Levels
         }
     }
 }
+#endif

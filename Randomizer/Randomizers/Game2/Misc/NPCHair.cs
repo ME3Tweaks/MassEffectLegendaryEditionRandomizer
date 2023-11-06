@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// This is not implemented in LE2R
+#if LEGACY
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -181,3 +184,4 @@ namespace Randomizer.Randomizers.Game2.Misc
         }
     }
 }
+#endif
