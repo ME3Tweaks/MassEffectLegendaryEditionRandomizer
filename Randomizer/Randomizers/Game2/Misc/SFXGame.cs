@@ -57,6 +57,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         public static bool RandomizeGameOverString(GameTarget target, RandomizationOption option)
         {
             // Install rotation code for strref
+            option.ProgressIndeterminate = true;
             MERControl.InstallMERControl(target);
             var sfxgame = SFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToPackage(target, sfxgame, "BioSFHandler_GameOver.HandleEvent", "BioSFHandler_GameOver.HandleEvent.uc", false);
