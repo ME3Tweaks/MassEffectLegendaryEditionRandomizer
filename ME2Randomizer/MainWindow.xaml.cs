@@ -195,6 +195,7 @@ namespace RandomizerUI
             }
         }
 
+        // Todo: move this into randomizer as it will be game specific.
         internal List<string> GetContributorCredits()
         {
             var contributors = new List<string>();
@@ -208,6 +209,7 @@ namespace RandomizerUI
             contributors.Add("benefactor - Technical");
             contributors.Add("Audemus - ME2R images & templates");
             contributors.Add("D. Senji - Music");
+            contributors.Add("ZumAstra - Testing");
             contributors.Sort();
             return contributors;
         }
