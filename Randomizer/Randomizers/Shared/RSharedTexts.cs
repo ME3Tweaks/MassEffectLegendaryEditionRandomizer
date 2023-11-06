@@ -140,7 +140,7 @@ namespace Randomizer.Randomizers.Shared
                 //    continue;
                 // See if strref has CUSTOMTOKEN or a control symbol
                 List<int> skipRanges = new List<int>();
-                FindSkipRanges(sref, skipRanges);
+                FindSkipRanges(sref.Data, skipRanges);
                 // uwuify it
                 StringBuilder sb = new StringBuilder();
                 char previousChar = (char)0x00;
@@ -229,6 +229,8 @@ namespace Randomizer.Randomizers.Shared
 
         private static string AddReactionToLine(string vanillaLine, string modifiedLine, bool keepCasing)
         {
+            var skipRanges = new List<int>();
+            FindSkipRanges(modifiedLine, skipRanges);
             string finalString = "";
             bool dangerousLine = false;
 
@@ -403,7 +405,35 @@ namespace Randomizer.Randomizers.Shared
 
                         if (!keepCasing)
                         {
-                            sm = sm.ToLower();
+                            if (skipRanges.Count > 0)
+                            {
+                                // Lowercase string but skip skip regions
+                                if (sm.Contains("%pausemenu", StringComparison.InvariantCultureIgnoreCase))
+                                    Debugger.Break();
+                                var newStr = sm.ToArray();
+                                for (int stri = 0; stri < sm.Length; stri++) // For every letter
+                                {
+                                    // Skip any items we should not skip.
+                                    if (skipRanges.Count > 0 && skipRanges[0] == stri)
+                                    {
+                                        stri = skipRanges[1] - 1; // We subtract one as the next iteration of the loop will +1 it again, which then will make it read the 'next' character
+                                        skipRanges.RemoveAt(0); // remove first 2
+                                        skipRanges.RemoveAt(0); // remove first 2
+
+                                        if (stri >= sm.Length - 1)
+                                            break;
+                                        continue;
+                                    }
+                                    newStr[stri] = char.ToLower(sm[stri]);
+                                }
+
+                                sm = new string(newStr);
+                            }
+                            else
+                            {
+                                // Lowercase whole thing. This is faster than having to build the string
+                                sm = sm.ToLower();
+                            }
                         }
                     }
                     else
@@ -530,21 +560,22 @@ namespace Randomizer.Randomizers.Shared
             return finalString;
         }
 
-        private static void FindSkipRanges(TLKStringRef sref, List<int> skipRanges)
+
+        private static void FindSkipRanges(string str, List<int> skipRanges)
         {
-            var str = sref.Data;
+            //var str = sref.Data;
             int startPos = -1;
             char openingChar = (char)0x00;
-            for (int i = 0; i < sref.Data.Length; i++)
+            for (int i = 0; i < str.Length; i++)
             {
-                if (startPos < 0 && (sref.Data[i] == '[' || sref.Data[i] == '<' || sref.Data[i] == '{'))
+                if (startPos < 0 && (str[i] == '[' || str[i] == '<' || str[i] == '{' || str[i] == '('))
                 {
                     startPos = i;
-                    openingChar = sref.Data[i];
+                    openingChar = str[i];
                 }
-                else if (startPos >= 0 && openingChar == '[' && sref.Data[i] == ']') // ui control token
+                else if (startPos >= 0 && openingChar == '[' && str[i] == ']') // ui control token
                 {
-                    var insideStr = sref.Data.Substring(startPos + 1, i - startPos - 1);
+                    var insideStr = str.Substring(startPos + 1, i - startPos - 1);
                     if (insideStr.StartsWith("Xbox", StringComparison.InvariantCultureIgnoreCase))
                     {
                         skipRanges.Add(startPos);
@@ -557,10 +588,10 @@ namespace Randomizer.Randomizers.Shared
                     openingChar = (char)0x00;
 
                 }
-                else if (startPos >= 0 && openingChar == '<' && sref.Data[i] == '>') //cust token
+                else if (startPos >= 0 && openingChar == '<' && str[i] == '>') //cust token
                 {
-                    var insideStr = sref.Data.Substring(startPos + 1, i - startPos - 1);
-                    if (insideStr.StartsWith("CUSTOM") || insideStr.StartsWith("font") || insideStr.StartsWith("/font") || insideStr.Equals("br", StringComparison.InvariantCultureIgnoreCase))
+                    var insideStr = str.Substring(startPos + 1, i - startPos - 1);
+                    if (insideStr.StartsWith("CUSTOM", StringComparison.CurrentCultureIgnoreCase) || insideStr.StartsWith("font", StringComparison.CurrentCultureIgnoreCase) || insideStr.StartsWith("/font", StringComparison.CurrentCultureIgnoreCase) || insideStr.Equals("br", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // custom token. Do not modify it
                         skipRanges.Add(startPos);
@@ -572,13 +603,29 @@ namespace Randomizer.Randomizers.Shared
                     startPos = -1;
                     openingChar = (char)0x00;
                 }
-                else if (startPos >= 0 && openingChar == '{' && sref.Data[i] == '}') // token for powers (?)
+                else if (startPos >= 0 && openingChar == '{' && str[i] == '}') // token for powers (?)
                 {
-                    //var insideStr = sref.Data.Substring(startPos + 1, i - startPos - 1);
+                    //var insideStr = str.Substring(startPos + 1, i - startPos - 1);
                     //Debug.WriteLine(insideStr);
                     // { } brackets are for ui tokens in powers, saves, I think.
                     skipRanges.Add(startPos);
                     skipRanges.Add(i + 1);
+
+                    startPos = -1;
+                    openingChar = (char)0x00;
+                }
+                else if (startPos >= 0 && openingChar == '(' && str[i] == ')')
+                {
+                    // Tokens seem to be (%PAUSEMENU) for example
+                    var insideStr = str.Substring(startPos + 1, i - startPos - 1);
+                    Debug.WriteLine(insideStr);
+
+                    if (str[startPos + 1] == '%')
+                    {
+                        // { } brackets are for ui tokens in powers, saves, I think.
+                        skipRanges.Add(startPos);
+                        skipRanges.Add(i + 1);
+                    }
 
                     startPos = -1;
                     openingChar = (char)0x00;
@@ -729,7 +776,7 @@ namespace Randomizer.Randomizers.Shared
                 }
                 // See if strref has CUSTOMTOKEN or a control symbol
                 List<int> skipRanges = new List<int>();
-                FindSkipRanges(sref, skipRanges);
+                FindSkipRanges(sref.Data, skipRanges);
 
                 var newStr = sref.Data.ToArray();
                 for (int i = 0; i < sref.Data.Length; i++) // For every letter
