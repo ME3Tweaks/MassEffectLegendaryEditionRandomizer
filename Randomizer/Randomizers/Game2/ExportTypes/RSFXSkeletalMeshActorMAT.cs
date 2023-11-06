@@ -104,7 +104,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     SetupChildrenBlend(animTreeTemplate);
 
 
-                    // If the animtree has 'DebugPostLoad' flag, it means MER already is using this for something else
+                    // If the animtree has 'DebugPostLoad' flag, it means MER already is using this for something else in this file
                     // We need to generate a new tree so the animations work properly
                     if (animTreeTemplate.ObjectFlags.Has(UnrealFlags.EObjectFlags.DebugPostLoad))
                     {
@@ -117,7 +117,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     else if (isSubfile)
                     {
                         // if it's a subfile it won't be used as an import
-                        // Let's rename this object
+                        // Let's rename this object so nearly files can't have memory collisions with this
                         animTreeTemplate.ObjectName = new NameReference("MER_AnimTree", ThreadSafeRandom.Next(20000000)); // New name
                     }
 

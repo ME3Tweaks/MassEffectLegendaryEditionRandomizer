@@ -474,8 +474,8 @@ namespace Randomizer.Randomizers.Game2.Levels
                 var interp1 = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.SeqAct_Interp_1");
 
                 // Make 2 additional dance options by cloning the interp and the data tree
-                var interp2 = KismetHelper.CloneObject(interp1);
-                var interp3 = KismetHelper.CloneObject(interp1);
+                var interp2 = KismetHelper.CloneObject(interp1, cloneChildren: true);
+                var interp3 = KismetHelper.CloneObject(interp1, cloneChildren: true);
 
                 var fadeToBlack = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_BlackScreen_1");
                 var setGestureMode = loungeP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Dancing_Shepard.BioSeqAct_SetGestureMode_1");
