@@ -19,7 +19,8 @@ namespace Randomizer.Randomizers.Shared
             option = 0;
             if (export.IsDefaultObject) return false;
 
-#if __GAME2__
+#if LEGACY && __GAME2__
+            // This is only for ME2R 
             if (export.ClassName == "Material")
             {
                 if (export.ObjectName.Name == "VI_ARM_NKD_Master_Mat")
@@ -45,13 +46,20 @@ namespace Randomizer.Randomizers.Shared
             return false;
         }
 
+        private static string[] disallowedHoloParams = new[]
+        {
+            "Static", // This mucks up scene2d
+            //"malfunction",
+            //"hFlicker",
+        };
+
         public static bool RandomizeExport(GameTarget target, ExportEntry exp, RandomizationOption option)
         {
             if (!CanRandomize(exp, out var coption)) return false;
             switch (coption)
             {
                 case option_hologram:
-                    RSharedMaterialInstance.RandomizeExport(exp, option);
+                    RSharedMaterialInstance.RandomizeExport(exp, option, disallowedHoloParams);
                     return true;
             }
 
