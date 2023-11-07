@@ -81,6 +81,7 @@ namespace Randomizer.MER
                             i--;
                             package = MERFileSystem.OpenMEPackage(file);
                             MERFileSystem.SetReadOnly(package, PreventSaves);
+                            break;
                         }
                         catch (IOException e)
                         {

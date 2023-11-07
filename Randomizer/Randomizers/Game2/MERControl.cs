@@ -93,17 +93,26 @@ namespace Randomizer.Randomizers.Game2
             }
         }
 
+        private static bool InstalledMERControl = false;
+
         public static bool InstallMERControl(GameTarget target)
         {
-            // Engine class
-            var engine = Engine.GetEngine(target);
-            ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
-            MERFileSystem.SavePackage(engine);
+            if (!InstalledMERControl)
+            {
+                // Engine class
+                var engine = Engine.GetEngine(target);
+                ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
+                MERFileSystem.SavePackage(engine);
 
-            var sfxgame = SFXGame.GetSFXGame(target);
-            ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
-            // MERFileSystem.SavePackage(sfxgame);
+                var sfxgame = SFXGame.GetSFXGame(target);
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
+                // MERFileSystem.SavePackage(sfxgame);
+
+                InstalledMERControl = true;
+            }
+
             return true;
+
         }
 
         public static void ResetClass()
@@ -111,6 +120,7 @@ namespace Randomizer.Randomizers.Game2
             InstalledBioPawnMERControl = false;
             InstalledBioMorphFaceClass = false;
             InstalledSFXSkeletalMeshActorMATMERControl = false;
+            InstalledMERControl = false;
         }
 
         public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.Add)

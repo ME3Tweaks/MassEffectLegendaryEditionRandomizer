@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if LEGACY
+using System.Linq;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
@@ -128,3 +129,4 @@ namespace Randomizer.Randomizers.Game2.Misc
         }
     }
 }
+#endif

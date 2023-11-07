@@ -20,6 +20,7 @@ using ME3TweaksCore.Targets;
 using Microsoft.WindowsAPICodePack.PortableDevices.CommandSystem.Object;
 using Newtonsoft.Json;
 using Randomizer.Randomizers;
+using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Game2.TextureAssets.LE2;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared.Classes;
@@ -35,8 +36,7 @@ namespace Randomizer.MER
         public static void InstallDebugScript(GameTarget target, string packagename, string scriptName)
         {
             Debug.WriteLine($"Installing debug script {scriptName}");
-            ScriptTools.InstallScriptToPackage(target, packagename, scriptName, "Debug." + scriptName + ".uc", false,
-                true);
+            ScriptTools.InstallScriptToPackage(target, packagename, scriptName, "Debug." + scriptName + ".uc", false, true);
         }
 
         [Conditional("DEBUG")]

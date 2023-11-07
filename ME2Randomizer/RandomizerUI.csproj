@@ -60,19 +60,22 @@
 	<!--VERSION INFO-->
 	<PropertyGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
 		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
+		<AssemblyTitle>Mass Effect Legendary Edition Randomizer</AssemblyTitle>
 		<Product>Mass Effect Legendary Edition Randomizer</Product>
 		<Description>Randomizer for Mass Effect Legendary Edition</Description>
 		<Copyright>2018-2023 ME3Tweaks</Copyright>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Game2Debug' Or '$(Configuration)'=='Game2Release'">
+		<AssemblyTitle>Mass Effect 2 Legendary Edition Randomizer</AssemblyTitle>
 		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
 		<Product>Mass Effect 2 Legendary Edition Randomizer</Product>
 		<Description>Randomizer for Mass Effect 2 Legendary Edition</Description>
 		<Copyright>2019-2023 ME3Tweaks</Copyright>
-		<Version>1.0.3</Version>
+		<Version>1.0.6</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Game3Debug' Or '$(Configuration)'=='Game3Release'">
+		<AssemblyTitle>Mass Effect 3 Legendary Edition Randomizer</AssemblyTitle>
 		<ApplicationIcon>masseffectrandomizer.ico</ApplicationIcon>
 		<Product>Mass Effect 3 Legendary Edition Randomizer</Product>
 		<Description>Randomizer for Mass Effect 3 Legendary Edition</Description>

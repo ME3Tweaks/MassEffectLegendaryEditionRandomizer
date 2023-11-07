@@ -261,7 +261,7 @@ namespace Randomizer.Randomizers.Game2
 #if DEBUG
                         if (true
                         //&& false //uncomment to disable filtering
-                         && !file.Contains("BioD_ProNor", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)

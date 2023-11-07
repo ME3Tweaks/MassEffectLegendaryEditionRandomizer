@@ -13,10 +13,14 @@
         MagSize.Y *= FRand() * RangeMult;
         MagSize.X = float(Class'Object'.static.FCeil(MagSize.X));
         MagSize.Y = float(Class'Object'.static.FCeil(MagSize.Y));
+        if (MagSize.X <= 0) MagSize.X = 1;
+        if (MagSize.Y <= 0) MagSize.Y = 1;
         MaxSpareAmmo.X *= FRand() * RangeMult;
         MaxSpareAmmo.Y *= FRand() * RangeMult;
         MaxSpareAmmo.X = float(Class'Object'.static.FCeil(MaxSpareAmmo.X));
         MaxSpareAmmo.Y = float(Class'Object'.static.FCeil(MaxSpareAmmo.Y));
+        if (MaxSpareAmmo.X <= 0) MaxSpareAmmo.X = 1;
+        if (MaxSpareAmmo.Y <= 0) MaxSpareAmmo.Y = 1;
         MinAimError.X *= FRand() * RangeMult;
         MinAimError.Y *= FRand() * RangeMult;
         MaxAimError.X *= FRand() * RangeMult;
