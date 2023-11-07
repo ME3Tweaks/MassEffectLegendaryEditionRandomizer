@@ -557,13 +557,12 @@ namespace Randomizer.Randomizers.Game2
                     //},
                     new RandomizationOption() {
                         HumanName = MERRuntimeOption.RTO_TITLE_ROMANCE,
-                        Description="Randomizes which romance you will get",
-                        IsRuntimeRandomizer = true,
+                        Description="Randomizes which romance you will get. This randomizes at runtime but does not support being toggled after install",
+                        // This is not a MER runtime randomizer
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
                         GoodTimeRandomizer = true,
-                        // IsRuntimeRandomizer = true, // Technically this could be coded in but i'm lazy
 
                     },
                     // This is not very interesting tbh
