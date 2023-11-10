@@ -28,10 +28,6 @@ using Windows.System;
 using LegendaryExplorerCore.Helpers;
 using Microsoft.WindowsAPICodePack.PortableDevices.CommandSystem.Object;
 using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
-using Randomizer.Randomizers.Game2.Enemy;
-using Randomizer.Randomizers.Game2.Levels;
-using Randomizer.Randomizers.Game2.Misc;
-using Randomizer.Randomizers.Game2;
 using System.Collections;
 using WinCopies.Util;
 

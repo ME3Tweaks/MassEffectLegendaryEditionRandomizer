@@ -9,9 +9,9 @@ using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Utility;
 
-namespace Randomizer.Randomizers.Game2.Misc
+namespace Randomizer.Randomizers.Shared
 {
-    public class Engine
+    public class RSharedEngine
     {
         public static IMEPackage GetEngine(GameTarget target)
         {

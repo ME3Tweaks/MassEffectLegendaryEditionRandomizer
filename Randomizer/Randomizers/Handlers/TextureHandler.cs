@@ -12,7 +12,7 @@ using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.TextureAssets.LE2;
+using Randomizer.Randomizers.Shared.Classes;
 
 namespace Randomizer.Randomizers.Handlers
 {

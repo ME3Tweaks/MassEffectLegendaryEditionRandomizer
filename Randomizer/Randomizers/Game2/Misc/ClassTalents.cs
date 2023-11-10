@@ -14,6 +14,7 @@ using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Levels;
 using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Misc
@@ -543,7 +544,7 @@ namespace Randomizer.Randomizers.Game2.Misc
 
             option.ProgressIndeterminate = true;
             option.CurrentOperation = "Adding fixes for class talent system";
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
             foreach (var className in ClasStrRefMap.Keys)
             {
                 ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "PlayerOnPowersLoaded", $"SFXPawn_Player{className}");

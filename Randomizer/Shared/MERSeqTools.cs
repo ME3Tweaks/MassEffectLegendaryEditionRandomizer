@@ -13,8 +13,6 @@ using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.Enemy;
-using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Shared
 {
@@ -690,6 +688,7 @@ namespace Randomizer.Shared
 
         }
 
+#if __GAME2__
         /// <summary>
         /// Creates a SeqVar_ObjectList with BioPawnTypes specified by the allowedPawns list that MER can port around
         /// </summary>
@@ -719,6 +718,7 @@ namespace Randomizer.Shared
 
             return MERSeqTools.CreateSeqVarList(sequence, bioPawnTypes.ToArray());
         }
+#endif
 
         /// <summary>
         /// Redirects all inputs to a given sequence object to another

@@ -2,8 +2,6 @@
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2;
-using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
@@ -42,7 +40,7 @@ namespace Randomizer.Randomizers.Shared
 
         public static bool RandomizeBioPawnLookatController(GameTarget target, RandomizationOption arg2)
         {
-            MERControl.InstallBioPawnMERControl(target);
+            RSharedMERControl.InstallBioPawnMERControl(target);
             CoalescedHandler.EnableFeatureFlag("bPawnLookatRandomizer");
             return true;
         }

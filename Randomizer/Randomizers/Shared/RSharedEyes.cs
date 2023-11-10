@@ -11,7 +11,6 @@ using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
@@ -35,8 +34,12 @@ namespace Randomizer.Randomizers.Shared
 
         public static bool InstallEyeRandomizer(GameTarget target, RandomizationOption option)
         {
-            MERControl.InstallBioPawnMERControl(target);
+            RSharedMERControl.InstallBioPawnMERControl(target);
+#if __GAME2__
             MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+#elif __GAME3__
+            // Stunt actor?
+#endif
             AddEyeSeekFree(target);
             CoalescedHandler.EnableFeatureFlag("bEyeRandomizer");
             return true;

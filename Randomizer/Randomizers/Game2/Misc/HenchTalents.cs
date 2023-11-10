@@ -13,6 +13,7 @@ using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Talents;
 using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Misc
@@ -569,7 +570,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             // Add the loadouts as a startup package to force overrides
             ThreadSafeDLCStartupPackage.AddStartupPackage(@"Startup_LE2R_HenchLoadouts");
 
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
 
             // Patch the initialize function for henchmen to refund any lost points
             ScriptTools.InstallScriptToPackage(target, sfxgame, "SFXPawn_Henchman.InitializeHenchman", "InitializeHenchman.uc", false);

@@ -85,11 +85,11 @@ namespace Randomizer.Randomizers.Handlers
             var gvTable = game.GetOrAddSection("SFXGame.BioGlobalVariableTable");
             gvTable.AddEntry(new CoalesceProperty("TimedPlotUnlocks", new CoalesceValue($"(PlotBool={boolIdx}, UnlockDay=0)", CoalesceParseAction.AddUnique)));
         }
+#endif
 
         /// <summary>
         /// Adds a bool to config with Type 2 to enable/disable runtime randomizers
         /// </summary>
-        /// <param name="boolIdx"></param>
         public static void EnableFeatureFlag(string featureFlagName, bool enabled = true)
         {
             var game = CoalescedHandler.GetIniFile("BioEngine");
@@ -107,7 +107,6 @@ namespace Randomizer.Randomizers.Handlers
             var controlEngine = game.GetOrAddSection("Engine.MERControlEngine");
             controlEngine.AddEntry(prop);
         }
-#endif
 
     }
 }

@@ -8,7 +8,6 @@ using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.Targets;
-using Randomizer.Randomizers.Game2.Misc;
 
 namespace Randomizer.MER
 {

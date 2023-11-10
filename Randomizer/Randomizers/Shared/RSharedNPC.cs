@@ -1,11 +1,5 @@
 ﻿using ME3TweaksCore.Targets;
-using Randomizer.Randomizers.Game2;
 using Randomizer.Randomizers.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Randomizer.Randomizers.Shared
 {
@@ -13,8 +7,13 @@ namespace Randomizer.Randomizers.Shared
     {
         public static bool InstallPawnColorRandomizer(GameTarget target, RandomizationOption option)
         {
-            MERControl.InstallBioPawnMERControl(target);
-            MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+            RSharedMERControl.InstallBioPawnMERControl(target);
+#if __GAME2__
+            // LE2 has SFXSkeletalMeshActorMAT
+            Randomizer.Randomizers.Game2.MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+#elif __GAME3__
+            // StuntActor?
+#endif
             CoalescedHandler.EnableFeatureFlag("bPawnColorsRandomizer");
             return true;
         }

@@ -30,7 +30,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         public static bool InstallIconicRandomizer(GameTarget target, RandomizationOption option)
         {
-            var sfxgame = MERControl.InstallBioMorphFaceRandomizerClasses(target) ?? SFXGame.GetSFXGame(target);
+            var sfxgame = MERControl.InstallBioMorphFaceRandomizerClasses(target) ?? RSharedSFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXSaveGame.LoadMorphHead"), "SFXSaveGame.LoadMorphHead.uc");
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioSFHandler_NewCharacter.StartGameWithCustomCharacter"), "BioSFHandler_NewCharacter.StartGameWithCustomCharacter.uc");
             MERFileSystem.SavePackage(sfxgame);
@@ -153,7 +153,7 @@ namespace Randomizer.Randomizers.Game2.Levels
 
         public static bool RandomizeCharacterCreator(GameTarget target, RandomizationOption option)
         {
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioSFHandler_NewCharacter.SelectNextPregeneratedHead"), "BioSFHandler_NewCharacter.SelectNextPregeneratedHead.uc");
             //ScriptTools.InstallScriptToExport(sfxgame.FindExport("BioSFHandler_NewCharacter.ApplyNewCode"), "BioSFHandler_NewCharacter.ApplyNewCode.uc");
             MERFileSystem.SavePackage(sfxgame);

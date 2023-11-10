@@ -24,7 +24,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             // Make the ship faster because otherwise it takes ages to do stuff
             // And can also consume more fuel
 
-            var sfxgameP = SFXGame.GetSFXGame(target);
+            var sfxgameP = RSharedSFXGame.GetSFXGame(target);
             var galaxyModCamDefaults = sfxgameP.FindExport("Default__BioCameraBehaviorGalaxy");
             var props = galaxyModCamDefaults.GetProperties();
 

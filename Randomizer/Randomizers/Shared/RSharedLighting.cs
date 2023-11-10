@@ -2,7 +2,6 @@
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
@@ -15,7 +14,7 @@ namespace Randomizer.Randomizers.Shared
     {
         public static bool InstallDynamicLightingRandomizer(GameTarget target, RandomizationOption option)
         {
-            var engine = Engine.GetEngine(target);
+            var engine = RSharedEngine.GetEngine(target);
             ScriptTools.AddToClassInPackageFromEmbedded(target, engine, "Light.PostBeginPlay", "Light");
             MERFileSystem.SavePackage(engine);
             CoalescedHandler.EnableFeatureFlag("bLightRandomizer");

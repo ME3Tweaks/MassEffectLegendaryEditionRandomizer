@@ -4,11 +4,12 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
 
-namespace Randomizer.Randomizers.Game2
+namespace Randomizer.Randomizers.Game1
 {
     /// <summary>
     /// Handler for MERControl enabled modifications

@@ -207,7 +207,7 @@ namespace Randomizer.Randomizers.Game2
                 }
 
                 // Save SFXGame to disk here
-                SFXGame.GetSFXGame(SelectedOptions.RandomizationTarget).Save();
+                RSharedSFXGame.GetSFXGame(SelectedOptions.RandomizationTarget).Save();
 
 
                 MERLog.Information($"Initialization complete, took {sw.ElapsedMilliseconds}ms");

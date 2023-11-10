@@ -2,7 +2,6 @@
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 
@@ -13,7 +12,7 @@ namespace Randomizer.Randomizers.Shared
 
         public static bool InstallDynamicHeightFogRandomizer(GameTarget target, RandomizationOption option)
         {
-            var engine = Engine.GetEngine(target);
+            var engine = RSharedEngine.GetEngine(target);
             ScriptTools.AddToClassInPackageFromEmbedded(target, engine, "HeightFog.PostBeginPlay", "HeightFog");
             MERFileSystem.SavePackage(engine);
             CoalescedHandler.EnableFeatureFlag("bFogRandomizer");

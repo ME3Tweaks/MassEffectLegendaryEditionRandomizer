@@ -12,6 +12,7 @@ using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
 using Serilog;
 
@@ -130,7 +131,7 @@ namespace Randomizer.Randomizers.Game2.Misc
         {
             option.ProgressIndeterminate = true;
 
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("SFXWeapon.PostBeginPlay"), "SFXWeapon.PostBeginPlay.uc");
             MERFileSystem.SavePackage(sfxgame);
 

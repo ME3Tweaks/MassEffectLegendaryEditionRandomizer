@@ -12,20 +12,17 @@ using Randomizer.MER;
 using Randomizer.Randomizers;
 using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
+using Randomizer.Randomizers.Shared.Classes;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game2.Misc
 {
     public class SFXGame
     {
-        public static IMEPackage GetSFXGame(GameTarget target)
-        {
-            return MERCaches.GlobalCommonLookupCache.GetCachedPackage("SFXGame.pcc");
-        }
-
         public static bool MakeShepardRagdollable(GameTarget target, RandomizationOption option)
         {
-            var sfxgame = GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
 
             // Add ragdoll power to shep
             var sfxplayercontrollerDefaults = sfxgame.FindExport(@"Default__SFXPlayerController");
@@ -59,7 +56,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             // Install rotation code for strref
             option.ProgressIndeterminate = true;
             MERControl.InstallMERControl(target);
-            var sfxgame = SFXGame.GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
             ScriptTools.InstallScriptToPackage(target, sfxgame, "BioSFHandler_GameOver.HandleEvent", "BioSFHandler_GameOver.HandleEvent.uc", false);
             MERFileSystem.SavePackage(sfxgame);
 
@@ -79,14 +76,14 @@ namespace Randomizer.Randomizers.Game2.Misc
 
         public static bool RandomizeWwiseEvents(GameTarget target, RandomizationOption option)
         {
-            var sfxgame = GetSFXGame(target);
+            var sfxgame = RSharedSFXGame.GetSFXGame(target);
             List<ExportEntry> referencedWwiseEvents = new List<ExportEntry>();
 
-            var f = GetAllProperties(sfxgame.FindExport("BioSFResources.GUI_Sound_Mappings").GetProperties());
+            var f = sfxgame.FindExport("BioSFResources.GUI_Sound_Mappings").GetProperties().GetAllProperties();
             // Get all resolved values
             foreach (var exp in sfxgame.Exports)
             {
-                var objProps = GetAllProperties(exp.GetProperties()).OfType<ObjectProperty>();
+                var objProps = exp.GetProperties().GetAllProperties().OfType<ObjectProperty>();
                 foreach (var op in objProps)
                 {
                     var resolvedValue = op.ResolveToExport(exp.FileRef);
@@ -104,7 +101,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             {
                 var propertyCollection = exp.GetProperties();
                 bool modified = false;
-                var objProps = GetAllProperties(propertyCollection).OfType<ObjectProperty>();
+                var objProps = propertyCollection.GetAllProperties().OfType<ObjectProperty>();
                 foreach (var op in objProps)
                 {
                     var resolvedValue = op.ResolveToExport(exp.FileRef);
@@ -125,40 +122,13 @@ namespace Randomizer.Randomizers.Game2.Misc
         }
 
         /// <summary>
-        /// Builds an enumeration of all properties. DO NOT ACCESS .Properties on arrays or structs - as they are also added to this list
-        /// </summary>
-        /// <param name="collection"></param>
-        /// <returns></returns>
-        private static IEnumerable<Property> GetAllProperties(List<Property> collection)
-        {
-            List<Property> props = new List<Property>();
-            props.AddRange(collection);
-            foreach (var subProp in collection)
-            {
-                if (subProp is ArrayPropertyBase apb)
-                {
-                    props.AddRange(GetAllProperties(apb.Properties.ToList()));
-                }
-                else if (subProp is StructProperty sp)
-                {
-                    props.AddRange(GetAllProperties(sp.Properties.ToList()));
-                }
-                else
-                {
-                }
-            }
-
-            return props;
-        }
-
-        /// <summary>
         /// Creates the loadoutdatamer class, and returns the unsaved package
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
         public static IMEPackage CreateAndSetupMERLoadoutClass(GameTarget target)
         {
-            var sfxGame = SFXGame.GetSFXGame(target);
+            var sfxGame = RSharedSFXGame.GetSFXGame(target);
 
             if (sfxGame.FindExport("SFXLoadoutDataMER") == null)
             {
