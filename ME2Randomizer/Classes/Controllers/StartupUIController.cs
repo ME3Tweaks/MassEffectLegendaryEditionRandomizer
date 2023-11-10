@@ -50,7 +50,7 @@ namespace RandomizerUI.Classes.Controllers
 #if !DEBUG
             if (APIKeys.HasAppCenterKey && !telemetryStarted)
             {
-                Microsoft.AppCenter.Crashes.Crashes.GetErrorAttachments = (ErrorReport report) =>
+                Crashes.GetErrorAttachments = (ErrorReport report) =>
                 {
                     var attachments = new List<ErrorAttachmentLog>();
                     // Attach some text.
@@ -221,102 +221,103 @@ namespace RandomizerUI.Classes.Controllers
                     cancellationTokenSource = ct,
                     ApplicationName = MERUI.GetRandomizerName(),
                     RequestHeader = MERUI.GetRandomizerName().Replace(" ", "").Replace("(", "").Replace(")", ""),
-                    ForcedUpgradeMaxReleaseAge = 3
-                };
+                    ForcedUpgradeMaxReleaseAge = 3,
+                    TagPrefix = MERUtilities.GetRandomizerShortName() + "-", // LE1R-,LE2R-,LE3R- are tag prefixes we will use
+            };
 
-                #endregion
+            #endregion
 
-                pd.SetMessage("Checking for application updates");
-                pd.Canceled += (sender, args) =>
-                {
-                    ct.Cancel();
-                };
-                AppUpdater.PerformGithubAppUpdateCheck(interopPackage);
+            pd.SetMessage("Checking for application updates");
+            pd.Canceled += (sender, args) =>
+            {
+                ct.Cancel();
+            };
+            AppUpdater.PerformGithubAppUpdateCheck(interopPackage);
 
-                // If user aborts download
-                pd.SetCancelable(false);
+            // If user aborts download
+            pd.SetCancelable(false);
+            pd.SetIndeterminate();
+            pd.SetTitle("Starting up");
+
+            void setStatus(string message)
+            {
                 pd.SetIndeterminate();
-                pd.SetTitle("Starting up");
+                pd.SetMessage(message);
+            }
 
-                void setStatus(string message)
+            GameTarget target = null;
+            try
+            {
+                pd.SetMessage($"Loading {MERUI.GetRandomizerName()} framework");
+                ToolTipService.ShowOnDisabledProperty.OverrideMetadata(typeof(Control),
+                    new FrameworkPropertyMetadata(true));
+                ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
+                    new FrameworkPropertyMetadata(int.MaxValue));
+                MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
+
+                TargetHandler.LoadTargets(); // Load game target
+
+                pd.SetMessage("Performing startup checks");
+                MERStartupCheck.PerformStartupCheck((title, message) =>
                 {
-                    pd.SetIndeterminate();
-                    pd.SetMessage(message);
-                }
-
-                GameTarget target = null;
-                try
-                {
-                    pd.SetMessage($"Loading {MERUI.GetRandomizerName()} framework");
-                    ToolTipService.ShowOnDisabledProperty.OverrideMetadata(typeof(Control),
-                        new FrameworkPropertyMetadata(true));
-                    ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
-                        new FrameworkPropertyMetadata(int.MaxValue));
-                    MEPackageHandler.GlobalSharedCacheEnabled = false; // ME2R does not use the global shared cache.
-
-                    TargetHandler.LoadTargets(); // Load game target
-
-                    pd.SetMessage("Performing startup checks");
-                    MERStartupCheck.PerformStartupCheck((title, message) =>
-                    {
-                        object o = new object();
-                        Application.Current.Dispatcher.Invoke(async () =>
-                        {
-                            if (Application.Current.MainWindow is MainWindow mw)
-                            {
-                                await mw.ShowMessageAsync(title, message);
-                                lock (o)
-                                {
-                                    Monitor.Pulse(o);
-                                }
-                            }
-                        });
-                        lock (o)
-                        {
-                            Monitor.Wait(o);
-                        }
-                    }, x => pd.SetMessage(x));
-
-                    // force initial refresh
+                    object o = new object();
                     Application.Current.Dispatcher.Invoke(async () =>
                     {
                         if (Application.Current.MainWindow is MainWindow mw)
                         {
-                            mw.MERPeriodicRefresh(null, null);
-
-                            // Start periodic
-                            PeriodicRefresh.OnPeriodicRefresh += mw.MERPeriodicRefresh;
-                            PeriodicRefresh.StartPeriodicRefresh();
+                            await mw.ShowMessageAsync(title, message);
+                            lock (o)
+                            {
+                                Monitor.Pulse(o);
+                            }
                         }
                     });
-                }
-                catch (Exception e)
-                {
-                    MERUILog.Exception(e, @"There was an error starting up the framework!");
-                }
+                    lock (o)
+                    {
+                        Monitor.Wait(o);
+                    }
+                }, x => pd.SetMessage(x));
 
-                pd.SetMessage("Preparing interface");
-                Thread.Sleep(250); // This will allow this message to show up for moment so user can see it.
-
+                // force initial refresh
                 Application.Current.Dispatcher.Invoke(async () =>
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
-                        mw.SetupTargetDescriptionText();
-                        mw.FinalizeInterfaceLoad();
+                        mw.MERPeriodicRefresh(null, null);
+
+                        // Start periodic
+                        PeriodicRefresh.OnPeriodicRefresh += mw.MERPeriodicRefresh;
+                        PeriodicRefresh.StartPeriodicRefresh();
                     }
                 });
-            };
-            bw.RunWorkerCompleted += async (a, b) =>
+            }
+            catch (Exception e)
+            {
+                MERUILog.Exception(e, @"There was an error starting up the framework!");
+            }
+
+            pd.SetMessage("Preparing interface");
+            Thread.Sleep(250); // This will allow this message to show up for moment so user can see it.
+
+            Application.Current.Dispatcher.Invoke(async () =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    mw.SetupTargetDescriptionText();
+                    mw.FinalizeInterfaceLoad();
+                }
+            });
+        };
+        bw.RunWorkerCompleted += async(a, b) =>
                     {
                         // Post critical startup
 
                         Random random = new Random();
-                        // LE2R does not use images like ME2R
+        // LE2R does not use images like ME2R
 #if __GAME1__
                         window.ImageCredits.ReplaceAll(ImageCredit.LoadImageCredits("imagecredits.txt", false));
 #endif
-                        window.ContributorCredits.ReplaceAll(window.GetContributorCredits());
+        window.ContributorCredits.ReplaceAll(window.GetContributorCredits());
                         window.LibraryCredits.ReplaceAll(LibraryCredit.LoadLibraryCredits("librarycredits.txt"));
                         // Todo: remove seed textbox as it's not used anymore, we don't support deterministic randomization
 #if !DEBUG
@@ -324,22 +325,22 @@ namespace RandomizerUI.Classes.Controllers
 #else
                         window.SeedTextBox.Text = random.Next().ToString();
 #endif
-                        window.TextBlock_AssemblyVersion.Text = $"Version {MLibraryConsumer.GetAppVersion()}";
+        window.TextBlock_AssemblyVersion.Text = $"Version {MLibraryConsumer.GetAppVersion()}";
 
                         if (!MERSettings.GetSettingBool(ESetting.SETTING_FIRSTRUN))
                         {
                             window.FirstRunFlyoutOpen = true;
                         }
-                        await pd.CloseAsync();
-                    };
-            bw.RunWorkerAsync();
+    await pd.CloseAsync();
+};
+bw.RunWorkerAsync();
         }
 
         public static object Prop { get; set; }
 
-        private static void RunOnUIThread(Action obj)
-        {
-            Application.Current.Dispatcher.Invoke(obj);
-        }
+private static void RunOnUIThread(Action obj)
+{
+    Application.Current.Dispatcher.Invoke(obj);
+}
     }
 }

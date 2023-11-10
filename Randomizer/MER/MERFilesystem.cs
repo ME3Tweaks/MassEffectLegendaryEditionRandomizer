@@ -28,6 +28,11 @@ namespace Randomizer.MER
         /// </summary>
         public const string PREVENT_SAVE_METADATA_NAME = "preventsave";
 
+        /// <summary>
+        /// Guid for tracking the source of a package
+        /// </summary>
+        public const string PACKAGE_DEBUG_GUID = "packageguid";
+
 #if __GAME1__
         /// <summary>
         /// The game this randomizer supports - this is the authoritative game
@@ -41,7 +46,7 @@ namespace Randomizer.MER
         /// </summary>
         public static MEGame Game = MEGame.LE2;
         public static readonly string[] filesToSkip = { "RefShaderCache-PC-D3D-SM5.upk", "IpDrv.pcc", "WwiseAudio.pcc", "SFXOnlineFoundation.pcc", "GFxUI.pcc" };
-        public static readonly string[] alwaysBasegameFiles = EntryImporter.FilesSafeToImportFrom(Game).Select(x=>Path.GetFileNameWithoutExtension(x).StripUnrealLocalization()).ToArray();
+        public static readonly string[] alwaysBasegameFiles = EntryImporter.FilesSafeToImportFrom(Game).Select(x => Path.GetFileNameWithoutExtension(x).StripUnrealLocalization()).ToArray();
 #elif __GAME3__
         /// <summary>
         /// The game this randomizer supports - this is the authoritative game
@@ -119,6 +124,20 @@ namespace Randomizer.MER
             if (preventSave)
             {
                 package.CustomMetadata[PREVENT_SAVE_METADATA_NAME] = true;
+            }
+
+            package.CustomMetadata[PACKAGE_DEBUG_GUID] = Guid.NewGuid();
+            if (path.Contains("SFXGame.pcc"))
+            {
+                if (sfxgameGuid == default(Guid))
+                {
+                    sfxgameGuid = (Guid)package.CustomMetadata[PACKAGE_DEBUG_GUID];
+                }
+                else
+                {
+                    // SHOULD NOT BE OPENING THIS!!!
+                    Debugger.Break();
+                }
             }
             return package;
         }
@@ -234,6 +253,9 @@ namespace Randomizer.MER
             }
             return result; // can return null
         }
+
+        public static int rmhSize = 0;
+        public static Guid sfxgameGuid;
 
         /// <summary>
         /// Saves an open package, if it is modified. Saves it to the correct location.

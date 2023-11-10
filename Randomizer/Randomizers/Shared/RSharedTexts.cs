@@ -408,8 +408,6 @@ namespace Randomizer.Randomizers.Shared
                             if (skipRanges.Count > 0)
                             {
                                 // Lowercase string but skip skip regions
-                                if (sm.Contains("%pausemenu", StringComparison.InvariantCultureIgnoreCase))
-                                    Debugger.Break();
                                 var newStr = sm.ToArray();
                                 for (int stri = 0; stri < sm.Length; stri++) // For every letter
                                 {
@@ -576,7 +574,7 @@ namespace Randomizer.Randomizers.Shared
                 else if (startPos >= 0 && openingChar == '[' && str[i] == ']') // ui control token
                 {
                     var insideStr = str.Substring(startPos + 1, i - startPos - 1);
-                    if (insideStr.StartsWith("Xbox", StringComparison.InvariantCultureIgnoreCase))
+                    if (insideStr.StartsWith("Xbox", StringComparison.InvariantCultureIgnoreCase) || insideStr.StartsWith("ui_", StringComparison.InvariantCultureIgnoreCase))
                     {
                         skipRanges.Add(startPos);
                         skipRanges.Add(i + 1);

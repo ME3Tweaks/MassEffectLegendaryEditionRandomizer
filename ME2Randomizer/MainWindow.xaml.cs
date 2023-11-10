@@ -44,7 +44,8 @@ namespace RandomizerUI
         private static string FaqLink = "https://me3tweaks.com/masseffectlerandomizer/faq";
         public bool ShowGenerationSelector => true;
 #elif __GAME2__
-        private static string FaqLink = "https://me3tweaks.com/masseffect2lerandomizer/faq";
+        // update once the page exists
+        private static string FaqLink = "https://www.nexusmods.com/masseffectlegendaryedition/mods/1952";
         public bool ShowGenerationSelector => true;
 #elif __GAME3__
         private static string FaqLink = "https://me3tweaks.com/masseffect3lerandomizer/faq";
@@ -195,6 +196,7 @@ namespace RandomizerUI
             }
         }
 
+        // Todo: move this into randomizer as it will be game specific.
         internal List<string> GetContributorCredits()
         {
             var contributors = new List<string>();
@@ -208,6 +210,7 @@ namespace RandomizerUI
             contributors.Add("benefactor - Technical");
             contributors.Add("Audemus - ME2R images & templates");
             contributors.Add("D. Senji - Music");
+            contributors.Add("ZumAstra - Testing");
             contributors.Sort();
             return contributors;
         }

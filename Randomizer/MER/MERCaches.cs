@@ -29,6 +29,7 @@ namespace Randomizer.MER
         /// </summary>
         public static void Cleanup()
         {
+            MERFileSystem.sfxgameGuid = default;
             _globalCommonLookupCache?.Dispose();
             _globalCommonLookupCache = null;
         }

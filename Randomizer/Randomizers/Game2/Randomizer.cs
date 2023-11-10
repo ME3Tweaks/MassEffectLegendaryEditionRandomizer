@@ -261,7 +261,8 @@ namespace Randomizer.Randomizers.Game2
 #if DEBUG
                         if (true
                         //&& false //uncomment to disable filtering
-                         && !file.Contains("BioH_Assassin", StringComparison.InvariantCultureIgnoreCase)
+                         && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
+                        // && !file.Contains("Nor", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProFre", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("ProCer", StringComparison.InvariantCultureIgnoreCase)
                         // && !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
@@ -297,7 +298,7 @@ namespace Randomizer.Randomizers.Game2
                         }
                         catch (Exception e)
                         {
-                            Log.Error($@"Exception occurred in per-file/export randomization: {e.Message}");
+                            MERLog.Exception(e,$@"Exception occurred in per-file/export randomization:");
                             TelemetryInterposer.TrackError(new Exception("Exception occurred in per-file/export randomizer", e));
                             Debugger.Break();
                         }
@@ -368,7 +369,10 @@ namespace Randomizer.Randomizers.Game2
 
             // Re-throw the unhandled exception after MERFS has closed
             if (rethrowException != null)
+            {
+                TelemetryInterposer.TrackError(rethrowException);
                 throw rethrowException;
+            }
         }
 
         private void CleanupInstallTimeOnlyFiles(List<string> installTimeOnlyPackages)
@@ -553,13 +557,12 @@ namespace Randomizer.Randomizers.Game2
                     //},
                     new RandomizationOption() {
                         HumanName = MERRuntimeOption.RTO_TITLE_ROMANCE,
-                        Description="Randomizes which romance you will get",
-                        IsRuntimeRandomizer = true,
+                        Description="Randomizes which romance you will get. This randomizes at runtime but does not support being toggled after install",
+                        // This is not a MER runtime randomizer
                         PerformSpecificRandomizationDelegate = Romance.PerformRandomization,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
                         GoodTimeRandomizer = true,
-                        // IsRuntimeRandomizer = true, // Technically this could be coded in but i'm lazy
 
                     },
                     // This is not very interesting tbh
@@ -1186,18 +1189,20 @@ namespace Randomizer.Randomizers.Game2
                         GoodTimeRandomizer = true
                         // This technically could be disabled post-install with modification of the pre-shuffler class...
                     },
-                    new RandomizationOption() {
-                            HumanName = "Animation data",
-                            PerformRandomizationOnExportDelegate = RSharedAnimSequence.RandomizeExport,
-                            SliderToTextConverter = RSharedAnimSequence.UIConverter,
-                            HasSliderOption = true,
-                            SliderValue = 1,
-                            Ticks = "1,2",
-                            Description="Fuzzes rigged bone positions and rotations",
-                            SliderTooltip = "Value determines which bones are used in the remapping. Default value is basic bones only.",
-                            Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
-                            GoodTimeRandomizer = true
-                    },
+                    // This does not seem to properly work currently
+                    // Needs more time in the oven
+                    //new RandomizationOption() {
+                    //        HumanName = "Animation data",
+                    //        PerformRandomizationOnExportDelegate = RSharedAnimSequence.RandomizeExport,
+                    //        SliderToTextConverter = RSharedAnimSequence.UIConverter,
+                    //        HasSliderOption = true,
+                    //        SliderValue = 1,
+                    //        Ticks = "1,2",
+                    //        Description="Fuzzes rigged bone positions and rotations",
+                    //        SliderTooltip = "Value determines which bones are used in the remapping. Default value is basic bones only.",
+                    //        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
+                    //        GoodTimeRandomizer = true
+                    //},
 
 
 
@@ -1224,7 +1229,7 @@ namespace Randomizer.Randomizers.Game2
                 {
                     new RandomizationOption()
                     {
-                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things", 
+                        HumanName = "Pawn sizes", Description = "Changes the size of characters. Will break a lot of things",
                         PerformRandomizationOnExportDelegate = RBioPawn.RandomizePawnSize,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP,
                         Ticks = "0.1,0.2,0.3,0.4,0.5,0.75",

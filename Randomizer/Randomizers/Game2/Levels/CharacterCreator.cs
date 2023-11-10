@@ -55,7 +55,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             return true;
         }
 
-#if ME2R
+#if LEGACY
         public static bool RandomizeIconicFemShep(GameTarget target, RandomizationOption option)
         {
             // LE version

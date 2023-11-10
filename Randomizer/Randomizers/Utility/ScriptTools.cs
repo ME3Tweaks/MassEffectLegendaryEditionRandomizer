@@ -11,6 +11,7 @@ using LegendaryExplorerCore.UnrealScript.Compiling.Errors;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
 
 namespace Randomizer.Randomizers.Utility
 {
@@ -46,7 +47,16 @@ namespace Randomizer.Randomizers.Utility
         /// <param name="shared"></param>
         public static IMEPackage InstallScriptToPackage(GameTarget target, string packageFile, string instancedFullPath, string scriptFilename, bool shared, bool saveOnFinish = false, PackageCache cache = null)
         {
-            var pf = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, packageFile));
+            IMEPackage pf;
+            if (packageFile == "SFXGame.pcc")
+            {
+                pf = SFXGame.GetSFXGame(target);
+            }
+            else
+            {
+                pf = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, packageFile));
+            }
+
             return InstallScriptToPackage(target, pf, instancedFullPath, scriptFilename, shared, saveOnFinish, cache);
         }
 

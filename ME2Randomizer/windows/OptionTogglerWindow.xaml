@@ -11,8 +11,8 @@
         WindowStartupLocation="CenterOwner"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         SizeToContent="WidthAndHeight"
-        MinWidth="200"
-        MinHeight="200"
+        MinWidth="400"
+        MinHeight="300"
         Title="Runtime Option Toggler">
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -24,7 +24,7 @@
     </Window.Resources>
     <DockPanel Margin="5">
         <DockPanel Dock="Top">
-            <TextBlock Text="Select which currently installed options to enable or disable." FontSize="16" Margin="0,2,20,2"/>
+            <TextBlock HorizontalAlignment="Left" Text="Select which currently installed options to enable or disable. You don't need to run the randomizer again after changing these settings." TextWrapping="Wrap" MaxWidth="400" FontSize="16" Margin="0,2,20,2"/>
         </DockPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
             <Button Command="{Binding CancelCommand}" Content="Cancel" HorizontalAlignment="Right" Margin="5,0"/>

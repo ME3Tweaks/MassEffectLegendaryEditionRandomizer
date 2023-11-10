@@ -34,8 +34,7 @@ namespace Randomizer.MER
         public static void InstallDebugScript(GameTarget target, string packagename, string scriptName)
         {
             Debug.WriteLine($"Installing debug script {scriptName}");
-            ScriptTools.InstallScriptToPackage(target, packagename, scriptName, "Debug." + scriptName + ".uc", false,
-                true);
+            ScriptTools.InstallScriptToPackage(target, packagename, scriptName, "Debug." + scriptName + ".uc", false, true);
         }
 
         [Conditional("DEBUG")]

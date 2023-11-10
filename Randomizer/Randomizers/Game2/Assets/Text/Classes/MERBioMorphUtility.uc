@@ -1,18 +1,6 @@
 ﻿Class MERBioMorphUtility
     config(Engine);
 
-// Types
-
-// Variables
-var config array<MorphRandomizationAlgorithm> HMMMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> HMFMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> ASAMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> KROMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> SALMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> TURMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> VORMorphAlgorithms;
-var config array<MorphRandomizationAlgorithm> SharedMorphAlgorithms;
-
 // Functions
 private static final function bool GetRandomAlgorithm(float randomizationLimit, Class<CustomMorphTargetSet> targetSet, out MorphRandomizationAlgorithm algorithm)
 {
@@ -46,33 +34,6 @@ private static final function bool GetRandomAlgorithm(float randomizationLimit, 
     }
     algorithm = generatedAlgo;
     return TRUE;
-    LogInternal("The following is currently unused", );
-    if (targetSet == Class'HMM_BaseMorphSet' && default.HMMMorphAlgorithms.Length > 0)
-    {
-        algorithm = default.HMMMorphAlgorithms[Rand(default.HMMMorphAlgorithms.Length)];
-        return TRUE;
-    }
-    if (targetSet == Class'HMF_BaseMorphSet' && default.HMFMorphAlgorithms.Length > 0)
-    {
-        algorithm = default.HMFMorphAlgorithms[Rand(default.HMFMorphAlgorithms.Length)];
-        return TRUE;
-    }
-    if (targetSet == Class'ASA_BaseMorphSet' && default.ASAMorphAlgorithms.Length > 0)
-    {
-        algorithm = default.ASAMorphAlgorithms[Rand(default.ASAMorphAlgorithms.Length)];
-        return TRUE;
-    }
-    if (targetSet == Class'KRO_baseMorphSet' && default.KROMorphAlgorithms.Length > 0)
-    {
-        algorithm = default.KROMorphAlgorithms[Rand(default.KROMorphAlgorithms.Length)];
-        return TRUE;
-    }
-    if (targetSet == Class'SAL_BaseMorphSet' && default.SALMorphAlgorithms.Length > 0)
-    {
-        algorithm = default.SALMorphAlgorithms[Rand(default.SALMorphAlgorithms.Length)];
-        return TRUE;
-    }
-    return FALSE;
 }
 public static function RandomizeBioMorphFace(BioMorphFace BMF, float randomizationLimit)
 {
@@ -322,72 +283,4 @@ private static final function bool GetCCAlgorithm(SFXMorphFaceFrontEndDataSource
 //class default properties can be edited in the Properties tab for the class's Default__ object.
 defaultproperties
 {
-    HMMMorphAlgorithms = ({
-                           AlgoName = "Anderson", 
-                           Randomizations = ({Feature = "Anderson", Min = 0.5, Max = 3.5, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "Joker", 
-                           Randomizations = ({Feature = "Anderson", Min = 0.5, Max = 3.5, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "SadFaceMaybe", 
-                           Randomizations = ({Feature = "Anderson", Min = 0.5, Max = 3.5, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "BigHair", 
-                           Randomizations = ({Feature = "Afro", Min = 0.0, Max = 4.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "AngryMan1", 
-                           Randomizations = ({Feature = "Eastwood", Min = 5.0, Max = 10.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}, 
-                                             {Feature = "eyes_BallBack", Min = 0.899999976, Max = 1.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}, 
-                                             {Feature = "eyes_RotateIn", Min = 0.0, Max = 1.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}, 
-                                             {Feature = "mouth_Down", Min = -3.0, Max = 1.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}, 
-                                             {Feature = "mouth_Wide", Min = -1.0, Max = 5.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}, 
-                                             {Feature = "nose_BendRight", Min = -3.0, Max = 3.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "Jacob", 
-                           Randomizations = ({Feature = "Jacob", Min = 0.0, Max = 2.5, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "Kaidan", 
-                           Randomizations = ({Feature = "Kaidan", Min = 0.0, Max = 3.75, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "SmolEyes", 
-                           Randomizations = ({Feature = "eyes_Big", Min = -40.0, Max = 0.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "ThiccEyes", 
-                           Randomizations = ({Feature = "eyes_Big", Min = 3.0, Max = 5.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }
-                         )
-    HMFMorphAlgorithms = ({
-                           AlgoName = "TallEyes", 
-                           Randomizations = ({Feature = "eyes_posup", Min = 0.5, Max = 4.0, MergeMode = EBMFFeatureMergeMode.Multiplicative, AddIfNotFound = TRUE}
-                                            )
-                          }, 
-                          {
-                           AlgoName = "EyesPoppinOut", 
-                           Randomizations = ({Feature = "eyes_ballforward", Min = -1.5, Max = 4.69999981, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }
-                         )
-    ASAMorphAlgorithms = ({
-                           AlgoName = "LargeTentacles", 
-                           Randomizations = ({Feature = "tentacle_Large", Min = -2.0, Max = 3.0, MergeMode = EBMFFeatureMergeMode.Exact, AddIfNotFound = TRUE}
-                                            )
-                          }
-                         )
 }
