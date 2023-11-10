@@ -11,7 +11,7 @@ using LegendaryExplorerCore.UnrealScript.Compiling.Errors;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game2.Misc;
+using Randomizer.Randomizers.Shared;
 
 namespace Randomizer.Randomizers.Utility
 {
@@ -50,7 +50,7 @@ namespace Randomizer.Randomizers.Utility
             IMEPackage pf;
             if (packageFile == "SFXGame.pcc")
             {
-                pf = SFXGame.GetSFXGame(target);
+                pf = RSharedSFXGame.GetSFXGame(target);
             }
             else
             {
