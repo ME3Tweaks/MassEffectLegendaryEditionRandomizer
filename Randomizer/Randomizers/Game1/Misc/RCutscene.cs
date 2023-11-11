@@ -274,7 +274,7 @@ namespace Randomizer.Randomizers.Game1.Misc
             return shufflerList.PullFirstItem(); // Could not find something else. Just take the first item
         }
 
-        private static bool BlackListedLinkDesc(SeqTools.VarLinkInfo vl)
+        private static bool BlackListedLinkDesc(VarLinkInfo vl)
         {
             if (vl == null) return true;
             if (vl.LinkDesc.StartsWith("line1")) return true; // Used in EndGm2 410 Hold The Line Huddle3 Intro to assign voice lines
