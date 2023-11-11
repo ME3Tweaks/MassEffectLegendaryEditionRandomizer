@@ -113,14 +113,14 @@ namespace Randomizer.Randomizers.Game1.Misc
         public static bool ShuffleCutscenePawns2(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export, out var cutsceneName)) return false;
-            var variableLinks = SeqTools.GetVariableLinksOfNode(export);
+            var variableLinks = KismetHelper.GetVariableLinksOfNode(export);
 
             // Entries that can be shuffled.
             // This list must not to have items removed!
             List<ExportEntry> pawnsToShuffleDirectAttached = new List<ExportEntry>();
             List<ExportEntry> pawnsToShuffleDynamicSet = new List<ExportEntry>();
 
-            var sequenceElements = SeqTools.GetAllSequenceElements(export).OfType<ExportEntry>().ToList(); ;
+            var sequenceElements = KismetHelper.GetAllSequenceElements(export).OfType<ExportEntry>().ToList(); ;
 
             foreach (var vl in variableLinks)
             {
@@ -246,7 +246,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                     //Debugger.Break();
                 }
 
-                SeqTools.WriteVariableLinksToNode(export, variableLinks);
+                KismetHelper.WriteVariableLinksToNode(export, variableLinks);
                 Debug.WriteLine($"Randomized {pawnsToShuffle.Count} links in animcutscene in {cutsceneName}, file {Path.GetFileName(export.FileRef.FilePath)}");
                 return true;
             }
@@ -274,7 +274,7 @@ namespace Randomizer.Randomizers.Game1.Misc
             return shufflerList.PullFirstItem(); // Could not find something else. Just take the first item
         }
 
-        private static bool BlackListedLinkDesc(SeqTools.VarLinkInfo vl)
+        private static bool BlackListedLinkDesc(VarLinkInfo vl)
         {
             if (vl == null) return true;
             if (vl.LinkDesc.StartsWith("line1")) return true; // Used in EndGm2 410 Hold The Line Huddle3 Intro to assign voice lines

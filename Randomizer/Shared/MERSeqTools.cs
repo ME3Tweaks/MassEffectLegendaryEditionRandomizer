@@ -125,7 +125,7 @@ namespace Randomizer.Shared
             foreach (var seqObj in sequenceElements)
             {
                 if (seqObj == node) continue; // Skip node pointing to itself
-                var linkSet = SeqTools.GetVariableLinksOfNode(seqObj);
+                var linkSet = KismetHelper.GetVariableLinksOfNode(seqObj);
                 if (linkSet.Any(x => x.LinkedNodes.Any(y => y == node)))
                 {
                     referencingNodes.Add(seqObj);
@@ -145,7 +145,7 @@ namespace Randomizer.Shared
             export.WriteProperty(new ObjectProperty(objValue.UIndex, "ObjValue"));
         }
 
-        public static void PrintVarLinkInfo(List<SeqTools.VarLinkInfo> seqLinks)
+        public static void PrintVarLinkInfo(List<VarLinkInfo> seqLinks)
         {
             foreach (var link in seqLinks)
             {
@@ -168,7 +168,7 @@ namespace Randomizer.Shared
         /// <returns></returns>
         public static bool IsAssignedClassType(ExportEntry sequenceObj, ExportEntry vlNode, List<ExportEntry> sequenceElements, string rootClass)
         {
-            var inboundConnections = SeqTools.FindVariableConnectionsToNode(vlNode, sequenceElements);
+            var inboundConnections = KismetHelper.FindVariableConnectionsToNode(vlNode, sequenceElements);
             foreach (var sequenceObject in inboundConnections)
             {
                 if (sequenceObject == sequenceObj)
@@ -178,7 +178,7 @@ namespace Randomizer.Shared
                 if (sequenceObject.InheritsFrom("SequenceAction") && sequenceObject.ClassName == "SeqAct_SetObject" && sequenceObject != sequenceObj)
                 {
                     //check if target is my node
-                    var referencingVarLinks = SeqTools.GetVariableLinksOfNode(sequenceObject);
+                    var referencingVarLinks = KismetHelper.GetVariableLinksOfNode(sequenceObject);
                     var targetLink = referencingVarLinks.FirstOrDefault(x => x.LinkDesc == "Target"); // What is the target node?
                     if (targetLink != null)
                     {
@@ -234,7 +234,7 @@ namespace Randomizer.Shared
         /// <returns></returns>
         public static ExportEntry GetNextNode(ExportEntry node, int outputLinkIdx)
         {
-            return SeqTools.GetOutboundLinksOfNode(node)[outputLinkIdx][0].LinkedOp as ExportEntry;
+            return KismetHelper.GetOutputLinksOfNode(node)[outputLinkIdx][0].LinkedOp as ExportEntry;
         }
 
         public static ExportEntry FindSequenceObjectByClassAndPosition(ExportEntry sequence, string className, int posX = int.MinValue, int posY = int.MinValue)
@@ -371,7 +371,7 @@ namespace Randomizer.Shared
 #if __GAME2__
         public static ExportEntry InstallMakeItCreepySingle(ExportEntry sourcePawnObj, ExportEntry destPawnObj)
         {
-            var sequence = SeqTools.GetParentSequence(sourcePawnObj);
+            var sequence = KismetHelper.GetParentSequence(sourcePawnObj);
             var creepyPrefab = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(MEGame.LE2, "SeqPrefabs.MakeItCreepy.pcc"), @"MakeItCreepy.pcc");
             var creepySeq = creepyPrefab.FindExport("MakeItCreepyInput");
 
@@ -464,7 +464,7 @@ namespace Randomizer.Shared
         /// <returns></returns>
         public static ExportEntry GetInterpData(ExportEntry seqActInterp)
         {
-            var links = SeqTools.GetVariableLinksOfNode(seqActInterp);
+            var links = KismetHelper.GetVariableLinksOfNode(seqActInterp);
             return links[0].LinkedNodes[0] as ExportEntry;
         }
 
@@ -729,12 +729,12 @@ namespace Randomizer.Shared
         /// <param name="newDestIdx"></param>
         public static void RedirectInboundLinks(ExportEntry original, ExportEntry newDest, int inputIdxOriginal = 0, int newDestIdx = 0)
         {
-            var parentSeq = SeqTools.GetParentSequence(original); // Use parent sequence. This ensures we can redirect on Sequence and SequenceReference
-            var seqObjects = SeqTools.GetAllSequenceElements(parentSeq).OfType<ExportEntry>();
-            var outboundNodes = SeqTools.FindOutboundConnectionsToNode(original, seqObjects);
+            var parentSeq = KismetHelper.GetParentSequence(original); // Use parent sequence. This ensures we can redirect on Sequence and SequenceReference
+            var seqObjects = KismetHelper.GetAllSequenceElements(parentSeq).OfType<ExportEntry>();
+            var outboundNodes = KismetHelper.FindOutputConnectionsToNode(original, seqObjects);
             foreach (var outboundNode in outboundNodes)
             {
-                var outboundLinks = SeqTools.GetOutboundLinksOfNode(outboundNode);
+                var outboundLinks = KismetHelper.GetOutputLinksOfNode(outboundNode);
                 foreach (var outLink in outboundLinks)
                 {
                     foreach (var linkedOp in outLink)
@@ -747,7 +747,7 @@ namespace Randomizer.Shared
                     }
                 }
 
-                SeqTools.WriteOutboundLinksToNode(outboundNode, outboundLinks);
+                KismetHelper.WriteOutputLinksToNode(outboundNode, outboundLinks);
             }
         }
 
@@ -795,19 +795,19 @@ namespace Randomizer.Shared
         /// </summary>
         public static void RemoveLinksTo(ExportEntry seqNode)
         {
-            var sequence = SeqTools.GetParentSequence(seqNode);
-            var nodes = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
-            var inboundNodes = SeqTools.FindOutboundConnectionsToNode(seqNode, nodes);
+            var sequence = KismetHelper.GetParentSequence(seqNode);
+            var nodes = KismetHelper.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+            var inboundNodes = KismetHelper.FindOutputConnectionsToNode(seqNode, nodes);
             foreach (var inbound in inboundNodes)
             {
-                var outbound = SeqTools.GetOutboundLinksOfNode(inbound);
+                var outbound = KismetHelper.GetOutputLinksOfNode(inbound);
                 foreach (var ob in outbound)
                 {
                     // Remove all items that link to our node
                     ob.RemoveAll(x => x.LinkedOp == seqNode);
                 }
 
-                SeqTools.WriteOutboundLinksToNode(inbound, outbound);
+                KismetHelper.WriteOutputLinksToNode(inbound, outbound);
             }
 
         }
@@ -898,28 +898,28 @@ namespace Randomizer.Shared
         /// <param name="mitmOutlinkName"></param>
         public static void InsertActionAfter(ExportEntry originalNode, string outlinkName, ExportEntry mitmNode, int mitmInputIdx, string mitmOutlinkName)
         {
-            var outLinkIdxToRedirect = SeqTools.GetOutlinkNames(originalNode).IndexOf(outlinkName);
+            var outLinkIdxToRedirect = KismetHelper.GetOutputLinkNames(originalNode).IndexOf(outlinkName);
             if (outLinkIdxToRedirect == -1)
             {
                 // Outlink needs made
                 KismetHelper.CreateNewOutputLink(originalNode, outlinkName, null);
-                outLinkIdxToRedirect = SeqTools.GetOutlinkNames(originalNode).IndexOf(outlinkName);
+                outLinkIdxToRedirect = KismetHelper.GetOutputLinkNames(originalNode).IndexOf(outlinkName);
             }
 
 
-            var originalOutLinks = SeqTools.GetOutboundLinksOfNode(originalNode);
-            var newOutLinks = SeqTools.GetOutboundLinksOfNode(originalNode);
+            var originalOutLinks = KismetHelper.GetOutputLinksOfNode(originalNode);
+            var newOutLinks = KismetHelper.GetOutputLinksOfNode(originalNode);
 
             newOutLinks[outLinkIdxToRedirect].Clear();
-            newOutLinks[outLinkIdxToRedirect].Add(new SeqTools.OutboundLink() { InputLinkIdx = mitmInputIdx, LinkedOp = mitmNode }); // Point only to our new node
-            SeqTools.WriteOutboundLinksToNode(originalNode, newOutLinks);
+            newOutLinks[outLinkIdxToRedirect].Add(new OutputLink() { InputLinkIdx = mitmInputIdx, LinkedOp = mitmNode }); // Point only to our new node
+            KismetHelper.WriteOutputLinksToNode(originalNode, newOutLinks);
 
-            var mitmOutLinks = SeqTools.GetOutboundLinksOfNode(mitmNode);
-            var mitmOutlinkIdxToUse = SeqTools.GetOutlinkNames(mitmNode).IndexOf(mitmOutlinkName);
+            var mitmOutLinks = KismetHelper.GetOutputLinksOfNode(mitmNode);
+            var mitmOutlinkIdxToUse = KismetHelper.GetOutputLinkNames(mitmNode).IndexOf(mitmOutlinkName);
 
             mitmOutLinks[mitmOutlinkIdxToUse] = originalOutLinks[outLinkIdxToRedirect]; // Use the original outlinks as the output from this outlink
 
-            SeqTools.WriteOutboundLinksToNode(mitmNode, mitmOutLinks);
+            KismetHelper.WriteOutputLinksToNode(mitmNode, mitmOutLinks);
         }
 
         /// <summary>

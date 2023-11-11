@@ -333,7 +333,7 @@ namespace RandomizerUI.Classes
                 SequenceFullName = interpNode.GetProperty<ObjectProperty>("ParentSequence").ResolveToEntry(interpNode.FileRef).InstancedFullPath;
                 UIndex = interpNode.UIndex;
 
-                var vars = SeqTools.GetVariableLinksOfNode(interpNode);
+                var vars = KismetHelper.GetVariableLinksOfNode(interpNode);
                 foreach (var v in vars)
                 {
                     if (v.LinkDesc == "Data")
@@ -498,7 +498,7 @@ namespace RandomizerUI.Classes
                 var modifyPPs = p.Exports.Where(x => x.ClassName == "BioSeqAct_ModifyPropertyPawn").ToList();
                 foreach (var modifyPP in modifyPPs)
                 {
-                    var vlinks = SeqTools.GetVariableLinksOfNode(modifyPP);
+                    var vlinks = KismetHelper.GetVariableLinksOfNode(modifyPP);
                     var min1health = vlinks.FirstOrDefault(x => x.LinkDesc.Equals("Min1Health"));
                     if (min1health != null)
                     {
