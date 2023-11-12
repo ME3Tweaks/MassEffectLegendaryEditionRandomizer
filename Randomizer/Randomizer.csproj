@@ -126,6 +126,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Remove="Randomizers\Game1\Assets\Text\Classes\MERControl.uc" />
+		<None Remove="Randomizers\Game1\Assets\Text\Classes\MERControlEngine.uc" />
+		<None Remove="Randomizers\Game1\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControl.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControlEngine.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERMorphStructs.uc" />
