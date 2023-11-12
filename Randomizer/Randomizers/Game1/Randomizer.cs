@@ -21,9 +21,11 @@ using Randomizer.Randomizers.Game1._2DA;
 using Randomizer.Randomizers.Game1.ExportTypes;
 using Randomizer.Randomizers.Game1.Levels;
 using Randomizer.Randomizers.Game1.Misc;
+using Randomizer.Randomizers.Game1.TextureAssets.LE1;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Levels;
 using Randomizer.Randomizers.Shared;
+using Randomizer.Randomizers.Shared.Classes;
 using Randomizer.Randomizers.Utility;
 using Serilog;
 
@@ -36,8 +38,8 @@ namespace Randomizer.Randomizers.Game1
         // Files that should not be generally passed over
         private static List<string> SpecializedFiles { get; } = new List<string>()
         {
-            "BioP_Char",
-            "BioD_Nor_103aGalaxyMap",
+            "EntryMenu",
+            //"BioD_Nor_103aGalaxyMap",
             "BioG_UIWorld" // Char creator lighting
         };
 
@@ -109,7 +111,7 @@ namespace Randomizer.Randomizers.Game1
         private void PerformRandomization(object sender, DoWorkEventArgs e)
         {
             MemoryManager.SetUsePooledMemory(true, false, false, (int)FileSize.KibiByte * 8, 4, 2048, false);
-            //ResetClasses();
+            ResetClasses();
             SelectedOptions.SetRandomizationInProgress?.Invoke(true);
             SelectedOptions.SetCurrentOperationText?.Invoke("Initializing randomizer");
             SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
@@ -137,35 +139,19 @@ namespace Randomizer.Randomizers.Game1
                 MERFileSystem.InitMERFS(SelectedOptions);
 
                 // Install ASIs required to make game work with DLC
-                var asigame = new ASIGame(SelectedOptions.RandomizationTarget);
-                if (SelectedOptions.RandomizationTarget.Game == MEGame.ME1)
-                {
-                    var asiList = ASIManager.MasterME1ASIUpdateGroups;
-                    ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.ME1_DLC_MOD_ENABLER), SelectedOptions.RandomizationTarget);
-                }
-                else if (SelectedOptions.RandomizationTarget.Game == MEGame.LE1)
-                {
-                    var asiList = ASIManager.MasterLE1ASIUpdateGroups;
-                    ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.LE1_AUTOTOC), SelectedOptions.RandomizationTarget);
-                    ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.LE1_AUTOLOAD_ENABLER), SelectedOptions.RandomizationTarget);
-                }
-                else
-                {
-                    throw new Exception("CANNOT RANDOMIZE THIS GAME");
-                }
+                var asiList = ASIManager.MasterLE1ASIUpdateGroups;
+                ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.LE1_AUTOTOC), SelectedOptions.RandomizationTarget);
+                ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.LE1_AUTOLOAD_ENABLER), SelectedOptions.RandomizationTarget);
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
+                // Load any special initializions here
+
                 // Prepare the textures
-                //if (SelectedOptions.RandomizationTarget.Game == MEGame.ME2)
-                //{
-                //    ME2Textures.SetupME2Textures(SelectedOptions.RandomizationTarget);
-                //}
-                //else
-                //{
-                //    LE2Textures.SetupLE2Textures(SelectedOptions.RandomizationTarget);
-                //}
+                LE1Textures.SetupLE1Textures(SelectedOptions.RandomizationTarget);
+
+                SharedRandomizer.InventoryCustomKismetClasses();
 
                 void srUpdate(object? o, EventArgs eventArgs)
                 {
@@ -222,7 +208,7 @@ namespace Randomizer.Randomizers.Game1
                         if (true
                 //&& false //uncomment to disable filtering
                 //&& !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
-                //&& !file.Contains("SFXGame", StringComparison.InvariantCultureIgnoreCase)
+                && !file.Contains("PRO", StringComparison.InvariantCultureIgnoreCase)
                 && !file.Contains("NOR", StringComparison.InvariantCultureIgnoreCase)
                 && !file.Contains("STA", StringComparison.InvariantCultureIgnoreCase)
                 )
@@ -305,7 +291,7 @@ namespace Randomizer.Randomizers.Game1
             CoalescedHandler.EndHandler();
             TLKBuilder.EndHandler();
             MERFileSystem.Finalize(SelectedOptions);
-            //ResetClasses();
+            ResetClasses();
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
 
@@ -314,16 +300,13 @@ namespace Randomizer.Randomizers.Game1
                 throw rethrowException;
         }
 
-        //        /// <summary>
-        //        /// Ensures things are set back to normal before first run
-        //        /// </summary>
-        //        private void ResetClasses()
-        //        {
-        //            RMorphTarget.ResetClass();
-        //            SquadmateHead.ResetClass();
-        //            PawnPorting.ResetClass();
-        //            NPCHair.ResetClass();
-        //        }
+        /// <summary>
+        /// Ensures things are set back to normal before first run
+        /// </summary>
+        private void ResetClasses()
+        {
+            SharedRandomizer.CleanupInstallTimeOnlyFiles();
+        }
 
 
         /// <summary>
@@ -872,9 +855,9 @@ namespace Randomizer.Randomizers.Game1
                 {
                     new RandomizationOption() {
                         HumanName = "Actors in cutscenes",
-                        Description="Swaps pawns around in animated cutscenes. May break some due to complexity, but often hilarious",
-                        PerformRandomizationOnExportDelegate = RCutscene.ShuffleCutscenePawns2,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        Description="Swaps pawns around in animated cutscenes",
+                        PerformRandomizationOnExportDelegate = RSharedCutscene.ShuffleCutscenePawns,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true
                     },
                     // Due to how stage placement works this doesn't really work very well in this game.
@@ -915,15 +898,15 @@ namespace Randomizer.Randomizers.Game1
                         HumanName = "Conversation Wheel", PerformRandomizationOnExportDelegate = RBioConversation.RandomizeExportReplies,
                         Description = "Changes replies in wheel. Can make conversations hard to exit",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Unsafe
-                    },
-                    new RandomizationOption()
-                    {
-                        HumanName = "Actors in conversations",
-                        PerformFileSpecificRandomization = RBioConversation.RandomizePackageActorsInConversation,
-                        Description = "Changes pawn roles in conversations. Somewhat buggy simply due to complexity and restrictions in engine, but can be entertaining",
-                        IsRecommended = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning
                     },*/
+                    //new RandomizationOption()
+                    //{
+                    //    HumanName = "Actors in conversations",
+                    //    PerformFileSpecificRandomization = RBioConversation.RandomizeActorsInConversation,
+                    //    Description = "Changes pawn roles in conversations. Somewhat buggy simply due to complexity and restrictions in engine, but can be entertaining",
+                    //    IsRecommended = true,
+                    //    Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning
+                    //},
 
                     new RandomizationOption()
                     {

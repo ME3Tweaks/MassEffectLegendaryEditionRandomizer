@@ -37,7 +37,7 @@ namespace Randomizer.Randomizers.Game3.Misc
                 var exp = package.FindExport(v);
                 if (exp != null)
                 {
-                    ScriptTools.InstallScriptTextToExport(exp, PatchMapping[v], $"AI patch - {v}", MERCaches.GlobalCommonLookupCache);
+                    ScriptTools.InstallScriptTextToExport(target, exp, PatchMapping[v], $"AI patch - {v}", MERCaches.GlobalCommonLookupCache);
                 }
             }
 
@@ -154,16 +154,16 @@ namespace Randomizer.Randomizers.Game3.Misc
             initializePowerListScript = initializePowerListScript.Replace("%POWERSLIST%", sb.ToString());
 
 
-            ScriptTools.InstallScriptTextToExport(sfxgame.FindExport("SFXPowerManager.InitializePowerList"), initializePowerListScript, "InitializePowerList", MERCaches.GlobalCommonLookupCache);
+            ScriptTools.InstallScriptTextToExport(target, sfxgame.FindExport("SFXPowerManager.InitializePowerList"), initializePowerListScript, "InitializePowerList", MERCaches.GlobalCommonLookupCache);
 
             // Add script to promote power usage.
-            ScriptTools.InstallScriptToPackage(sfxgame, "SFXPowerCustomAction.ShouldUsePowerOnShields", "EnemyPowersSFXGame.ShouldUsePowerOnShields.uc", false, false, cache: MERCaches.GlobalCommonLookupCache);
+            ScriptTools.InstallScriptToPackage(target, sfxgame, "SFXPowerCustomAction.ShouldUsePowerOnShields", "EnemyPowersSFXGame.ShouldUsePowerOnShields.uc", false, false, cache: MERCaches.GlobalCommonLookupCache);
 
 
 
 #if DEBUG
-            MERDebug.InstallDebugScript(sfxgame, "SFXAI_Core.ChooseAttack", false);
-            MERDebug.InstallDebugScript(sfxgame, "SFXAI_Core.Attack", false);
+            MERDebug.InstallDebugScript(target, sfxgame, "SFXAI_Core.ChooseAttack", false);
+            MERDebug.InstallDebugScript(target, sfxgame, "SFXAI_Core.Attack", false);
 #endif
             MERFileSystem.SavePackage(sfxgame);
             return true;
