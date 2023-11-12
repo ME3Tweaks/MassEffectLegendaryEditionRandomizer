@@ -123,7 +123,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             var randSwitch = galaxyMapObjsP.FindExport("TheWorld.PersistentLevel.Main_Sequence.GalaxyMap.SequenceReference_0.Sequence_4.SeqAct_RandomSwitch_1");
             var newLinkNum = MERSeqTools.AddRandomSwitchOutput(randSwitch);
 
-            var delay = MERSeqTools.CreateDelay(SeqTools.GetParentSequence(randSwitch), 0.5f);
+            var delay = MERSeqTools.CreateDelay(KismetHelper.GetParentSequence(randSwitch), 0.5f);
 
             var wwisePost = galaxyMapObjsP.FindExport("TheWorld.PersistentLevel.Main_Sequence.GalaxyMap.SequenceReference_0.Sequence_4.SeqAct_WwisePostEvent_3");
             KismetHelper.CreateOutputLink(randSwitch, $"Link {newLinkNum}", delay);

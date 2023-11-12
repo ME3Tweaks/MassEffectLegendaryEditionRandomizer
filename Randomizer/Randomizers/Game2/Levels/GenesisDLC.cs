@@ -147,7 +147,7 @@ namespace Randomizer.Randomizers.Game2.Levels
             var audioSources = MERFileSystem.LoadedFiles.Keys.Where(x => x.Contains("_LOC_INT", StringComparison.InvariantCultureIgnoreCase) && x.Contains("Bio")).ToList();
 
 
-            var audioInterps = SeqTools.GetAllSequenceElements(conversationSeq).Where(x => x.ClassName == "InterpData")
+            var audioInterps = KismetHelper.GetAllSequenceElements(conversationSeq).Where(x => x.ClassName == "InterpData")
                     .OfType<ExportEntry>().ToList();
             foreach (var audioInterp in audioInterps)
             {

@@ -257,7 +257,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 {
                     var ifp = baseIFP + i;
                     var setObj = topFloorP.FindExport(ifp);
-                    SeqTools.ChangeOutlink(setObj, 0, 0, creepySeq.UIndex);
+                    KismetHelper.ChangeOutlink(setObj, 0, 0, creepySeq.UIndex);
                 }
 
                 // CreepySeq -> Start Conversation
@@ -282,7 +282,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 var modify =
                     bottomFloorP.FindExport(
                         "TheWorld.PersistentLevel.Main_Sequence.Tracking_sign.BioSeqAct_ModifyPropertyPawn_1");
-                var pawnsToChange = SeqTools.GetVariableLinksOfNode(modify).SelectMany(x => x.LinkedNodes)
+                var pawnsToChange = KismetHelper.GetVariableLinksOfNode(modify).SelectMany(x => x.LinkedNodes)
                     .OfType<ExportEntry>().ToList();
 
                 ExportEntry lastCreepySeq = null;
@@ -292,7 +292,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                     if (lastCreepySeq == null)
                     {
                         // Point to first creepyseq
-                        SeqTools.ChangeOutlink(modify, 0, 1, creepySeq.UIndex);
+                        KismetHelper.ChangeOutputLink(modify, 0, 1, creepySeq.UIndex);
                     }
                     else
                     {
@@ -330,7 +330,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 {
                     var ifp = baseIFP + i;
                     var setObj = lowSouthP.FindExport(ifp);
-                    SeqTools.ChangeOutlink(setObj, 0, 0, creepySeq.UIndex);
+                    KismetHelper.ChangeOutputLink(setObj, 0, 0, creepySeq.UIndex);
                 }
 
                 // CreepySeq -> Start Conversation
@@ -368,7 +368,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                         ifp = "TheWorld.PersistentLevel.Main_Sequence.ads.Mid_Ad_logic.BioSeqAct_ModifyPropertyPawn_10"; // We use same logic but different IFP as it's branched
                     }
                     var setObj = mainRoomP.FindExport(ifp);
-                    SeqTools.ChangeOutlink(setObj, 0, idx, creepySeq.UIndex);
+                    KismetHelper.ChangeOutputLink(setObj, 0, idx, creepySeq.UIndex);
                 }
 
                 // CreepySeq -> Start Conversation

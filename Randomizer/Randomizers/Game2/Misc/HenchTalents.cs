@@ -1218,7 +1218,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                     controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.SeqAct_Destroy_0"),
                     0);
 
-                var outboundToHint = SeqTools.GetOutboundLinksOfNode(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_7"));
+                var outboundToHint = KismetHelper.GetOutputLinksOfNode(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_7"));
                 if (outboundToHint.Count == 4)
                 {
                     // Done to ShowHint remove
@@ -1234,7 +1234,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                         outboundToHint[1].RemoveAt(0);
                     }
 
-                    SeqTools.WriteOutboundLinksToNode(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_7"), outboundToHint);
+                    KismetHelper.WriteOutputLinksToNode(controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.BioSeqAct_FaceOnlyVO_7"), outboundToHint);
                 }
 
                 controlRoomP.FindExport("TheWorld.PersistentLevel.Main_Sequence.LS87_OverloadTutorial.SeqVar_Float_2").WriteProperty(new FloatProperty(1, "FloatValue"));

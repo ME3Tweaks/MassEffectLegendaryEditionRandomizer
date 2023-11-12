@@ -45,7 +45,7 @@ namespace Randomizer.Randomizers.Shared
 
 
                 // 3. Create the child objects
-                var varLinks = SeqTools.GetVariableLinksOfNode(randomizerObj);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(randomizerObj);
                 foreach (var a in actorsToLink)
                 {
                     var pawnRef = SequenceObjectCreator.CreateSequenceObject(package, "SeqVar_Object", null);
@@ -55,7 +55,7 @@ namespace Randomizer.Randomizers.Shared
                 }
 
                 // 4. Link the child objects
-                SeqTools.WriteVariableLinksToNode(randomizerObj, varLinks);
+                KismetHelper.WriteVariableLinksToNode(randomizerObj, varLinks);
 
                 // 5. Add everything to the sequence
                 KismetHelper.AddObjectsToSequence(mainSeq, false, addedSeqObjs.ToArray());

@@ -40,7 +40,7 @@ namespace Randomizer.Randomizers.Game1.Misc
             {
                 if (v.ClassName == "BioSeqAct_HideAllWeapons")
                 {
-                    var varLinks = SeqTools.GetVariableLinksOfNode(v);
+                    var varLinks = KismetHelper.GetVariableLinksOfNode(v);
                     var varlink = varLinks.FirstOrDefault(x => x.LinkDesc == "ShouldHideWeapons");
                     if (varlink != null && varlink.LinkedNodes.Count == 1 && varlink.LinkedNodes[0] is ExportEntry ex)
                     {
@@ -50,7 +50,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                 }
                 else if (v.ClassName == "BioSeqAct_NonCombatArea")
                 {
-                    var varLinks = SeqTools.GetVariableLinksOfNode(v);
+                    var varLinks = KismetHelper.GetVariableLinksOfNode(v);
                     var varlink = varLinks.FirstOrDefault(x => x.LinkDesc == "EnableCombat");
                     if (varlink != null && varlink.LinkedNodes.Count == 1 && varlink.LinkedNodes[0] is ExportEntry ex)
                     {

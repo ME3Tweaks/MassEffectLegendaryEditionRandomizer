@@ -14,11 +14,11 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
         public static bool RandomizeExport(ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export)) return false;
-            var seqLinks = SeqTools.GetVariableLinksOfNode(export);
+            var seqLinks = KismetHelper.GetVariableLinksOfNode(export);
 
             // Make a new list of sequence vars based on the originals. We will null out items in this list to prevent randomization of them
             // before we merge back in.
-            var randomizationMask = new List<SeqTools.VarLinkInfo>(seqLinks);
+            var randomizationMask = new List<VarLinkInfo>(seqLinks);
             for (int i = 0; i < randomizationMask.Count; i++)
             {
                 var info = randomizationMask[i];
@@ -53,7 +53,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             }
 
             // Write the updated links out.
-            SeqTools.WriteVariableLinksToNode(export, seqLinks);
+            KismetHelper.WriteVariableLinksToNode(export, seqLinks);
 
             return true;
         }

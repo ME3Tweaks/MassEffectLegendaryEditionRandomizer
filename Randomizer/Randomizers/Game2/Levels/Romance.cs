@@ -34,26 +34,26 @@ namespace Randomizer.Randomizers.Game2.Levels
                 // Install random switch and point it at the romance log culminations for each
                 // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
                 var randomSwitch = MERSeqTools.CreateRandSwitch(romSeq, 7);
-                var outLinks = SeqTools.GetOutboundLinksOfNode(randomSwitch);
+                var outLinks = KismetHelper.GetOutputLinksOfNode(randomSwitch);
 
-                outLinks[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_7") }); // JACOB
-                outLinks[1].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_10") }); // GARRUS
-                outLinks[2].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_9") }); // TALI
-                outLinks[3].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_8") }); // THANE
-                outLinks[4].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_6") }); // JACK
-                outLinks[5].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.SeqAct_Delay_4") }); // MIRANDA--| -> Delay into teleport
-                outLinks[6].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.SeqAct_Delay_4") }); // ME1------| -> Delay into teleport
+                outLinks[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_7") }); // JACOB
+                outLinks[1].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_10") }); // GARRUS
+                outLinks[2].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_9") }); // TALI
+                outLinks[3].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_8") }); // THANE
+                outLinks[4].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.BioSeqAct_SetStreamingState_6") }); // JACK
+                outLinks[5].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.SeqAct_Delay_4") }); // MIRANDA--| -> Delay into teleport
+                outLinks[6].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Romance_Culminations.Load_and_Activate_Romance_Content.SeqAct_Delay_4") }); // ME1------| -> Delay into teleport
 
-                SeqTools.WriteOutboundLinksToNode(randomSwitch, outLinks);
+                KismetHelper.WriteOutputLinksToNode(randomSwitch, outLinks);
 
                 // Repoint to our randomswitch
-                var penultimateOutbound = SeqTools.GetOutboundLinksOfNode(outToRepoint);
+                var penultimateOutbound = KismetHelper.GetOutputLinksOfNode(outToRepoint);
                 penultimateOutbound[0].Clear();
-                penultimateOutbound[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = randomSwitch });
+                penultimateOutbound[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = randomSwitch });
  
                 // DEBUG ONLY: FORCE LINK
-                //penultimateOutbound[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.GetUExport(27) });
-                SeqTools.WriteOutboundLinksToNode(outToRepoint, penultimateOutbound);
+                //penultimateOutbound[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.GetUExport(27) });
+                KismetHelper.WriteOutputLinksToNode(outToRepoint, penultimateOutbound);
 
                 MERFileSystem.SavePackage(romChooserPackage);
             }
@@ -67,18 +67,18 @@ namespace Randomizer.Randomizers.Game2.Levels
                 // Install random switch and point it at the romance log culminations for each
                 // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
                 var randomSwitch = MERSeqTools.CreateRandSwitch(romSeq, 2);
-                var outLinks = SeqTools.GetOutboundLinksOfNode(randomSwitch);
+                var outLinks = KismetHelper.GetOutputLinksOfNode(randomSwitch);
 
-                outLinks[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Introduction.Intro_Cutscene_Bridge.SeqAct_Log_0") }); // MIRANDA
-                outLinks[1].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Introduction.Intro_Cutscene_Bridge.SeqAct_Delay_1") }); // ME1
+                outLinks[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Introduction.Intro_Cutscene_Bridge.SeqAct_Log_0") }); // MIRANDA
+                outLinks[1].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence.SEQ_Endgame_Introduction.Intro_Cutscene_Bridge.SeqAct_Delay_1") }); // ME1
 
-                SeqTools.WriteOutboundLinksToNode(randomSwitch, outLinks);
+                KismetHelper.WriteOutputLinksToNode(randomSwitch, outLinks);
 
                 // Repoint to our randomswitch
-                var penultimateOutbound = SeqTools.GetOutboundLinksOfNode(outToRepoint);
+                var penultimateOutbound = KismetHelper.GetOutputLinksOfNode(outToRepoint);
                 penultimateOutbound[0].Clear();
-                penultimateOutbound[0].Add(new SeqTools.OutboundLink() {InputLinkIdx = 0, LinkedOp = randomSwitch});
-                SeqTools.WriteOutboundLinksToNode(outToRepoint, penultimateOutbound);
+                penultimateOutbound[0].Add(new OutputLink() {InputLinkIdx = 0, LinkedOp = randomSwitch});
+                KismetHelper.WriteOutputLinksToNode(outToRepoint, penultimateOutbound);
 
                 MERFileSystem.SavePackage(romChooserPackage);
             }

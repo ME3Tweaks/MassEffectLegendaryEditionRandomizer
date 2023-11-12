@@ -114,14 +114,14 @@ namespace Randomizer.Randomizers.Game1.Misc
         public static bool ShuffleCutscenePawns2(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export, out var cutsceneName)) return false;
-            var variableLinks = SeqTools.GetVariableLinksOfNode(export);
+            var variableLinks = KismetHelper.GetVariableLinksOfNode(export);
 
             // Entries that can be shuffled.
             // This list must not to have items removed!
             List<ExportEntry> pawnsToShuffleDirectAttached = new List<ExportEntry>();
             List<ExportEntry> pawnsToShuffleDynamicSet = new List<ExportEntry>();
 
-            var sequenceElements = SeqTools.GetAllSequenceElements(export).OfType<ExportEntry>().ToList(); ;
+            var sequenceElements = KismetHelper.GetAllSequenceElements(export).OfType<ExportEntry>().ToList(); ;
 
             foreach (var vl in variableLinks)
             {
@@ -247,7 +247,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                     //Debugger.Break();
                 }
 
-                SeqTools.WriteVariableLinksToNode(export, variableLinks);
+                KismetHelper.WriteVariableLinksToNode(export, variableLinks);
                 Debug.WriteLine($"Randomized {pawnsToShuffle.Count} links in animcutscene in {cutsceneName}, file {Path.GetFileName(export.FileRef.FilePath)}");
                 return true;
             }

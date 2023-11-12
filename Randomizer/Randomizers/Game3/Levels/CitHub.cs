@@ -213,7 +213,7 @@ namespace Randomizer.Randomizers.Game3.Levels
             var seqObjsToSkip = KismetHelper.GetSequenceObjects(sequence).OfType<ExportEntry>().Where(x => x.ClassName == "RvrSeqAct_SpawnClientEffect");
             foreach (var v in seqObjsToSkip)
             {
-                SeqTools.SkipSequenceElement(v, "Out");
+                KismetHelper.SkipSequenceElement(v, "Out");
             }
 
             var delay = SequenceObjectCreator.CreateSequenceObject(underBellyDP, "SeqAct_Delay", sourceCache);
