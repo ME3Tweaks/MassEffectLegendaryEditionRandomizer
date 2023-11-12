@@ -35,28 +35,28 @@ namespace Randomizer.Randomizers.Game3.Levels
             // Install random switch and point it at the romance log culminations for each
             // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
             var randomSwitch = MERSeqTools.InstallRandomSwitchIntoSequence(target, romSeq, 8);
-            var outLinks = SeqTools.GetOutboundLinksOfNode(randomSwitch);
+            var outLinks = KismetHelper.GetOutputLinksOfNode(randomSwitch);
 
             var outOptions = kismetObjects.Where(x => x.ClassName == "BioSeqAct_SetStreamingState").ToList();
             for (int i = 0; i < outLinks.Count; i++)
             {
-                outLinks[i].Add(new SeqTools.OutboundLink()
+                outLinks[i].Add(new OutputLink()
                 {
                     InputLinkIdx = 0,
                     LinkedOp = outOptions[i]
                 });
             }
 
-            SeqTools.WriteOutboundLinksToNode(randomSwitch, outLinks);
+            KismetHelper.WriteOutputLinksToNode(randomSwitch, outLinks);
 
             // Repoint to our randomswitch
-            var playMovieOutbound = SeqTools.GetOutboundLinksOfNode(outToRepoint);
+            var playMovieOutbound = KismetHelper.GetOutputLinksOfNode(outToRepoint);
             playMovieOutbound[0].Clear();
-            playMovieOutbound[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = randomSwitch });
+            playMovieOutbound[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = randomSwitch });
 
             // DEBUG ONLY: FORCE LINK
-            //penultimateOutbound[0].Add(new SeqTools.OutboundLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.GetUExport(27) });
-            SeqTools.WriteOutboundLinksToNode(outToRepoint, playMovieOutbound);
+            //penultimateOutbound[0].Add(new OutputLink() { InputLinkIdx = 0, LinkedOp = romChooserPackage.GetUExport(27) });
+            KismetHelper.WriteOutputLinksToNode(outToRepoint, playMovieOutbound);
 
             MERFileSystem.SavePackage(romChooserPackage);
             return true;

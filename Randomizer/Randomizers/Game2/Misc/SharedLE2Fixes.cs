@@ -51,9 +51,9 @@ namespace Randomizer.Randomizers.Game2.Misc
                 var failedWave4 = hereticChessP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Spawn_Sequence.wave4.SeqEvent_SequenceActivated_2"); // Wave 3 failed
                 var failedWavesDone = hereticChessP.FindExport("TheWorld.PersistentLevel.Main_Sequence.Spawn_Sequence.Waves_Done.SeqEvent_SequenceActivated_3"); // Wave 4 failed
 
-                var failedGate3 = MERSeqTools.CreateGate(SeqTools.GetParentSequence(failedWave3));
-                var failedGate4 = MERSeqTools.CreateGate(SeqTools.GetParentSequence(failedWave4));
-                var failedGate5 = MERSeqTools.CreateGate(SeqTools.GetParentSequence(failedWavesDone));
+                var failedGate3 = MERSeqTools.CreateGate(KismetHelper.GetParentSequence(failedWave3));
+                var failedGate4 = MERSeqTools.CreateGate(KismetHelper.GetParentSequence(failedWave4));
+                var failedGate5 = MERSeqTools.CreateGate(KismetHelper.GetParentSequence(failedWavesDone));
 
                 // Failed goes to Failsafe logic instead of skip
                 MERSeqTools.ChangeOutlink(failedWave3, 0, 0, failedGate3.UIndex);

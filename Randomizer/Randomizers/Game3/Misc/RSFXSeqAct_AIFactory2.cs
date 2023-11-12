@@ -189,11 +189,11 @@ namespace Randomizer.Randomizers.Game3.Misc
         public static bool RandomizeSpawnSets(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export)) return false;
-            var sequence = SeqTools.GetParentSequence(export);
+            var sequence = KismetHelper.GetParentSequence(export);
             if (sequence != null)
             {
-                var nodesInSeq = SeqTools.GetAllSequenceElements(sequence);
-                var connectionsToAIFactory = SeqTools.FindOutboundConnectionsToNode(export, nodesInSeq.OfType<ExportEntry>());
+                var nodesInSeq = KismetHelper.GetAllSequenceElements(sequence);
+                var connectionsToAIFactory = KismetHelper.FindOutputConnectionsToNode(export, nodesInSeq.OfType<ExportEntry>());
 
                 if (connectionsToAIFactory.Any())
                 {
@@ -213,7 +213,7 @@ namespace Randomizer.Randomizers.Game3.Misc
                     // Repoint all the original inputs to Spawn to ours.
                     foreach (var connection in connectionsToAIFactory)
                     {
-                        var outbound = SeqTools.GetOutboundLinksOfNode(connection);
+                        var outbound = KismetHelper.GetOutputLinksOfNode(connection);
 
                         // Enumerate output links
                         bool changed = false;
@@ -234,7 +234,7 @@ namespace Randomizer.Randomizers.Game3.Misc
                         // Commit the changes
                         if (changed)
                         {
-                            SeqTools.WriteOutboundLinksToNode(connection, outbound);
+                            KismetHelper.WriteOutputLinksToNode(connection, outbound);
                         }
                     }
 

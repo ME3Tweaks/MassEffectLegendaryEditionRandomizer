@@ -50,7 +50,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        private static bool CanLinkBeRandomized(SeqTools.VarLinkInfo info, out EActorType actorType)
+        private static bool CanLinkBeRandomized(VarLinkInfo info, out EActorType actorType)
         {
             actorType = EActorType.Invalid;
             if (info.LinkedNodes.Count != 1)
@@ -97,7 +97,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                 if (!CanRandomizeConversationStart(convStart))
                     continue;
 
-                var sequence = SeqTools.GetParentSequence(convStart);
+                var sequence = KismetHelper.GetParentSequence(convStart);
 
                 // Add our randomizer node
                 var randNextNode = SequenceObjectCreator.CreateSequenceObject(package, @"MERSeqAct_RandomizePawnsInNextNode");
@@ -106,13 +106,13 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                 MERSeqTools.InsertActionAfter(convStart, "Out", randNextNode, 1, "Reset");
 
 
-                var sequenceObjects = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
-                var incomingExports = SeqTools.FindOutboundConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
+                var sequenceObjects = KismetHelper.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+                var incomingExports = KismetHelper.FindOutputConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
 
                 foreach (var incoming in incomingExports)
                 {
                     // Repoint to our randomization node -> RandomizeNext input
-                    var outboundsFromPrevNode = SeqTools.GetOutboundLinksOfNode(incoming);
+                    var outboundsFromPrevNode = KismetHelper.GetOutputLinksOfNode(incoming);
                     foreach (var outLink in outboundsFromPrevNode)
                     {
                         foreach (var linkedNode in outLink)
@@ -125,7 +125,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                         }
                     }
 
-                    SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
+                    KismetHelper.WriteOutputLinksToNode(incoming, outboundsFromPrevNode);
                 }
 
                 KismetHelper.CreateOutputLink(randNextNode, "Randomized", convStart);
@@ -134,7 +134,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
                 // Change all dynamic lookups to non-native since native seems unreliable for some reason.
 
-                var varLinks = SeqTools.GetVariableLinksOfNode(convStart);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(convStart);
                 foreach (var v1 in varLinks)
                 {
                     foreach (var v2 in v1.LinkedNodes.OfType<ExportEntry>())
@@ -192,14 +192,14 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
 
                 // Shuffle the inputs to the conversation. We will store these and then have to update the Owner and Player tags
                 // I think......
-                var seqLinks = SeqTools.GetVariableLinksOfNode(convStart);
+                var seqLinks = KismetHelper.GetVariableLinksOfNode(convStart);
 
                 // Dictionary of linked nodes, and var links that point to them.
                 List<ExportEntry> shufflableNodes = new List<ExportEntry>();
-                List<SeqTools.VarLinkInfo> applicableLinks = new();
+                List<VarLinkInfo> applicableLinks = new();
                 ExportEntry ownerEntry = null;
                 ExportEntry playerEntry = null;
-                var sequenceObjects = SeqTools.GetAllSequenceElements(convStart).OfType<ExportEntry>().ToList();
+                var sequenceObjects = KismetHelper.GetAllSequenceElements(convStart).OfType<ExportEntry>().ToList();
                 foreach (var varilink in seqLinks)
                 {
                     if (CanLinkBeRandomized(varilink, out _))
@@ -299,10 +299,10 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                     varilink.LinkedNodes[0] = package.GetUExport(repointedItem);
                 }
 
-                //SeqTools.PrintVarLinkInfo(seqLinks);
+                //KismetHelper.PrintVarLinkInfo(seqLinks);
 
                 // Write the updated links out.
-                SeqTools.WriteVariableLinksToNode(convStart, seqLinks);
+                KismetHelper.WriteVariableLinksToNode(convStart, seqLinks);
 
 
 
@@ -487,7 +487,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             return true;
         }
 
-        private static void BuildActorMap(Dictionary<NameReference, ActorLookup> findActorMap, SeqTools.VarLinkInfo sourceLink, int newSourceLinkEntryUindex)
+        private static void BuildActorMap(Dictionary<NameReference, ActorLookup> findActorMap, VarLinkInfo sourceLink, int newSourceLinkEntryUindex)
         {
             var originalInfo = GetLookupInfo(sourceLink.LinkedNodes[0] as ExportEntry, sourceLink);
             ActorLookup lookupInfo = GetLookupInfo(sourceLink.LinkedNodes[0].FileRef.GetUExport(newSourceLinkEntryUindex), sourceLink);
@@ -499,7 +499,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             }
         }
 
-        private static ActorLookup GetLookupInfo(ExportEntry entry, SeqTools.VarLinkInfo varilink)
+        private static ActorLookup GetLookupInfo(ExportEntry entry, VarLinkInfo varilink)
         {
             ActorLookup lookupInfo = new ActorLookup();
 
@@ -564,7 +564,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                             Debugger.Break();
                         }
 
-                        var seqObjs = SeqTools.GetAllSequenceElements(entry).OfType<ExportEntry>();
+                        var seqObjs = KismetHelper.GetAllSequenceElements(entry).OfType<ExportEntry>();
                         foreach (var seqObj in seqObjs)
                         {
                             var props = seqObj.GetProperties();

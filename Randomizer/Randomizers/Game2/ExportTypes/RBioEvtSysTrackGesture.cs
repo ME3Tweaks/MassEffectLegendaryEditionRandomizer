@@ -86,11 +86,11 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
             var gesturesToCheck = gestures.Append(defaultPose).ToList();
 
             // Get the containing sequence
-            var owningSequence = SeqTools.GetParentSequence(trackExport);
+            var owningSequence = KismetHelper.GetParentSequence(trackExport);
             while (owningSequence.ClassName != "Sequence")
             {
                 owningSequence = owningSequence.Parent as ExportEntry;
-                var parSeq = SeqTools.GetParentSequence(owningSequence);
+                var parSeq = KismetHelper.GetParentSequence(owningSequence);
                 if (parSeq != null)
                 {
                     owningSequence = parSeq;
@@ -146,10 +146,10 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
                 owningSequence = export;
             while (owningSequence.ClassName != "Sequence")
             {
-                //owningSequence = SeqTools.GetParentSequence(owningSequence);
+                //owningSequence = KismetHelper.GetParentSequence(owningSequence);
 
                 owningSequence = owningSequence.Parent as ExportEntry;
-                var parSeq = SeqTools.GetParentSequence(owningSequence);
+                var parSeq = KismetHelper.GetParentSequence(owningSequence);
                 if (parSeq != null)
                 {
                     owningSequence = parSeq;

@@ -57,7 +57,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             if (miniGameType == EMinigameSkipType.SeqRef)
             {
                 // Update the credits
-                var minigameVarLinks = SeqTools.GetVariableLinksOfNode(exp);
+                var minigameVarLinks = KismetHelper.GetVariableLinksOfNode(exp);
                 // Update the Out: Value Remaining to something random.
                 var ovrNode = minigameVarLinks.FirstOrDefault(x => x.LinkDesc == "OUT: Value Remaining")?.LinkedNodes.FirstOrDefault();
                 if (ovrNode is ExportEntry ovr)
@@ -68,7 +68,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             else if (miniGameType == EMinigameSkipType.SeqAct)
             {
                 // Update the credits
-                var minigameVarLinks = SeqTools.GetVariableLinksOfNode(exp);
+                var minigameVarLinks = KismetHelper.GetVariableLinksOfNode(exp);
                 // Update the Remaining Remaining to something random.
                 var ovrNode = minigameVarLinks.FirstOrDefault(x => x.LinkDesc == "Remaining Resources")?.LinkedNodes.FirstOrDefault();
                 if (ovrNode is ExportEntry ovr)
@@ -77,7 +77,7 @@ namespace Randomizer.Randomizers.Game2.Misc
                 }
             }
 
-            SeqTools.SkipSequenceElement(exp, "Success"); //Success is link 0
+            KismetHelper.SkipSequenceElement(exp, "Success"); //Success is link 0
             return true;
         }
     }

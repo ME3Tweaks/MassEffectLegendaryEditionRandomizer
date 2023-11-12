@@ -120,7 +120,7 @@ namespace Randomizer.Randomizers.Game3.ExportTypes
             }
 
 
-            var interps = SeqTools.GetAllSequenceElements(matSeq).OfType<ExportEntry>().Where(x => x.ClassName == "InterpData");
+            var interps = KismetHelper.GetAllSequenceElements(matSeq).OfType<ExportEntry>().Where(x => x.ClassName == "InterpData");
 
             foreach (var interp in interps)
             {

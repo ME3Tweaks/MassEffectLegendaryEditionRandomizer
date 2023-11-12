@@ -126,13 +126,13 @@ namespace Randomizer.Randomizers.Game1.Misc
                 {
                     Debug.WriteLine($"Inventorying {lf.Key}");
 
-                    var researchTechObjs = SeqTools.GetAllSequenceElements(researchTechFound).OfType<ExportEntry>().ToList();
+                    var researchTechObjs = KismetHelper.GetAllSequenceElements(researchTechFound).OfType<ExportEntry>().ToList();
                     {
                         var seqStart = researchTechObjs.First(x => x.ClassName == "SeqEvent_SequenceActivated");
                         InventoryOutboundResearch(lf.Key, seqStart, rewards);
                     }
 
-                    var newWeaponObjs = SeqTools.GetAllSequenceElements(newWeaponFound).OfType<ExportEntry>().ToList();
+                    var newWeaponObjs = KismetHelper.GetAllSequenceElements(newWeaponFound).OfType<ExportEntry>().ToList();
                     {
                         var seqStart = newWeaponObjs.First(x => x.ClassName == "SeqEvent_SequenceActivated");
                         InventoryOutboundWeapon(lf.Key, seqStart, rewards);
@@ -156,12 +156,12 @@ namespace Randomizer.Randomizers.Game1.Misc
 
         private static void InventoryOutboundWeapon(string key, ExportEntry node, List<MissionReward> rewards)
         {
-            var outlinks = SeqTools.GetOutboundLinksOfNode(node);
+            var outlinks = KismetHelper.GetOutputLinksOfNode(node);
             var linkedOp = outlinks[0][0].LinkedOp;
             bool checkNext = false;
             if (linkedOp != null && linkedOp.ClassName == "SequenceReference")
             {
-                var varLinks = SeqTools.GetVariableLinksOfNode(linkedOp as ExportEntry);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(linkedOp as ExportEntry);
                 if (varLinks.Count == 4)
                 {
                     // 3 items is blank one. more than 3 means populated
@@ -185,7 +185,7 @@ namespace Randomizer.Randomizers.Game1.Misc
             if (checkNext)
             {
                 // Get next node(s) as we might have multiple pieces
-                var nextOutlinks = SeqTools.GetOutboundLinksOfNode(node);
+                var nextOutlinks = KismetHelper.GetOutputLinksOfNode(node);
                 if (nextOutlinks.Count == 1 && nextOutlinks[0].Count == 1 && nextOutlinks[0][0].LinkedOp is ExportEntry maybeSeqNext && maybeSeqNext.ClassName == "SequenceReference")
                 {
                     // CALL ON NEXT
@@ -196,12 +196,12 @@ namespace Randomizer.Randomizers.Game1.Misc
 
         private static void InventoryOutboundResearch(string key, ExportEntry node, List<MissionReward> rewards)
         {
-            var outlinks = SeqTools.GetOutboundLinksOfNode(node);
+            var outlinks = KismetHelper.GetOutputLinksOfNode(node);
             var linkedOp = outlinks[0][0].LinkedOp;
             bool checkNext = false;
             if (linkedOp != null && linkedOp.ClassName == "SequenceReference")
             {
-                var varLinks = SeqTools.GetVariableLinksOfNode(linkedOp as ExportEntry);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(linkedOp as ExportEntry);
                 if (varLinks.Count == 4)
                 {
                     // 3 items is blank one. more than 3 means populated
@@ -226,7 +226,7 @@ namespace Randomizer.Randomizers.Game1.Misc
             }
         }
 
-        private static void ReadPlotData(List<SeqTools.VarLinkInfo> seqObjs, MissionReward mw)
+        private static void ReadPlotData(List<VarLinkInfo> seqObjs, MissionReward mw)
         {
             var plotObj = seqObjs[0].LinkedNodes[0] as ExportEntry;
             mw.TreasurePlotBoolIdx = plotObj.GetProperty<IntProperty>("m_nIndex");
@@ -292,7 +292,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                 var awardSeqRef = currentPackage.FindExport(originalReward.SequenceObjectIFP);
                 MissionReward newAward = originalReward.IsWeapon ? weaponRewards.PullFirstItem() : researchRewards.PullFirstItem();
 
-                var varLinks = SeqTools.GetVariableLinksOfNode(awardSeqRef);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(awardSeqRef);
 
                 // UPDATE PLOT ITEM
                 var plotObj = varLinks[0].LinkedNodes[0] as ExportEntry;
@@ -328,7 +328,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                     {
                         // doesn't currently have a codex image
                         codexImageObj = SequenceObjectCreator.CreateSequenceObject(currentPackage, "SeqVar_Object"); //todo: Cach
-                        KismetHelper.AddObjectToSequence(codexImageObj, SeqTools.GetParentSequence(awardSeqRef));
+                        KismetHelper.AddObjectToSequence(codexImageObj, KismetHelper.GetParentSequence(awardSeqRef));
                         varLinks[3].LinkedNodes.Add(codexImageObj);
                     }
                     else
@@ -345,7 +345,7 @@ namespace Randomizer.Randomizers.Game1.Misc
                     varLinks[3].LinkedNodes.Clear(); // Ensure no link(s).
                 }
 
-                SeqTools.WriteVariableLinksToNode(awardSeqRef, varLinks);
+                KismetHelper.WriteVariableLinksToNode(awardSeqRef, varLinks);
 
                 // Update the pickup packages
                 foreach (var pickupPackageF in originalReward.PickupPackages)
@@ -380,11 +380,11 @@ namespace Randomizer.Randomizers.Game1.Misc
             var shpCr2 = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BioD_ShpCr2_130TurnIntoHusk.pcc"));
             string ifp = target.Game == MEGame.LE2 ? "TheWorld.PersistentLevel.Main_Sequence.TREASURE.Show_Choice_GUI_0.TREASURE_1.SeqAct_Switch_0" : throw new Exception("This value needs looked up in ME2!");
             var swExp = shpCr2.FindExport(ifp);
-            var outbounds = SeqTools.GetOutboundLinksOfNode(swExp);
+            var outbounds = KismetHelper.GetOutputLinksOfNode(swExp);
             foreach (var ob in outbounds)
             {
-                var awardTreasure = SeqTools.GetOutboundLinksOfNode(ob[0].LinkedOp as ExportEntry)[0][0].LinkedOp as ExportEntry;
-                var state = SeqTools.GetVariableLinksOfNode(awardTreasure)[0].LinkedNodes[0] as ExportEntry;
+                var awardTreasure = KismetHelper.GetOutputLinksOfNode(ob[0].LinkedOp as ExportEntry)[0][0].LinkedOp as ExportEntry;
+                var state = KismetHelper.GetVariableLinksOfNode(awardTreasure)[0].LinkedNodes[0] as ExportEntry;
                 AddBonusWeapon(state.GetProperty<StrProperty>("m_sRefName"));
             }
 
@@ -393,12 +393,12 @@ namespace Randomizer.Randomizers.Game1.Misc
             foreach (var vari in variations)
             {
                 var sequence = shpCr2.FindExport("TheWorld.PersistentLevel.Main_Sequence.TREASURE." + vari);
-                var treasureTokens = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>().Where(x => x.ClassName == "SFXSeqAct_TreasureTokens");
+                var treasureTokens = KismetHelper.GetAllSequenceElements(sequence).OfType<ExportEntry>().Where(x => x.ClassName == "SFXSeqAct_TreasureTokens");
                 foreach (var tk in treasureTokens)
                 {
-                    var srefName = (SeqTools.GetVariableLinksOfNode(tk)[0].LinkedNodes[0] as ExportEntry).GetProperty<StrProperty>("m_sRefName");
+                    var srefName = (KismetHelper.GetVariableLinksOfNode(tk)[0].LinkedNodes[0] as ExportEntry).GetProperty<StrProperty>("m_sRefName");
                     var relevantInfo = allRewards.First(x => x.TreasurePlotBoolSrefName == srefName);
-                    var choiceImage = SeqTools.GetVariableLinksOfNode(MERSeqTools.GetNextNode(tk, 0))[7].LinkedNodes[0] as ExportEntry;
+                    var choiceImage = KismetHelper.GetVariableLinksOfNode(MERSeqTools.GetNextNode(tk, 0))[7].LinkedNodes[0] as ExportEntry;
                     if (relevantInfo.CodexImageIFP != null)
                     {
                         InstallNewSourceTexture(shpCr2, choiceImage, null, relevantInfo, texturePackageCache);

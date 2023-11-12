@@ -987,10 +987,10 @@ namespace Randomizer.Randomizers.Game2.Misc
                 // Need to repoint existing things that pointed to the original pawns back to the new ones
 
                 // Miranda
-                SeqTools.WriteObjValue(package.GetUExport(3450), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3451), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3454), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3490), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3450), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3451), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3454), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3490), newMirandaPawn);
 
                 // Update level
                 var worldBin = ObjectBinary.From<Level>(world);
@@ -1065,17 +1065,17 @@ namespace Randomizer.Randomizers.Game2.Misc
                 // Need to repoint existing things that pointed to the original pawns back to the new ones
 
                 // Miranda
-                SeqTools.WriteOriginator(package.GetUExport(458), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3243), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3247), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3249), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3252), newMirandaPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3255), newMirandaPawn);
+                KismetHelper.WriteOriginator(package.GetUExport(458), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3243), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3247), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3249), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3252), newMirandaPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3255), newMirandaPawn);
 
                 // Jacob
-                SeqTools.WriteOriginator(package.GetUExport(457), newJacobPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3242), newJacobPawn);
-                SeqTools.WriteObjValue(package.GetUExport(3254), newJacobPawn);
+                KismetHelper.WriteOriginator(package.GetUExport(457), newJacobPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3242), newJacobPawn);
+                KismetHelper.WriteObjValue(package.GetUExport(3254), newJacobPawn);
 
                 // Update level
                 var worldBin = ObjectBinary.From<Level>(world);
