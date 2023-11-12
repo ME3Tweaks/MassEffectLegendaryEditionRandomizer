@@ -141,7 +141,7 @@ namespace Randomizer.Randomizers.Game1
                 if (SelectedOptions.RandomizationTarget.Game == MEGame.ME1)
                 {
                     var asiList = ASIManager.MasterME1ASIUpdateGroups;
-                    ASIManager.InstallASIToTarget(asiList.Find(x=>x.UpdateGroupId == ASIModIDs.ME1_DLC_MOD_ENABLER), SelectedOptions.RandomizationTarget);
+                    ASIManager.InstallASIToTarget(asiList.Find(x => x.UpdateGroupId == ASIModIDs.ME1_DLC_MOD_ENABLER), SelectedOptions.RandomizationTarget);
                 }
                 else if (SelectedOptions.RandomizationTarget.Game == MEGame.LE1)
                 {
@@ -242,7 +242,7 @@ namespace Randomizer.Randomizers.Game1
                             {
                                 // Specific randomization pass before the exports are processed
                                 rp.PerformFileSpecificRandomization(SelectedOptions.RandomizationTarget, package, rp);
-                            
+
                             }
 
                             if (perExportRandomizers.Any())
@@ -775,17 +775,27 @@ namespace Randomizer.Randomizers.Game1
                 {
                     // Doesn't seem to work
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
-                    new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true, PerformRandomizationOnExportDelegate = RSharedHeightFogComponent.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                    new RandomizationOption() {
+                        HumanName = "Fog colors",
+                        Description = "Changes colors of fog", 
+                        IsRecommended = true,
+                        PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
+                        IsRuntimeRandomizer = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    },
                     new RandomizationOption() {
                         HumanName = "Post Processing volumes",
                         Description = "Changes postprocessing. Likely will make some areas of game unplayable",
                         PerformRandomizationOnExportDelegate = RPostProcessingVolume.RandomizeExport,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
-                    new RandomizationOption() {HumanName = "Light colors", Description = "Changes colors of dynamic lighting",
-                        PerformRandomizationOnExportDelegate = RSharedLighting.RandomizeExport,
+                    new RandomizationOption() {
+                        HumanName = "Light colors", 
+                        Description = "Changes colors of dynamic lighting",
+                        PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    },
                     new RandomizationOption() {
                         HumanName = "Clusters",
                         Description = "Randomizes positions of clusters",
