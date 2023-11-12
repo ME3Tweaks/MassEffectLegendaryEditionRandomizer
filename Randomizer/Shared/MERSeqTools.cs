@@ -145,7 +145,7 @@ namespace Randomizer.Shared
             export.WriteProperty(new ObjectProperty(objValue.UIndex, "ObjValue"));
         }
 
-        public static void PrintVarLinkInfo(List<SeqTools.VarLinkInfo> seqLinks)
+        public static void PrintVarLinkInfo(List<VarLinkInfo> seqLinks)
         {
             foreach (var link in seqLinks)
             {
@@ -911,7 +911,7 @@ namespace Randomizer.Shared
             var newOutLinks = SeqTools.GetOutboundLinksOfNode(originalNode);
 
             newOutLinks[outLinkIdxToRedirect].Clear();
-            newOutLinks[outLinkIdxToRedirect].Add(new SeqTools.OutboundLink() { InputLinkIdx = mitmInputIdx, LinkedOp = mitmNode }); // Point only to our new node
+            newOutLinks[outLinkIdxToRedirect].Add(new OutputLink() { InputLinkIdx = mitmInputIdx, LinkedOp = mitmNode }); // Point only to our new node
             SeqTools.WriteOutboundLinksToNode(originalNode, newOutLinks);
 
             var mitmOutLinks = SeqTools.GetOutboundLinksOfNode(mitmNode);
