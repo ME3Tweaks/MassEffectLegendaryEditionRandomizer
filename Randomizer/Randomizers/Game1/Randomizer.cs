@@ -111,7 +111,7 @@ namespace Randomizer.Randomizers.Game1
         private void PerformRandomization(object sender, DoWorkEventArgs e)
         {
             MemoryManager.SetUsePooledMemory(true, false, false, (int)FileSize.KibiByte * 8, 4, 2048, false);
-            ResetClasses();
+            ResetClasses(false);
             SelectedOptions.SetRandomizationInProgress?.Invoke(true);
             SelectedOptions.SetCurrentOperationText?.Invoke("Initializing randomizer");
             SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
@@ -136,7 +136,11 @@ namespace Randomizer.Randomizers.Game1
             Exception rethrowException = null;
             try
             {
+                // Initialize FileSystem and handlers
                 MERFileSystem.InitMERFS(SelectedOptions);
+
+                // Initialize the global cache system
+                MERCaches.Init(SelectedOptions.RandomizationTarget);
 
                 // Install ASIs required to make game work with DLC
                 var asiList = ASIManager.MasterLE1ASIUpdateGroups;
@@ -207,7 +211,7 @@ namespace Randomizer.Randomizers.Game1
 #if DEBUG
                         if (true
                 //&& false //uncomment to disable filtering
-                //&& !file.Contains("OmgHub", StringComparison.InvariantCultureIgnoreCase)
+                && !file.Contains("GLO", StringComparison.InvariantCultureIgnoreCase)
                 && !file.Contains("PRO", StringComparison.InvariantCultureIgnoreCase)
                 && !file.Contains("NOR", StringComparison.InvariantCultureIgnoreCase)
                 && !file.Contains("STA", StringComparison.InvariantCultureIgnoreCase)
@@ -291,7 +295,7 @@ namespace Randomizer.Randomizers.Game1
             CoalescedHandler.EndHandler();
             TLKBuilder.EndHandler();
             MERFileSystem.Finalize(SelectedOptions);
-            ResetClasses();
+            ResetClasses(true);
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
 
@@ -303,9 +307,10 @@ namespace Randomizer.Randomizers.Game1
         /// <summary>
         /// Ensures things are set back to normal before first run
         /// </summary>
-        private void ResetClasses()
+        private void ResetClasses(bool endOfRandomizationRun)
         {
             SharedRandomizer.CleanupInstallTimeOnlyFiles();
+            MERCaches.Cleanup(endOfRandomizationRun);
         }
 
 
@@ -760,7 +765,7 @@ namespace Randomizer.Randomizers.Game1
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
                     new RandomizationOption() {
                         HumanName = "Fog colors",
-                        Description = "Changes colors of fog", 
+                        Description = "Changes colors of fog",
                         IsRecommended = true,
                         PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
                         IsRuntimeRandomizer = true,
@@ -773,7 +778,7 @@ namespace Randomizer.Randomizers.Game1
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     new RandomizationOption() {
-                        HumanName = "Light colors", 
+                        HumanName = "Light colors",
                         Description = "Changes colors of dynamic lighting",
                         PerformSpecificRandomizationDelegate = RSharedLighting.InstallDynamicLightingRandomizer,
                         IsRecommended = true,
@@ -859,6 +864,14 @@ namespace Randomizer.Randomizers.Game1
                         PerformRandomizationOnExportDelegate = RSharedCutscene.ShuffleCutscenePawns,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal,
                         IsRecommended = true
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "Actors in conversations",
+                        PerformFileSpecificRandomization = RBioConversation.RandomizeActorsInConversation2,
+                        Description = "Changes pawn roles in conversations",
+                        IsRecommended = false,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
                     },
                     // Due to how stage placement works this doesn't really work very well in this game.
                     //new RandomizationOption() {

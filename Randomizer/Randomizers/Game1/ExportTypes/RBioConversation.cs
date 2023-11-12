@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LegendaryExplorerCore.Dialogue;
 using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Handlers;
-using Randomizer.Randomizers.Utility;
 using Randomizer.Shared;
 
 namespace Randomizer.Randomizers.Game1.ExportTypes
@@ -21,6 +16,118 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
     /// </summary>
     class RBioConversation
     {
+        private static bool CanRandomizeStagePlacement(ExportEntry export) => !export.IsDefaultObject && export.ClassName is @"BioSeqAct_OverrideStagePlacement";
+
+        /// <summary>
+        /// The inputs we filter for randomizing interps with
+        /// </summary>
+        private static readonly List<int> INTERP_PLAY_INPUT_IDXS = new() { 0 };
+
+        /// <summary>
+        /// Uses runtime randomization class
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="export"></param>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static bool RandomizeActorsInConversation2(GameTarget target, IMEPackage package, RandomizationOption option)
+        {
+            var conversationStartExports = package.Exports.Where(CanRandomizeStagePlacement).ToList();
+            if (!conversationStartExports.Any())
+                return false;
+
+            var nonNativeLookupClass = package.FindExport("MERGameContentKismet.MERSeqVar_ObjectFindByTagNonNative");
+
+            foreach (var convStart in conversationStartExports)
+            {
+                //if (convStart.UIndex < 13638)
+                //    continue;
+                if (!CanRandomizeConversationStart(convStart))
+                    continue;
+
+                var sequence = SeqTools.GetParentSequence(convStart);
+
+                // Add our randomizer node
+                var randNextNode = SequenceObjectCreator.CreateSequenceObject(package, @"MERSeqAct_RandomizePawnsInNextNode");
+                KismetHelper.AddObjectToSequence(randNextNode, sequence);
+
+                MERSeqTools.InsertActionAfter(convStart, "Out", randNextNode, 1, "Reset");
+
+                var sequenceObjects = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+                var incomingExports = SeqTools.FindOutboundConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
+
+                foreach (var incoming in incomingExports)
+                {
+                    // Repoint to our randomization node -> RandomizeNext input
+                    var outboundsFromPrevNode = SeqTools.GetOutboundLinksOfNode(incoming);
+                    foreach (var outLink in outboundsFromPrevNode)
+                    {
+                        foreach (var linkedNode in outLink)
+                        {
+                            // Play is Input 0
+                            if (linkedNode.InputLinkIdx == 0 && linkedNode.LinkedOp == convStart)
+                            {
+                                linkedNode.LinkedOp = randNextNode;
+                            }
+                        }
+                    }
+
+                    SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
+                }
+
+                KismetHelper.CreateOutputLink(randNextNode, "Randomized", convStart);
+                KismetHelper.CreateOutputLink(convStart, "Out", randNextNode, 1); // Reset
+                KismetHelper.CreateOutputLink(convStart, "Failed", randNextNode, 1); // Reset
+
+                // Change all dynamic lookups to non-native since native seems unreliable for some reason.
+
+                var varLinks = SeqTools.GetVariableLinksOfNode(convStart);
+                foreach (var v1 in varLinks)
+                {
+                    foreach (var v2 in v1.LinkedNodes.OfType<ExportEntry>())
+                    {
+                        // Change to our lookup object so we can randomize it easier
+                        if (v2.ClassName == "SeqVar_Object")
+                        {
+
+                            v2.ObjectName = new NameReference("MERSeqVar_ObjectFindByTagNonNative_SVO", v2.ObjectName.Number);
+                            if (nonNativeLookupClass == null)
+                            {
+                                nonNativeLookupClass = EntryImporter.EnsureClassIsInFile(v2.FileRef, "MERSeqVar_ObjectFindByTagNonNative", new RelinkerOptionsPackage()) as ExportEntry;
+                            }
+
+                            v2.Class = nonNativeLookupClass;
+                            continue;
+                        }
+
+                        if (v2.ClassName == "BioSeqVar_ObjectFindByTag")
+                        {
+                            v2.ObjectName = new NameReference("MERSeqVar_ObjectFindByTagNonNative_OFBT", v2.ObjectName.Number);
+                            if (nonNativeLookupClass == null)
+                            {
+                                nonNativeLookupClass = EntryImporter.EnsureClassIsInFile(v2.FileRef, "MERSeqVar_ObjectFindByTagNonNative", new RelinkerOptionsPackage()) as ExportEntry;
+                            }
+
+                            v2.Class = nonNativeLookupClass;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static bool CanRandomizeConversationStart(ExportEntry convStart)
+        {
+            //var fname = Path.GetFileName(convStart.FileRef.FilePath);
+            //if (fname == "BioD_CitHub_220AsL.pcc" && convStart.UIndex == 803) // seems to be able to softlock thane's interrogation as some of the inputs appear to have been disabled. If they're randomized around, it could cause softlock on convo start which kills loyalty mission
+            //    return false;
+            //if (fname == "BioD_RprGtA_420CoreBattle.pcc" && convStart.UIndex == 4626) // can softlock cause shep hits a deathplane
+            //    return false;
+
+            return true;
+        }
+
+
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioSeqAct_OverrideStagePlacement";
         public static bool RandomizeExport(GameTarget target, ExportEntry export, RandomizationOption option)
         {
@@ -59,7 +166,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
             }
 
             private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioConversation";
-            private static bool CanRandomizeSeqActStartConvo(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioSeqAct_StartConversation";
+            private static bool CanRandomizeStagePlacement(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioSeqAct_StartConversation";
 
             private static string[] Localizations = new[] { "INT" }; // Add more later, maybe.
 
@@ -96,7 +203,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
 
             public static bool RandomizePackageActorsInConversation(GameTarget target, IMEPackage package, RandomizationOption option)
             {
-                var conversationStartExports = package.Exports.Where(CanRandomizeSeqActStartConvo).ToList();
+                var conversationStartExports = package.Exports.Where(CanRandomizeStagePlacement).ToList();
                 if (!conversationStartExports.Any())
                     return false;
 

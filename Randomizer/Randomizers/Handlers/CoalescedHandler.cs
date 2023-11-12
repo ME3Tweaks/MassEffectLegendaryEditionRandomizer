@@ -53,10 +53,13 @@ namespace Randomizer.Randomizers.Handlers
             return ConfigBundle.GetAsset(filename, true);
         }
 
-
         private void Commit()
         {
+#if __GAME1__
+            // Create M3CD
+#else
             ConfigBundle.CommitDLCAssets();
+#endif
         }
         #endregion
 

@@ -211,6 +211,7 @@ namespace RandomizerUI
             contributors.Add("Audemus - ME2R images & templates");
             contributors.Add("D. Senji - Music");
             contributors.Add("ZumAstra - Testing");
+            contributors.Add("DropTheSquid - BioMorphFace tools");
             contributors.Sort();
             return contributors;
         }
