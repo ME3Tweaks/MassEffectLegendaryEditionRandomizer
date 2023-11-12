@@ -206,4 +206,9 @@
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\ME3TweaksCore.csproj" />
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\submodules\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Randomizers\Game1\Assets\Binary\Packages\LE1\InstallSessionOnly\" />
+	  <Folder Include="Randomizers\Game1\Assets\Textures\" />
+	</ItemGroup>
 </Project>

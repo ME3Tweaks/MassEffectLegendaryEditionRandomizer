@@ -15,6 +15,7 @@ namespace Randomizer.Randomizers.Game1.Misc
 {
     class RCutscene
     {
+        
 
         private static string[] acceptableTagsForPawnShuffling =
 {

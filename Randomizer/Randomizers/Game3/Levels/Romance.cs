@@ -5,7 +5,6 @@ using Randomizer.MER;
 using Randomizer.Shared;
 using WinCopies.Util;
 using System.Linq;
-using LegendaryExplorerCore.ME1.Unreal.UnhoodBytecode;
 
 namespace Randomizer.Randomizers.Game3.Levels
 {
