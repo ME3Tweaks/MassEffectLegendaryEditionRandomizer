@@ -38,7 +38,7 @@ namespace Randomizer.MER
         /// The game this randomizer supports - this is the authoritative game
         /// </summary>
         public static MEGame Game = MEGame.LE1;
-        public static readonly string[] filesToSkip = { "Core", "PlotManagerMap","RefShaderCache-PC-D3D-SM5", "IpDrv", "WwiseAudio", "SFXOnlineFoundation", "GFxUI" };
+        public static readonly string[] filesToSkip = { "Core", "PlotManagerMap", "RefShaderCache-PC-D3D-SM5", "IpDrv", "WwiseAudio", "SFXOnlineFoundation", "GFxUI" };
         public static readonly string[] alwaysBasegameFiles = { "Startup", "Engine", "GameFramework", "SFXGame", "EntryMenu", "BIOG_Male_Player_C", "BIOC_Materials", "SFXStrategicAI" };
 #elif __GAME2__
         /// <summary>
@@ -81,12 +81,7 @@ namespace Randomizer.MER
             DLCModCookedPath = Path.Combine(dlcModPath, options.RandomizationTarget.Game.CookedDirName());
 
             // ME1 Randomizer does not use this feature
-#if !__GAME1__
-            if (options.RandomizationTarget.Game.IsGame2() || options.RandomizationTarget.Game.IsGame3())
-            {
-                CoalescedHandler.StartHandler(options.RandomizationTarget.Game);
-            }
-#endif
+            CoalescedHandler.StartHandler(options.RandomizationTarget.Game);
 
             if (useTlk)
             {

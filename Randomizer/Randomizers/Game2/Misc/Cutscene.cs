@@ -101,6 +101,7 @@ namespace Randomizer.Randomizers.Game2.Misc
             return true;
         }
 
+#if LEGACY
         public static bool ShuffleCutscenePawns2(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export, out var cutsceneName)) return false;
@@ -434,5 +435,6 @@ namespace Randomizer.Randomizers.Game2.Misc
             acceptableTagsForPawnShuffling = MEREmbedded.GetEmbeddedTextAsset("allowedcutscenerandomizationtags.txt").Split(new[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
         }
+#endif
     }
 }

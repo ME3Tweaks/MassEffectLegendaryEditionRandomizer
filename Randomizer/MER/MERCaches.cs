@@ -27,8 +27,18 @@ namespace Randomizer.MER
         /// <summary>
         /// Disposes of packages in the global common lookup cache
         /// </summary>
-        public static void Cleanup()
+        public static void Cleanup(bool endOfRandomizationRun)
         {
+            if (_globalCommonLookupCache != null && endOfRandomizationRun)
+            {
+                foreach (var v in _globalCommonLookupCache.GetPackages())
+                {
+                    if (v.IsModified)
+                    {
+                        MERFileSystem.SavePackage(v);
+                    }
+                }
+            }
             MERFileSystem.sfxgameGuid = default;
             _globalCommonLookupCache?.Dispose();
             _globalCommonLookupCache = null;
@@ -40,7 +50,7 @@ namespace Randomizer.MER
         /// <param name="target"></param>
         public static void ReInit(GameTarget target)
         {
-            Cleanup();
+            Cleanup(false);
             Init(target);
         }
 

@@ -12,6 +12,7 @@ namespace Randomizer.Randomizers.Shared
 
         public static bool InstallDynamicHeightFogRandomizer(GameTarget target, RandomizationOption option)
         {
+            RSharedMERControl.InstallMERControl(target);
             var engine = RSharedEngine.GetEngine(target);
             ScriptTools.AddToClassInPackageFromEmbedded(target, engine, "HeightFog.PostBeginPlay", "HeightFog");
             MERFileSystem.SavePackage(engine);
@@ -21,6 +22,7 @@ namespace Randomizer.Randomizers.Shared
 
 
         // Old ME2R code
+#if LEGACY
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"HeightFogComponent";
         public static bool RandomizeExport(GameTarget target, ExportEntry export,RandomizationOption option)
         {
@@ -46,5 +48,6 @@ namespace Randomizer.Randomizers.Shared
             }
             return false;
         }
+#endif
     }
 }

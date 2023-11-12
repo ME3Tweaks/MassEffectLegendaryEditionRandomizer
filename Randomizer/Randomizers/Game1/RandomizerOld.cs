@@ -1,4 +1,4 @@
-﻿#if __GAME1__
+﻿#if LEGACY
 //using System;
 //using System.Collections.Concurrent;
 //using System.Collections.Generic;
