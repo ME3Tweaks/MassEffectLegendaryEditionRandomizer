@@ -14,6 +14,7 @@ using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Helpers;
+using ME3TweaksCore.ME3Tweaks.M3Merge;
 using ME3TweaksCore.Misc;
 using ME3TweaksCore.NativeMods;
 using Randomizer.MER;
@@ -279,6 +280,9 @@ namespace Randomizer.Randomizers.Game1
                     }
                 }
 
+
+
+
                 sw.Stop();
                 MERLog.Information($"Randomization time: {sw.Elapsed.ToString()}");
 
@@ -296,6 +300,12 @@ namespace Randomizer.Randomizers.Game1
             CoalescedHandler.EndHandler();
             TLKBuilder.EndHandler();
             MERFileSystem.Finalize(SelectedOptions);
+
+            // This must occur after all handlers are closed.
+            SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
+            SelectedOptions.SetCurrentOperationText?.Invoke("Performing full merge & sync");
+            M3MergeDLC.RunCompleteMerge(SelectedOptions.RandomizationTarget);
+
             ResetClasses(true);
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
@@ -576,7 +586,15 @@ namespace Randomizer.Randomizers.Game1
                 {
                     new RandomizationOption() {HumanName = "NPC movement speeds", Description = "Changes non-player movement stats. Can make combat very easy or very difficult", PerformRandomizationOnExportDelegate = RMovementSpeed2DA.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true},
                     //new RandomizationOption() {HumanName = "Player movement speeds", Description = "Changes player movement stats", PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizePlayerMovementSpeed, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
-                    new RandomizationOption() {HumanName = "NPC walking routes", PerformRandomizationOnExportDelegate = RBioWaypointSet.RandomizeExport},
+                    new RandomizationOption() {
+                        HumanName = "NPC walking routes",
+                        Description = "Randomizes where NPCs that walk on pre-defined routes will walk",
+                        PerformSpecificRandomizationDelegate = RBioWaypointSet.InstallDynamicBioWayPointSetRandomizer,
+                        IsRuntimeRandomizer = true,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    },
                     //new RandomizationOption() {HumanName = "Hammerhead", IsRecommended = true, Description = "Changes HammerHead stats",PerformSpecificRandomizationDelegate = HammerHead.PerformRandomization, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
                    // new RandomizationOption() {HumanName = "'Lite' pawn animations", IsRecommended = true, Description = "Changes the animations used by basic non-interactable NPCs. Some may T-pose due to the sheer complexity of this randomizer",PerformRandomizationOnExportDelegate = RSFXSkeletalMeshActorMAT.RandomizeBasicGestures, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning},
                     new RandomizationOption()

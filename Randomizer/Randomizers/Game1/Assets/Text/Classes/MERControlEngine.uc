@@ -20,6 +20,7 @@ var config bool bEnemyPowerRandomizer_EnforceMinPowerCount;
 var config bool bEnemyPowerRandomizer_OneTime;
 var config bool bIconicRandomizer;
 var config bool bIconicRandomizer_Persistent;
+var config bool bBioWayPointSetRandomizer;
 var config array<string> MEREyeIFPs;
 var config float fBioMorphFaceRandomization;
 var config float fIconicFaceRandomization;

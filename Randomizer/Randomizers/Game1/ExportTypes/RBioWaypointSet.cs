@@ -9,11 +9,25 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
+using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game1.ExportTypes
 {
     class RBioWaypointSet
     {
+
+        public static bool InstallDynamicBioWayPointSetRandomizer(GameTarget target, RandomizationOption option)
+        {
+            RSharedMERControl.InstallMERControl(target);
+            var sfxGame = RSharedSFXGame.GetSFXGame(target);
+            ScriptTools.AddToClassInPackageFromEmbedded(target, sfxGame, "BioWayPointSet.PostBeginPlay", "BioWayPointSet");
+            MERFileSystem.SavePackage(sfxGame);
+            CoalescedHandler.EnableFeatureFlag("bBioWayPointSetRandomizer");
+            return true;
+        }
+
         private static bool CanRandomize(ExportEntry export) => !export.IsDefaultObject && export.ClassName == @"BioWaypointSet";
         public static bool RandomizeExport(GameTarget target, ExportEntry export, RandomizationOption option)
         {

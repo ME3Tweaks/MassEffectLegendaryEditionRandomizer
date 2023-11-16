@@ -58,6 +58,10 @@ namespace Randomizer.Randomizers.Handlers
         {
 #if __GAME1__
             // Create M3CD
+            var m3cdText = ConfigMerge.ConvertBundleToM3CD(ConfigBundle);
+            var outPath = Path.Combine(MERFileSystem.DLCModCookedPath, "ConfigDelta-LE1R.m3cd");
+            MERLog.Information($"Writing randomizer M3CD to {outPath}");
+            File.WriteAllText(outPath, m3cdText);
 #else
             ConfigBundle.CommitDLCAssets();
 #endif

@@ -71,6 +71,9 @@ namespace Randomizer.MER
         public static void InitMERFS(OptionsPackage options)
         {
             MERLog.Information("Initializing MER FileSystem");
+
+            M3MergeDLC.RemoveMergeDLC(options.RandomizationTarget); // We will re-create this as necessary.
+
             var useTlk = options.SelectedOptions.Any(x => x.RequiresTLK);
 
             installedStartupPackage = false;

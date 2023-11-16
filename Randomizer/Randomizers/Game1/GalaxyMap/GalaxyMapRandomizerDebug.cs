@@ -5,8 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -14,14 +12,11 @@ using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Textures;
 using LegendaryExplorerCore.TLK;
-using LegendaryExplorerCore.TLK.ME1;
-using LegendaryExplorerCore.TLK.ME2ME3;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.Classes;
-using ME3TweaksModManager.modmanager.starterkit;
+using ME3TweaksCore.ME3Tweaks.StarterKit;
 using Randomizer.MER;
-using Randomizer.Randomizers.Utility;
 using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Game1.GalaxyMap
