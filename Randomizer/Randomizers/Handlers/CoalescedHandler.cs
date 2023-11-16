@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Coalesced.Xml;
+using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
@@ -76,6 +77,27 @@ namespace Randomizer.Randomizers.Handlers
             var sfxengine = engine.GetOrAddSection("SFXGame.SFXEngine");
             sfxengine.AddEntry(new CoalesceProperty("DynamicLoadMapping", new CoalesceValue(mapping.GetSeekFreeStructText(), CoalesceParseAction.AddUnique)));
         }
+#if __GAME1__
+        public static void Add2DAPackage(ExportEntry export)
+        {
+            Add2DA($"{export.FileRef.FileNameNoExtension}");
+        }
+
+        /// <summary>
+        /// Adds a 2DA table to the mod's 2DA list
+        /// </summary>
+        /// <param name="twoDAIFP"></param>
+        public static void Add2DA(string twoDAIFP)
+        {
+            var autoloadPath = Path.Combine(Directory.GetParent(MERFileSystem.DLCModCookedPath).FullName, "AutoLoad.ini");
+            var autoload = new AutoloadIni(autoloadPath);
+            if (!autoload.Bio2DAs.Contains(twoDAIFP))
+            {
+                autoload.Bio2DAs.Add(twoDAIFP);
+                File.WriteAllText(autoloadPath, autoload.ToString());
+            }
+        }
+#endif
 
 #if __GAME2__ || __GAME3__
         /// <summary>

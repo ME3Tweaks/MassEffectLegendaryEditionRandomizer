@@ -92,29 +92,33 @@ namespace Randomizer.Randomizers.Shared
             bool keepCasing = option.HasSubOptionSelected(RSharedTexts.SUBOPTIONKEY_UWU_KEEPCASING);
             bool addReactions = option.HasSubOptionSelected(RSharedTexts.SUBOPTIONKEY_REACTIONS_ENABLED);
 
-            var existingTLK = TLKBuilder.GetBuildingTLK();
-            var skipIDs = existingTLK.StringRefs.Select(x => x.StringID).ToList();
             var MERTlks = TLKBuilder.GetMERTLKs();
-
             var nonMerTLKs = TLKBuilder.GetAllTLKs().Where(x => !MERTlks.Contains(x));
 
-            option.ProgressValue = 0;
-            option.ProgressMax = nonMerTLKs.Where(x => x.Localization == MELocalization.INT).Sum(x => x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
-            option.ProgressMax += MERTlks.Where(x => x.Localization == MELocalization.INT).Sum(x => x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
-            option.ProgressIndeterminate = false;
-
-
-            // UwUify MER TLK first
-            foreach (var tf in MERTlks)
+            foreach (var existingTLK in MERTlks)
             {
-                UwuifyTalkFile(tf, keepCasing, addReactions, skipIDs, true, option);
+                var skipIDs = existingTLK.StringRefs.Select(x => x.StringID).ToList();
+
+                option.ProgressValue = 0;
+                option.ProgressMax = nonMerTLKs.Where(x => x.Localization == MELocalization.INT).Sum(x =>
+                    x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
+                option.ProgressMax += MERTlks.Where(x => x.Localization == MELocalization.INT).Sum(x =>
+                    x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
+                option.ProgressIndeterminate = false;
+
+                // UwUify MER TLK first
+                foreach (var tf in MERTlks)
+                {
+                    UwuifyTalkFile(tf, keepCasing, addReactions, skipIDs, true, option);
+                }
+
+                // UwUify non MER TLK
+                foreach (var tf in nonMerTLKs)
+                {
+                    UwuifyTalkFile(tf, keepCasing, addReactions, skipIDs, false, option);
+                }
             }
 
-            // UwUify non MER TLK
-            foreach (var tf in nonMerTLKs)
-            {
-                UwuifyTalkFile(tf, keepCasing, addReactions, skipIDs, false, option);
-            }
             return true;
         }
 
@@ -663,10 +667,8 @@ namespace Randomizer.Randomizers.Shared
             MERLog.Information("Randomizing vowels in words");
             var hardMode = option.HasSubOptionSelected(RSharedTexts.SUBOPTIONKEY_VOWELS_HARDMODE);
 
-
-            var existingTLK = TLKBuilder.GetBuildingTLK();
-            var skipIDs = existingTLK.StringRefs.Select(x => x.StringID).ToList();
             var MERTLKs = TLKBuilder.GetMERTLKs();
+            var skipIDs = MERTLKs[0].StringRefs.Select(x => x.StringID).ToList();
             Dictionary<char, char> vowels = null;
             List<char> vowelValues = null;
 
@@ -733,7 +735,8 @@ namespace Randomizer.Randomizers.Shared
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             // Add lowercase translation
-            var lowerCaseMap = translationMapUC.ToDictionary(x => char.ToLowerInvariant(x.Key), x => char.ToLowerInvariant(x.Value));
+            var lowerCaseMap = translationMapUC.ToDictionary(x => char.ToLowerInvariant(x.Key),
+                x => char.ToLowerInvariant(x.Value));
 
             // Build a full translation
             var translationMap = new[] { translationMapUC, lowerCaseMap }.SelectMany(dict => dict)
@@ -743,8 +746,10 @@ namespace Randomizer.Randomizers.Shared
             // MER
 
             option.ProgressValue = 0;
-            option.ProgressMax = nonMERTLKs.Sum(x => x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
-            option.ProgressMax += MERTLKs.Sum(x => x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
+            option.ProgressMax = nonMERTLKs.Sum(x =>
+                x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
+            option.ProgressMax += MERTLKs.Sum(x =>
+                x.StringRefs.Count(y => y.StringID > 0 && !string.IsNullOrWhiteSpace(y.Data)));
             option.ProgressIndeterminate = false;
 
             foreach (var merTLK in MERTLKs)
@@ -752,11 +757,11 @@ namespace Randomizer.Randomizers.Shared
                 RandomizeVowelsInternal(merTLK, skipIDs, translationMap, true, option);
             }
 
+
             // Non MER
-            Parallel.ForEach(nonMERTLKs, tf =>
-              {
-                  RandomizeVowelsInternal(tf, skipIDs, translationMap, false, option);
-              });
+            Parallel.ForEach(nonMERTLKs, tf => { RandomizeVowelsInternal(tf, skipIDs, translationMap, false, option); });
+
+
             return true;
         }
 

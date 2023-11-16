@@ -170,19 +170,5 @@ namespace Randomizer.MER
                 //Debugger.Break();
             }
         }
-
-        public IReadOnlyCollection<IMEPackage> GetPackages()
-        {
-            return new ReadOnlyCollection<IMEPackage>(Cache.Values.ToList());
-        }
-
-        /// <summary>
-        /// Gets the list of packages in this cache - the list is a copy
-        /// </summary>
-        /// <returns></returns>
-        public List<IMEPackage> GetPackageList()
-        {
-            return Cache.Values.ToList();
-        }
     }
 }

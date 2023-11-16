@@ -11,6 +11,8 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Helpers;
+using ME3TweaksCore.ME3Tweaks.M3Merge;
+using ME3TweaksCore.ME3Tweaks.StarterKit;
 using ME3TweaksCore.Targets;
 using Randomizer.Randomizers;
 using Randomizer.Randomizers.Handlers;
@@ -39,7 +41,10 @@ namespace Randomizer.MER
         /// </summary>
         public static MEGame Game = MEGame.LE1;
         public static readonly string[] filesToSkip = { "Core", "PlotManagerMap", "RefShaderCache-PC-D3D-SM5", "IpDrv", "WwiseAudio", "SFXOnlineFoundation", "GFxUI" };
-        public static readonly string[] alwaysBasegameFiles = { "Startup", "Engine", "GameFramework", "SFXGame", "EntryMenu", "BIOG_Male_Player_C", "BIOC_Materials", "SFXStrategicAI" };
+        public static readonly string[] alwaysBasegameFiles =
+        {
+            "Startup", "Engine", "GameFramework", "SFXGame", "EntryMenu", "BIOG_Male_Player_C", "BIOC_Materials", "SFXStrategicAI"
+        };
 #elif __GAME2__
         /// <summary>
         /// The game this randomizer supports - this is the authoritative game
@@ -80,7 +85,6 @@ namespace Randomizer.MER
             options.RandomizationTarget.InstallBinkBypass(true);
             DLCModCookedPath = Path.Combine(dlcModPath, options.RandomizationTarget.Game.CookedDirName());
 
-            // ME1 Randomizer does not use this feature
             CoalescedHandler.StartHandler(options.RandomizationTarget.Game);
 
             if (useTlk)
@@ -329,10 +333,34 @@ namespace Randomizer.MER
         /// <returns></returns>
         private static void CreateRandomizerDLCMod(GameTarget target, string dlcpath)
         {
-            Directory.CreateDirectory(dlcpath);
-            var zipMemory = MEREmbedded.GetEmbeddedAsset("StarterKit", $"{target.Game.ToString().ToLower()}starterkit.zip");
-            using ZipArchive archive = new ZipArchive(zipMemory);
-            archive.ExtractToDirectory(dlcpath);
+            //Directory.CreateDirectory(dlcpath);
+            //var zipMemory = MEREmbedded.GetEmbeddedAsset("StarterKit", $"{target.Game.ToString().ToLower()}starterkit.zip");
+            //using ZipArchive archive = new ZipArchive(zipMemory);
+            //archive.ExtractToDirectory(dlcpath);
+
+#if __GAME1__
+            var dlcFolder = target.GetDLCPath();
+            if (!Directory.Exists(dlcFolder))
+            {
+                Directory.CreateDirectory(dlcFolder);
+            }
+#endif
+
+            StarterKitOptions options = new StarterKitOptions()
+            {
+                ModName = $"{MERUtilities.GetGameUIName(false)} DLC Module",
+                ModInternalName = $"{MERUtilities.GetGameUIName(false)} DLC Module",
+                ModDLCFolderNameSuffix = $"{MERFileSystem.Game}Randomizer",
+                ModGame = MERFileSystem.Game,
+                ModMountPriority = M3MergeDLC.MERGE_DLC_MOUNT_PRIORITY - 1,
+                ModInternalTLKID = 23092349,
+                OutputFolderOverride = dlcFolder, // Do not create a mod folder - just create the DLC component
+#if __GAME2__
+                ModModuleNumber = XXX FIX ME
+#endif
+            };
+            DLCModGenerator.CreateStarterKitMod(target.GetDLCPath(), options, null, out var _);
+
         }
 
         private static bool installedStartupPackage;

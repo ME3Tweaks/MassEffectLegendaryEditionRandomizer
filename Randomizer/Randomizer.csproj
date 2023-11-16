@@ -62,6 +62,8 @@
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.uc" />
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.tfc" />
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.tlk" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.swf" />
+		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.gfx" />
 		<Folder Include="Randomizers\Game1\Assets\StarterKit\" />
 
 	</ItemGroup>
@@ -213,5 +215,6 @@
 	<ItemGroup>
 	  <Folder Include="Randomizers\Game1\Assets\Binary\Packages\LE1\InstallSessionOnly\" />
 	  <Folder Include="Randomizers\Game1\Assets\Textures\" />
+	  <Folder Include="Randomizers\Game1\Assets\Text\GalaxyMap\" />
 	</ItemGroup>
 </Project>

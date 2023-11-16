@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LegendaryExplorerCore.Unreal.Collections;
+using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared.Classes
@@ -172,14 +173,18 @@ namespace Randomizer.Randomizers.Shared.Classes
         public static void Init(GameTarget target, bool loadGestures = true)
         {
             MERLog.Information("Initializing GestureManager");
-            // Load gesture mapping (LE2 and LE3 use this)
+            // Load gesture mapping
+#if __GAME1__
+            var gesturesPackage = RSharedSFXGame.GetSFXGame(target);
+#elif __GAME2__ || __GAME3__
             var gesturesFile = MERFileSystem.GetPackageFile(target, "GesturesConfigDLC.pcc");
             if (!File.Exists(gesturesFile))
             {
                 gesturesFile = MERFileSystem.GetPackageFile(target, "GesturesConfig.pcc");
             }
-
             var gesturesPackage = MERFileSystem.OpenMEPackage(gesturesFile, preventSave: true);
+#endif
+
             // name can change if it's dlc so we just do this
             var gestureRuntimeData = gesturesPackage.Exports.FirstOrDefault(x => x.ClassName == "BioGestureRuntimeData");
             var gestMap = ObjectBinary.From<BioGestureRuntimeData>(gestureRuntimeData);
@@ -196,8 +201,7 @@ namespace Randomizer.Randomizers.Shared.Classes
                 if (loadGestures && RandomGesturePackages.Contains(v.Key.Name))
                 {
                     MERLog.Information($"Preloading gesture package {v.Value.Name}.pcc");
-                    _gesturePackageCache.GetCachedPackageEmbedded(target.Game,
-                        $"Gestures.{v.Value.Name}.pcc"); // We don't capture the result - we just preload
+                    _gesturePackageCache.GetCachedPackageEmbedded(target.Game, $"Gestures.{v.Value.Name}.pcc"); // We don't capture the result - we just preload
                 }
                 else
                 {

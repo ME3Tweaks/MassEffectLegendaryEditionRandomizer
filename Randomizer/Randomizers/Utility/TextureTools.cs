@@ -74,6 +74,10 @@ namespace Randomizer.Randomizers.Utility
             //}
 
             Texture2D t2d = new Texture2D(export);
+            if (packageStored)
+            {
+                t2d.Replace(loadedImage, props, isPackageStored: true);
+            }
 #if __GAME2__
             t2d.Replace(loadedImage, props, forcedTFCName: Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName);
 #else

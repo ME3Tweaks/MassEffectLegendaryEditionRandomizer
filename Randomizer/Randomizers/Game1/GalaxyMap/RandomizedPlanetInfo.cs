@@ -15,7 +15,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
         public int RowID;
 
         /// <summary>
-        /// Prevents shuffling this item outside of it's row ID
+        /// Prevents shuffling this item outside of its row ID
         /// </summary>
         public bool PreventShuffle;
 
@@ -59,10 +59,13 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
         /// Category of image to use. Ensure there are enough images in the imagegroup folder.
         /// </summary>
         public string ImageGroup { get; internal set; }
+
+#if LEGACY
         /// <summary>
         /// DLC folder this RPI belongs to. Can be UNC, Vegas, or null. Used with PreventShuffle as some Row ID's will be the same.
         /// </summary>
         public string DLC { get; internal set; }
+#endif
 
         /// <summary>
         /// Text to assign the action button if the row has an action button (like Land or Survey)

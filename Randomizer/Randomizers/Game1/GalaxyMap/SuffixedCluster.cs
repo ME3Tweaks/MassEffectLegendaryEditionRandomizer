@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Randomizer.Randomizers.Game1.GalaxyMap
 {
+    /// <summary>
+    /// Describes a cluster name that can be suffixed properly so it makes sense in English
+    /// </summary>
     public class SuffixedCluster
     {
         public string ClusterName;

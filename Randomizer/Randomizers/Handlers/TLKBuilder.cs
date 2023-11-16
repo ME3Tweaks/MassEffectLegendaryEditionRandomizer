@@ -11,6 +11,8 @@ using LegendaryExplorerCore.TLK.ME2ME3;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using WinCopies.Util;
+using HuffmanCompression = LegendaryExplorerCore.TLK.ME1.HuffmanCompression;
 
 namespace Randomizer.Randomizers.Handlers
 {
@@ -37,6 +39,8 @@ namespace Randomizer.Randomizers.Handlers
         private static List<IMEPackage> Game1GlobalTlkPackages { get; set; }
 #endif
 
+
+#if __GAME2__ || __GAME3__
         /// <summary>
         /// Gets the talk file
         /// </summary>
@@ -50,6 +54,7 @@ namespace Randomizer.Randomizers.Handlers
         {
             return MERTalkFile;
         }
+#endif
 
         private static TLKBuilder CurrentHandler { get; set; }
         public const int FirstDynamicID = 7421320;
@@ -158,7 +163,10 @@ namespace Randomizer.Randomizers.Handlers
 
         private SortedSet<MELocalization> loadedLanguages = new();
         private int NextDynamicID = FirstDynamicID;
+
+#if __GAME2__ || __GAME3__
         private ITalkFile MERTalkFile;
+#endif
 
         private void Start(GameTarget target)
         {
@@ -171,54 +179,47 @@ namespace Randomizer.Randomizers.Handlers
             var loadedFiles = MELoadedFiles.GetFilesLoadedInGame(target.Game, true, gameRootOverride: target.TargetPath);
 
             Game1GlobalTlkPackages = new List<IMEPackage>(3);
-            // ME1: GlobalTLKs, LE1: Startup_INT
-            if (target.Game.IsOTGame())
-            {
-                foreach (var f in loadedFiles.Where(x => x.Key.Contains("GlobalTlk")))
-                {
-                    // Todo: Filter out languages
-                    Game1GlobalTlkPackages.Add(MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, f.Key)));
-                }
-            }
-            else
-            {
-                // Main TLK is Startup
-                Game1GlobalTlkPackages.Add(MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "Startup_INT.pcc")));
+            // LE1: Startup_INT holds GlobalTlk
+            // Main TLK is Startup
+            var startupPackage = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "Startup_INT.pcc"));
+            Game1GlobalTlkPackages.Add(startupPackage);
+            LoadedOfficialTalkFiles.AddRange(startupPackage.Exports.Where(x => !x.IsDefaultObject && x.ClassName == "BioTlkFile").Select(x => new ME1TalkFile(x)));
 
-                // Mod Tlks
-                foreach (var f in loadedFiles.Where(x => x.Key.Contains("GlobalTlk")))
+            // Mod Tlks
+            foreach (var f in loadedFiles.Where(x => x.Key.Contains("_GlobalTlk")))
+            {
+                if (f.Key.Contains(MERFileSystem.DLCModName))
+                    continue; // This is a MER TLK
+
+                // Filter out anything except non-localized (INT)
+
+                if (f.Key.GetUnrealLocalization() == MELocalization.None)
                 {
-                    // Todo: Filter out languages
-                    Game1GlobalTlkPackages.Add(MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, f.Key)));
+                    var package = MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, f.Key));
+                    Game1GlobalTlkPackages.Add(package);
+                    LoadedOfficialTalkFiles.AddRange(package.Exports.Where(x => !x.IsDefaultObject && x.ClassName == "BioTlkFile").Select(x => new ME1TalkFile(x)));
                 }
             }
 
             foreach (var package in Game1GlobalTlkPackages)
             {
-                foreach (var tlkExp in package.Exports.Where(x => x.ClassName == "BioTlk"))
+                foreach (var tlkExp in package.Exports.Where(x => x.ClassName == "BioTlkFile"))
                 {
-                    //if (tlkFile.Contains("DLC_440")) // Change if our module number changes
-                    //{
-                    //    var tf = new TalkFile();
-                    //    tf.LoadTlkData(tlkFile);
-                    //    MERTalkFiles.Add(tf);
-                    //    if (tlkFile.Contains("_INT"))
-                    //        MERTalkFile = tf;
-                    //    var fname = Path.GetFileNameWithoutExtension(tlkFile);
-                    //    loadedLanguages.Add(fname.Substring(fname.LastIndexOf("_") + 1));
-                    //}
-                    //else
-                    //{
                     var tf = new ME1TalkFile(tlkExp);
                     LoadedOfficialTalkFiles.Add(tf);
                     loadedLanguages.Add(MELocalization.INT); // we only support INT.
-                    //}
                 }
             }
 
-            var tlkPackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(target.Game, $"BlankTlkPackage.{(target.Game.IsOTGame() ? "upk" : "pcc")}"));
-
-            MERTalkFile = new ME1TalkFile(tlkPackage.Exports.FirstOrDefault(x => x.ClassName is "BioTlkFile"));
+            var tlkPackages = Directory.GetFiles(MERFileSystem.DLCModCookedPath, "DLC_MOD_LE1Randomizer_GlobalTlk*");
+            foreach (var f in tlkPackages)
+            {
+                var tlkPackage = MERFileSystem.OpenMEPackage(f);
+                foreach (var tlkExp in tlkPackage.Exports.Where(x => x.ClassName == "BioTlkFile"))
+                {
+                    MERTalkFiles.Add(new ME1TalkFile(tlkExp));
+                }
+            }
 #elif __GAME2__
             // Load the basegame TLKs
             var bgPath = M3Directories.GetBioGamePath(target);
@@ -279,6 +280,25 @@ namespace Randomizer.Randomizers.Handlers
 #if __GAME1__
             // Game 1 uses embedded TLKs. This method will commit the
             // the GlobalTlk for the DLC component.
+            var pc = new PackageCache();
+            foreach (var f in MERTalkFiles)
+            {
+                if (f is ME1TalkFile mt && mt.IsModified)
+                {
+                    var package = pc.GetCachedPackage(mt.FilePath); // Load the package.
+                    var hc = new LegendaryExplorerCore.TLK.ME1.HuffmanCompression();
+                    hc.LoadInputData(mt.StringRefs);
+                    hc.SerializeTalkfileToExport(package.GetUExport(mt.UIndex));
+                }
+            }
+
+            // For all loaded packages that contain modified tlks, save them.
+            foreach (var tlkPackage in pc.GetPackages())
+            {
+                MERFileSystem.SavePackage(tlkPackage);
+            }
+
+            pc.Dispose();
 
 #elif __GAME2__ || __GAME3__
 
@@ -296,12 +316,13 @@ namespace Randomizer.Randomizers.Handlers
 #endif
 
             // Free memory
-            MERTalkFile = null;
             MERTalkFiles = null;
             LoadedOfficialTalkFiles = null;
             _updatedTlkStrings = null;
 #if __GAME1__
             Game1GlobalTlkPackages = null;
+#else
+            MERTalkFile = null;
 #endif
         }
 
@@ -339,12 +360,24 @@ namespace Randomizer.Randomizers.Handlers
                 if (loc == MELocalization.INT)
                 {
                     var tlkData = MEREmbedded.GetEmbeddedAsset("Binary", v, fullPath: true);
+#if __GAME1__
+                    throw new Exception("Not fixed or implemented! ME1TalkFile needs to support loading from stream.");
+                    //var tlk = new ME1TalkFile(tlkData);
+                    foreach (var mtlk in MERTalkFiles)
+                    {
+                        foreach (var str in mtlk.StringRefs)
+                        {
+                            mtlk.ReplaceString(str.StringID, str.Data, addIfNotFound: true);
+                        }
+                    }
+#elif __GAME2__ || __GAME3__
                     var tlk = new ME2ME3TalkFile(tlkData);
                     var destTlk = TLKBuilder.CurrentHandler.MERTalkFile;
                     foreach (var str in tlk.StringRefs)
                     {
                         destTlk.ReplaceString(str.StringID, str.Data, addIfNotFound: true);
                     }
+#endif
                 }
             }
         }
@@ -376,7 +409,7 @@ namespace Randomizer.Randomizers.Handlers
 
         private List<ITalkFile> InternalGetAllTLKs()
         {
-            var items = LoadedOfficialTalkFiles.ToList();
+            var items = Enumerable.ToList(LoadedOfficialTalkFiles);
             items.AddRange(MERTalkFiles);
             return items;
         }
@@ -400,7 +433,7 @@ namespace Randomizer.Randomizers.Handlers
         private List<int> _updatedTlkStrings;
         public static IReadOnlyList<int> UpdatedTlkStrings => CurrentHandler._updatedTlkStrings;
 
-        public static void AddUpdatedTlk(int descriptionReference)
+        public static void AddUpdatedTlkId(int descriptionReference)
         {
             CurrentHandler._updatedTlkStrings.Add(descriptionReference);
         }

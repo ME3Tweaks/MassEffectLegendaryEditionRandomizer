@@ -1,30 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
-using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
-using Microsoft.WindowsAPICodePack.PortableDevices.CommandSystem.Object;
-using Newtonsoft.Json;
 using Randomizer.Randomizers;
 using Randomizer.Randomizers.Handlers;
-using Randomizer.Randomizers.Shared.Classes;
 using Randomizer.Randomizers.Utility;
-using WinCopies.Diagnostics;
-using WinCopies.Util;
 
 namespace Randomizer.MER
 {

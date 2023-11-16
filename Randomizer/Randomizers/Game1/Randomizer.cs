@@ -19,6 +19,7 @@ using ME3TweaksCore.NativeMods;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game1._2DA;
 using Randomizer.Randomizers.Game1.ExportTypes;
+using Randomizer.Randomizers.Game1.GalaxyMap;
 using Randomizer.Randomizers.Game1.Levels;
 using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Game1.TextureAssets.LE1;
@@ -545,17 +546,26 @@ namespace Randomizer.Randomizers.Game1
                         SetupRandomizerButtonText = "Setup",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         RequiresTLK = true
-                    },
-#if DEBUG
+                    },*/
                     new RandomizationOption() {
-                        HumanName = "Skip splash",
-                        Description = "Skips the splash screen",
-                        PerformSpecificRandomizationDelegate = EntryMenu.SetupFastStartup,
+                        HumanName = "Galaxy Map",
+                        Description = "This option must be chosen for any of the sub-options to be functional. On its own, this option does nothing",
+                        PerformSpecificRandomizationDelegate = GalaxyMapRandomizer.RewriteGalaxyMap,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        OptionIsSelected = true
+                        OptionIsSelected = true,
+                        RequiresTLK = true,
+                        SubOptions = new ObservableCollectionExtended<RandomizationOption>()
+                        {
+                            new RandomizationOption()
+                            {
+                                OptionIsSelected = true,
+                                IsOptionOnly = true,
+                                SubOptionKey = GalaxyMapRandomizer.RANDSETTING_REWRITE_TEXT_AND_IMAGES,
+                                HumanName = "Rewrite galaxy map and images",
+                                Description = "Completely rewrites the Galaxy Map with new planetary stories and images for every single planet. Makes for a fresh exploration of the galaxy map. Plot planets remain labeled for navigation.",
+                            }
+                        }
                     },
-#endif
-                    */
                 }
             });
 
