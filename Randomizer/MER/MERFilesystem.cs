@@ -356,7 +356,7 @@ namespace Randomizer.MER
                 ModDLCFolderNameSuffix = $"{MERFileSystem.Game}Randomizer",
                 ModGame = MERFileSystem.Game,
                 ModMountPriority = M3MergeDLC.MERGE_DLC_MOUNT_PRIORITY - 1,
-                ModInternalTLKID = 23092349,
+                ModInternalTLKID = 34108000,
                 OutputFolderOverride = dlcFolder, // Do not create a mod folder - just create the DLC component
 #if __GAME2__
                 ModModuleNumber = XXX FIX ME
