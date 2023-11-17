@@ -22,6 +22,7 @@ using LegendaryExplorerCore.Unreal.Classes;
 using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game1._2DA;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
@@ -540,36 +541,12 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
             }
         }
 
-        public const string RANDSETTING_REWRITE_TEXT_AND_IMAGES = "RANDSETTING_REWRITE_TEXT_AND_IMAGES";
+        public const string RANDSETTING_KEEP_PLOT_PLANET_NAMES = "RANDSETTING_KEEP_PLOT_PLANET_NAMES";
         public const string MAP_SWF_PREFIX = "galMapLE1R_";
 
         public static bool RewriteGalaxyMap(GameTarget target, RandomizationOption option)
         {
-            List<IMEPackage> sourcePackages = new List<IMEPackage>(); // List of packages that contain 2DAs that we are going to change (maybe not save to, but will effectively change)
-            sourcePackages.Add(RSharedEngine.GetEngine(target));
-            sourcePackages.Add(RSharedSFXGame.GetSFXGame(target)); // A few 2DAs are here.
-            sourcePackages.Add(MERFileSystem.OpenMEPackage(MERFileSystem.GetPackageFile(target, "BIOG_2DA_UNC_GalaxyMap_X.pcc"))); // This is hardcoded as it is not in the DLC directory
-
-            // Load all DLC in order of mount priority (lowest to highest) 
-            var installedDLC = target.GetInstalledDLCByMountPriority();
-            foreach (var id in installedDLC)
-            {
-                if (id == MERFileSystem.DLCModName)
-                    continue; // Ignore this
-                var autoloadPath = Path.Combine(target.GetDLCPath(), id, "AutoLoad.ini");
-                if (File.Exists(autoloadPath))
-                {
-                    var autoloadIni = new AutoloadIni(autoloadPath);
-                    foreach (var bio2da in autoloadIni.Bio2DAs)
-                    {
-                        var packageFile = MERFileSystem.GetPackageFile(target, $"{bio2da}.pcc");
-                        if (packageFile != null)
-                        {
-                            sourcePackages.Add(MERFileSystem.OpenMEPackage(packageFile));
-                        }
-                    }
-                }
-            }
+            var all2DAPackages = Bio2DATools.GetAll2DAPackages(target);
 
             // Create our overriding 2DA package
             var twoDAPath = Path.Combine(MERFileSystem.DLCModCookedPath, "BIOG_2DA_LE1R_GalaxyMap.pcc");
@@ -588,7 +565,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
             Bio2DA galaxyMap_Images = new Bio2DA() { IsIndexed = false }; // Check if this is accurate.
 
             // Merge 2DAs
-            foreach (var sp in sourcePackages)
+            foreach (var sp in all2DAPackages)
             {
                 var galMapPlanet = sp.Exports.FirstOrDefault(x => !x.IsDefaultObject && x.ClassName == "Bio2DANumberedRows" && x.ObjectName.Name.Contains("GalaxyMap_Planet"));
                 if (galMapPlanet != null)
@@ -619,7 +596,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 }
             }
 
-            if (option.HasSubOptionSelected(RANDSETTING_REWRITE_TEXT_AND_IMAGES))
+            if (option.HasSubOptionSelected(RANDSETTING_KEEP_PLOT_PLANET_NAMES))
             {
                 GalaxyMapRewriter = new GalaxyMapRewrite(target, option, galaxyMap_Planet, galaxyMap_Cluster, galaxyMap_System, galaxyMap_Images); // Initialize the rewrite module
             }
@@ -646,7 +623,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
             List<int> mergedClusterRows = new List<int>();
             List<int> mergedImageRows = new List<int>();
 
-            foreach (var sp in sourcePackages)
+            foreach (var sp in all2DAPackages)
             {
                 // In each source package, load the original 2DA we loaded from
                 // and then 

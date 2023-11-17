@@ -16,31 +16,6 @@ namespace Randomizer.Randomizers.Game1
     /// </summary>
     public class MERControl
     {
-        private static bool InstalledBioPawnMERControl = false;
-        public static void InstallBioPawnMERControl(GameTarget target)
-        {
-            if (!InstalledBioPawnMERControl)
-            {
-                var sfxgame = RSharedSFXGame.GetSFXGame(target);
-                ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioPawn.PostBeginPlay"),
-                    "BioPawn.PostBeginPlay.uc");
-                MERFileSystem.SavePackage(sfxgame);
-                InstalledBioPawnMERControl = true;
-            }
-        }
-
-        private static bool InstalledSFXSkeletalMeshActorMATMERControl = false;
-        public static void InstallSFXSkeletalMeshActorMATMERControl(GameTarget target)
-        {
-            if (!InstalledSFXSkeletalMeshActorMATMERControl)
-            {
-                var sfxgame = RSharedSFXGame.GetSFXGame(target);
-                ScriptTools.AddToClassInPackageFromEmbedded(target, sfxgame, "SFXSkeletalMeshActorMAT.PostBeginPlay",
-                    "SFXSkeletalMeshActorMAT");
-                MERFileSystem.SavePackage(sfxgame);
-                InstalledSFXSkeletalMeshActorMATMERControl = true;
-            }
-        }
 
         private static bool InstalledBioMorphFaceClass = false;
 
@@ -94,31 +69,17 @@ namespace Randomizer.Randomizers.Game1
             }
         }
 
-        public static bool InstallMERControl(GameTarget target)
-        {
-            // Engine class
-            var engine = RSharedEngine.GetEngine(target);
-            ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
-            MERFileSystem.SavePackage(engine);
-
-            var sfxgame = RSharedSFXGame.GetSFXGame(target);
-            ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
-            // MERFileSystem.SavePackage(sfxgame);
-            return true;
-        }
 
         public static void ResetClass()
         {
-            InstalledBioPawnMERControl = false;
             InstalledBioMorphFaceClass = false;
-            InstalledSFXSkeletalMeshActorMATMERControl = false;
         }
 
-        public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.Add)
-        {
-            var bioEngine = CoalescedHandler.GetIniFile("BIOEngine.ini");
-            var section = bioEngine.GetOrAddSection("Engine.MERControlEngine");
-            section.AddEntryIfUnique(new CoalesceProperty(key, new CoalesceValue(value.ToString(), parseAction)));
-        }
+        //public static void SetVariable(string key, object value, CoalesceParseAction parseAction = CoalesceParseAction.Add)
+        //{
+        //    var bioEngine = CoalescedHandler.GetIniFile("BIOEngine.ini");
+        //    var section = bioEngine.GetOrAddSection("Engine.MERControlEngine");
+        //    section.AddEntryIfUnique(new CoalesceProperty(key, new CoalesceValue(value.ToString(), parseAction)));
+        //}
     }
 }

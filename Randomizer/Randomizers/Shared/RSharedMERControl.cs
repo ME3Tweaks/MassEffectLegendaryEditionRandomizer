@@ -4,31 +4,71 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ME3TweaksCore.Targets;
+using Randomizer.MER;
+using Randomizer.Randomizers.Game1.Misc;
+using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared
 {
     internal class RSharedMERControl
     {
+
+        private static bool InstalledBioPawnMERControl = false;
+        /// <summary>
+        /// Installs code into BioPawn.PostBeginPlay for MER
+        /// </summary>
+        /// <param name="target"></param>
         public static void InstallBioPawnMERControl(GameTarget target)
         {
-#if __GAME1__
-            Randomizer.Randomizers.Game1.MERControl.InstallBioPawnMERControl(target);
-#elif __GAME2__
-            Randomizer.Randomizers.Game2.MERControl.InstallBioPawnMERControl(target);
-#elif __GAME3__
-            Randomizer.Randomizers.Game3.MERControl.InstallBioPawnMERControl(target);
-#endif
+            if (!InstalledBioPawnMERControl)
+            {
+                InstallMERControl(target); // This is a prerequesite
+                var sfxgame = RSharedSFXGame.GetSFXGame(target);
+                ScriptTools.InstallScriptToExport(target, sfxgame.FindExport("BioPawn.PostBeginPlay"),
+                    "BioPawn.PostBeginPlay.uc");
+                MERFileSystem.SavePackage(sfxgame);
+                InstalledBioPawnMERControl = true;
+            }
         }
 
-        public static void InstallMERControl(GameTarget target)
+
+        private static bool InstalledMERControl = false;
+        /// <summary>
+        /// Installs scaffolding code used by many other randomizers
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static bool InstallMERControl(GameTarget target)
         {
-#if __GAME1__
-            Randomizer.Randomizers.Game1.MERControl.InstallMERControl(target);
-#elif __GAME2__
-            Randomizer.Randomizers.Game2.MERControl.InstallBioPawnMERControl(target);
-#elif __GAME3__
-            Randomizer.Randomizers.Game3.MERControl.InstallBioPawnMERControl(target);
-#endif
+            if (!InstalledMERControl)
+            {
+                // Engine class
+                var engine = RSharedEngine.GetEngine(target);
+                ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
+                MERFileSystem.SavePackage(engine);
+
+                var sfxgame = RSharedSFXGame.GetSFXGame(target);
+                ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
+                MERFileSystem.SavePackage(sfxgame);
+
+                InstalledMERControl = true;
+            }
+
+            return true;
+        }
+
+        public static void ResetClass()
+        {
+            InstalledMERControl = false;
+            InstalledBioPawnMERControl = false;
+        }
+
+        public static bool InstallNPCMovementRandomizer(GameTarget target, RandomizationOption option)
+        {
+            InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bNPCMovementSpeedRandomizer");
+            return true;
         }
     }
 }

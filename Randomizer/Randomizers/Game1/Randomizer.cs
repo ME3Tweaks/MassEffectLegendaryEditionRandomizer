@@ -159,6 +159,13 @@ namespace Randomizer.Randomizers.Game1
 
                 SharedRandomizer.InventoryCustomKismetClasses();
 
+                // Merge any TLKs that need merged
+                if (SelectedOptions.SelectedOptions.Any(x => x.RequiresTLK))
+                {
+                    // Merge TLK data - this makes lookups work
+                    TLKBuilder.MergeEmbeddedTLKs();
+                }
+
                 void srUpdate(object? o, EventArgs eventArgs)
                 {
                     if (o is RandomizationOption option)
@@ -320,6 +327,7 @@ namespace Randomizer.Randomizers.Game1
         /// </summary>
         private void ResetClasses(bool endOfRandomizationRun)
         {
+            RSharedMERControl.ResetClass();
             SharedRandomizer.CleanupInstallTimeOnlyFiles();
             MERCaches.Cleanup(endOfRandomizationRun);
         }
@@ -535,6 +543,39 @@ namespace Randomizer.Randomizers.Game1
 
             RandomizationGroups.Add(new RandomizationGroup()
             {
+                GroupName = "Galaxy Map",
+                Options = new ObservableCollectionExtended<RandomizationOption>()
+                {
+                    new RandomizationOption() {
+                        HumanName = "Rewrite entire galaxy map",
+                        Description = "Completely rewrites the entire galaxy map (names and descriptions) with new stories, adding images for every single planet. Makes for a fresh exploration of the Galaxy Map.",
+                        PerformSpecificRandomizationDelegate = GalaxyMapRandomizer.RewriteGalaxyMap,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        OptionIsSelected = true,
+                        RequiresTLK = true,
+                        SubOptions = new ObservableCollectionExtended<RandomizationOption>()
+                        {
+                            new RandomizationOption()
+                            {
+                                OptionIsSelected = true,
+                                IsOptionOnly = true,
+                                SubOptionKey = GalaxyMapRandomizer.RANDSETTING_KEEP_PLOT_PLANET_NAMES,
+                                HumanName = "Keep plot planet names",
+                                Description = "Doesn't change plot planet names.",
+                            }
+                        }
+                    },
+                    new RandomizationOption() {
+                        HumanName = "Locations",
+                        Description = "Randomizes positions of clusters, systems, and planets/asteroids/ships.",
+                        //PerformRandomizationOnExportDelegate = RGalaxyMapClusters2DA.RandomizeClustersXY,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
+                    },
+                }
+            });
+
+            RandomizationGroups.Add(new RandomizationGroup()
+            {
                 GroupName = "Miscellaneous",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
@@ -557,25 +598,6 @@ namespace Randomizer.Randomizers.Game1
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
                         RequiresTLK = true
                     },*/
-                    new RandomizationOption() {
-                        HumanName = "Galaxy Map",
-                        Description = "This option must be chosen for any of the sub-options to be functional. On its own, this option does nothing",
-                        PerformSpecificRandomizationDelegate = GalaxyMapRandomizer.RewriteGalaxyMap,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        OptionIsSelected = true,
-                        RequiresTLK = true,
-                        SubOptions = new ObservableCollectionExtended<RandomizationOption>()
-                        {
-                            new RandomizationOption()
-                            {
-                                OptionIsSelected = true,
-                                IsOptionOnly = true,
-                                SubOptionKey = GalaxyMapRandomizer.RANDSETTING_REWRITE_TEXT_AND_IMAGES,
-                                HumanName = "Rewrite galaxy map and images",
-                                Description = "Completely rewrites the Galaxy Map with new planetary stories and images for every single planet. Makes for a fresh exploration of the galaxy map. Plot planets remain labeled for navigation.",
-                            }
-                        }
-                    },
                 }
             });
 
@@ -584,7 +606,16 @@ namespace Randomizer.Randomizers.Game1
                 GroupName = "Movement & pawns",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "NPC movement speeds", Description = "Changes non-player movement stats. Can make combat very easy or very difficult", PerformRandomizationOnExportDelegate = RMovementSpeed2DA.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true},
+                    new RandomizationOption() {
+                        HumanName = "NPC movement speeds",
+                        Description = "Changes non-player movement stats. Can make combat very easy or very difficult",
+                        PerformSpecificRandomizationDelegate = RSharedMERControl.InstallNPCMovementRandomizer,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true,
+                        IsRecommended = true
+
+                    },
                     //new RandomizationOption() {HumanName = "Player movement speeds", Description = "Changes player movement stats", PerformSpecificRandomizationDelegate = PawnMovementSpeed.RandomizePlayerMovementSpeed, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Normal},
                     new RandomizationOption() {
                         HumanName = "NPC walking routes",
@@ -755,7 +786,7 @@ namespace Randomizer.Randomizers.Game1
                     new RandomizationOption()
                     {
                         HumanName = "Battle Royale Mode",
-                        PerformFileSpecificRandomization = RBattleRoyale.RandomizeFile,
+                        PerformSpecificRandomizationDelegate = RBattleRoyale.InstallBattleRoyaleMode,
                         Description = "Everyone that isn't important to the plot wakes up on the wrong side of the bed",
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                     },
@@ -812,12 +843,6 @@ namespace Randomizer.Randomizers.Game1
                         IsRecommended = true,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
                     },
-                    new RandomizationOption() {
-                        HumanName = "Clusters",
-                        Description = "Randomizes positions of clusters",
-                        PerformRandomizationOnExportDelegate = RGalaxyMapClusters2DA.RandomizeClustersXY,
-                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe
-                    },
                 }
             });
 
@@ -826,7 +851,14 @@ namespace Randomizer.Randomizers.Game1
                 GroupName = "Text",
                 Options = new ObservableCollectionExtended<RandomizationOption>()
                 {
-                    new RandomizationOption() {HumanName = "Game over text", PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeGameOverText, RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
+                    new RandomizationOption() {HumanName = "Game over text",
+                        PerformSpecificRandomizationDelegate = SFXGame.RandomizeGameOverString,
+                        RequiresTLK = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
+                        IsRecommended = true,
+                        GoodTimeRandomizer = true,
+                        IsRuntimeRandomizer = true,
+                    },
                     new RandomizationOption() {HumanName = "Intro Crawl", PerformSpecificRandomizationDelegate = RSharedTexts.RandomizeOpeningCrawl, RequiresTLK = true, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe, IsRecommended = true},
                     new RandomizationOption()
                     {
@@ -952,7 +984,7 @@ namespace Randomizer.Randomizers.Game1
                     new RandomizationOption()
                     {
                         HumanName = "Music",
-                        PerformRandomizationOnExportDelegate = RMusic2DA.RandomizeExport,
+                        PerformSpecificRandomizationDelegate = RMusic2DA.RandomizeMusic2DAs,
                         Description = "Changes what music is played in-game. Often plays unfitting music. This does not affect certain areas as some areas have audio not classified as 'Music'.",
                         IsRecommended = false,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning

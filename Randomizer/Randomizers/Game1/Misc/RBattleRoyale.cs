@@ -16,12 +16,22 @@ using LegendaryExplorerCore.Unreal.Classes;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
 using RoboSharp;
 
 namespace Randomizer.Randomizers.Game1.Misc
 {
     class RBattleRoyale
     {
+
+        public static bool InstallBattleRoyaleMode(GameTarget target, RandomizationOption option)
+        {
+            RSharedMERControl.InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bBattleRoyaleMode");
+            return true;
+        }
+
         private static IMEPackage TemplatePackage; // Needs way to null out
 
         private static string[] tagsToNotRandomize = new string[]

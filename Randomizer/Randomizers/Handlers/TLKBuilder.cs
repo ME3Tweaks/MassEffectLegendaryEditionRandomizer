@@ -353,7 +353,7 @@ namespace Randomizer.Randomizers.Handlers
         /// </summary>
         public static void MergeEmbeddedTLKs()
         {
-            var embeddedTLKs = MEREmbedded.ListEmbeddedAssets("Binary", "TLK");
+            var embeddedTLKs = MEREmbedded.ListEmbeddedAssets("Binary", "TLK").Concat(MEREmbedded.ListEmbeddedAssets("Binary", "TLK", true));
             foreach (var v in embeddedTLKs)
             {
                 var loc = v.GetUnrealLocalization();
@@ -361,11 +361,10 @@ namespace Randomizer.Randomizers.Handlers
                 {
                     var tlkData = MEREmbedded.GetEmbeddedAsset("Binary", v, fullPath: true);
 #if __GAME1__
-                    throw new Exception("Not fixed or implemented! ME1TalkFile needs to support loading from stream.");
-                    //var tlk = new ME1TalkFile(tlkData);
+                    var tlk = new ME2ME3TalkFile(tlkData); // We store files on disk as .tlk files - ME2ME3TalkFile. Really should just use json or xml.
                     foreach (var mtlk in MERTalkFiles)
                     {
-                        foreach (var str in mtlk.StringRefs)
+                        foreach (var str in tlk.StringRefs)
                         {
                             mtlk.ReplaceString(str.StringID, str.Data, addIfNotFound: true);
                         }

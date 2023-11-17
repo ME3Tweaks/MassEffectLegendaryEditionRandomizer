@@ -66,6 +66,8 @@
 		<EmbeddedResource Include="Randomizers\Game1\Assets\**\*.gfx" />
 		<Folder Include="Randomizers\Game1\Assets\StarterKit\" />
 
+		<PackageReference Include="SixLabors.Fonts" Version="2.0.0" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Game2Debug'">
@@ -125,12 +127,14 @@
 		<EmbeddedResource Include="Randomizers\SharedAssets\**\*.txt" />
 		<EmbeddedResource Include="Randomizers\SharedAssets\**\*.xml" />
 		<EmbeddedResource Include="Randomizers\SharedAssets\**\*.zip" />
+		<EmbeddedResource Include="Randomizers\SharedAssets\**\*.tlk" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Randomizers\Game1\Assets\Text\Classes\MERControl.uc" />
 		<None Remove="Randomizers\Game1\Assets\Text\Classes\MERControlEngine.uc" />
 		<None Remove="Randomizers\Game1\Assets\Text\Scripts\BioPawn.PostBeginPlay.uc" />
+		<None Remove="Randomizers\Game1\Assets\Text\Scripts\BioSFHandler_GameOver.SetupGameOver.uc" />
 		<None Remove="Randomizers\Game1\Assets\Text\Scripts\BioWayPointSet.PostBeginPlay.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControl.uc" />
 		<None Remove="Randomizers\Game2\Assets\Text\Classes\MERControlEngine.uc" />
