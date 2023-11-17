@@ -130,7 +130,8 @@ namespace RandomizerUI.Classes.Controllers
                     LECPackageSaveFailedCallback = x => MERLog.Error($@"Failed to save package: {x}"),
                     PropertyDatabasesToLoad = new[] { MERFileSystem.Game },
                     AllowedSigners = new[] { new BuildHelper.BuildSigner() { SigningName = "Michael Perez", DisplayName = "ME3Tweaks" } },
-                    LoadBuildInfo = true
+                    LoadBuildInfo = true,
+                    BetaMode = true // Use Beta ASIs
                 };
 
 
