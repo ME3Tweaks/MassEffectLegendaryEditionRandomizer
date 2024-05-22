@@ -12,6 +12,7 @@ using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
+using LegendaryExplorerCore.Misc.ME3Tweaks;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.ME3Tweaks.M3Merge;

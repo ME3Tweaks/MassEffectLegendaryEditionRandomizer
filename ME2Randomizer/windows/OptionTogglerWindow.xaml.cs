@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using LegendaryExplorerCore.Coalesced;
+using LegendaryExplorerCore.Coalesced.Config;
 using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using MahApps.Metro.Controls;
 using ME3TweaksCore.Config;
@@ -23,13 +24,7 @@ using ME3TweaksCoreWPF.UI;
 using PropertyChanged;
 using Randomizer.MER;
 using RandomizerUI.Classes;
-using Windows.Foundation.Collections;
-using Windows.System;
 using LegendaryExplorerCore.Helpers;
-using Microsoft.WindowsAPICodePack.PortableDevices.CommandSystem.Object;
-using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
-using System.Collections;
-using WinCopies.Util;
 
 namespace RandomizerUI.windows
 {

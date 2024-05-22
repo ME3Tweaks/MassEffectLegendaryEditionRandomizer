@@ -571,28 +571,28 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 if (galMapPlanet != null)
                 {
                     var planet2DA = new Bio2DA(galMapPlanet);
-                    planet2DA.MergeInto(galaxyMap_Planet);
+                    planet2DA.MergeInto(galaxyMap_Planet, out _);
                 }
 
                 var galMapCluster = sp.Exports.FirstOrDefault(x => !x.IsDefaultObject && x.ClassName == "Bio2DANumberedRows" && x.ObjectName.Name.Contains("GalaxyMap_Cluster"));
                 if (galMapCluster != null)
                 {
                     var cluster2DA = new Bio2DA(galMapCluster);
-                    cluster2DA.MergeInto(galaxyMap_Cluster);
+                    cluster2DA.MergeInto(galaxyMap_Cluster, out _);
                 }
 
                 var galMapSystem = sp.Exports.FirstOrDefault(x => !x.IsDefaultObject && x.ClassName == "Bio2DANumberedRows" && x.ObjectName.Name.Contains("GalaxyMap_System"));
                 if (galMapSystem != null)
                 {
                     var system2DA = new Bio2DA(galMapSystem);
-                    system2DA.MergeInto(galaxyMap_System);
+                    system2DA.MergeInto(galaxyMap_System, out _);
                 }
 
                 var galMapImages = sp.Exports.FirstOrDefault(x => !x.IsDefaultObject && x.ClassName == "Bio2DANumberedRows" && x.ObjectName.Name.Contains("Images_GalaxyMapImages"));
                 if (galMapImages != null)
                 {
                     var galaxyMapImages = new Bio2DA(galMapImages);
-                    galaxyMapImages.MergeInto(galaxyMap_Images);
+                    galaxyMapImages.MergeInto(galaxyMap_Images, out _);
                 }
             }
 
@@ -631,7 +631,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 if (galMapPlanet != null)
                 {
                     var planet2DA = new Bio2DA(galMapPlanet);
-                    mergedPlanetRows.AddRange(galaxyMap_Planet.MergeInto(planet2DA, false));
+                    mergedPlanetRows.AddRange(galaxyMap_Planet.MergeInto(planet2DA, out _, false));
                     planet2DA.Write2DAToExport();
                 }
 
@@ -639,7 +639,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 if (galMapSystem != null)
                 {
                     var system2DA = new Bio2DA(galMapSystem);
-                    mergedSystemRows.AddRange(galaxyMap_System.MergeInto(system2DA, false));
+                    mergedSystemRows.AddRange(galaxyMap_System.MergeInto(system2DA, out _, false));
                     system2DA.Write2DAToExport();
                 }
 
@@ -647,7 +647,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 if (galMapCluster != null)
                 {
                     var cluster2DA = new Bio2DA(galMapCluster);
-                    mergedClusterRows.AddRange(galaxyMap_Cluster.MergeInto(cluster2DA, false));
+                    mergedClusterRows.AddRange(galaxyMap_Cluster.MergeInto(cluster2DA, out _, false));
                     cluster2DA.Write2DAToExport();
                 }
 
@@ -655,7 +655,7 @@ namespace Randomizer.Randomizers.Game1.GalaxyMap
                 if (galMapImages != null)
                 {
                     var galaxyMapImages = new Bio2DA(galMapImages);
-                    mergedImageRows.AddRange(galaxyMap_Images.MergeInto(galaxyMapImages, false));
+                    mergedImageRows.AddRange(galaxyMap_Images.MergeInto(galaxyMapImages, out _, false));
                     galaxyMapImages.Write2DAToExport();
                 }
 

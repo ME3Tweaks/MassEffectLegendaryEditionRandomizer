@@ -1,17 +1,12 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using LegendaryExplorerCore.Coalesced;
-using LegendaryExplorerCore.Coalesced.Xml;
+using LegendaryExplorerCore.Coalesced.Config;
 using LegendaryExplorerCore.GameFilesystem;
-using LegendaryExplorerCore.Helpers;
-using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Config;
 using Randomizer.MER;
-using Randomizer.Randomizers.Shared.Classes;
 
 namespace Randomizer.Randomizers.Handlers
 {
@@ -58,7 +53,7 @@ namespace Randomizer.Randomizers.Handlers
         {
 #if __GAME1__
             // Create M3CD
-            var m3cdText = ConfigMerge.ConvertBundleToM3CD(ConfigBundle);
+            var m3cdText = M3CConfigMerge.ConvertBundleToM3CD(ConfigBundle);
             var outPath = Path.Combine(MERFileSystem.DLCModCookedPath, "ConfigDelta-LE1R.m3cd");
             MERLog.Information($"Writing randomizer M3CD to {outPath}");
             File.WriteAllText(outPath, m3cdText);
