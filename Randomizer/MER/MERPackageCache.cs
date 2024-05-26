@@ -8,7 +8,6 @@ using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Targets;
 using Randomizer.Randomizers;
 using Serilog;
-using WinCopies.Util;
 
 namespace Randomizer.MER
 {

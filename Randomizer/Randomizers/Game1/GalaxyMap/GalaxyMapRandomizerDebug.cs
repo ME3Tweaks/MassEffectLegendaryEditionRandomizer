@@ -8,6 +8,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Textures;
@@ -17,7 +18,6 @@ using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.Classes;
 using ME3TweaksCore.ME3Tweaks.StarterKit;
 using Randomizer.MER;
-using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Game1.GalaxyMap
 {

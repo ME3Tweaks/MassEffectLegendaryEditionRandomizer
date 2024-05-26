@@ -20,6 +20,7 @@ using LegendaryExplorerCore.Unreal.ObjectInfo;
 using Newtonsoft.Json;
 using Randomizer.MER;
 using Randomizer.Randomizers;
+using Randomizer.Randomizers.Game1.GalaxyMap;
 using Randomizer.Randomizers.Utility;
 
 namespace RandomizerUI.Classes
@@ -52,7 +53,7 @@ namespace RandomizerUI.Classes
             // For UI binding.
             RandomizationOption option = new RandomizationOption();
             option.OnOperationUpdate += srUpdate;
-            dataworker.DoWork += MERDebug.DoStuff;
+            dataworker.DoWork += GalaxyMapRandomizerDebug.BuildSWFPackage;
             //dataworker.DoWork += MERDebug.BuildTFCs;
             //dataworker.DoWork += MERDebug.BuildHenchPowers;
             //dataworker.DoWork += MERDebug.BuildPowersBank;

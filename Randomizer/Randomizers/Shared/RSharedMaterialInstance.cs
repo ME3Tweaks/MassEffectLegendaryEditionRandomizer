@@ -5,7 +5,6 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using Randomizer.Randomizers.Utility;
-using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Shared
 {
