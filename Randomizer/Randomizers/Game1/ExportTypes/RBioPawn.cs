@@ -4,6 +4,8 @@ using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Handlers;
+using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Game1.ExportTypes
@@ -50,6 +52,16 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
             d3d.Y *= ThreadSafeRandom.NextFloat(1 - option.SliderValue, 1 + option.SliderValue);
             d3d.Z *= ThreadSafeRandom.NextFloat(1 - option.SliderValue, 1 + option.SliderValue);
             export.WriteProperty(d3d.ToStructProperty("X", "Y", "Z", "DrawScale3D", true));
+            return true;
+        }
+
+        public static bool InstallEnemyPowerRandomizer(GameTarget target, RandomizationOption option)
+        {
+            RSharedMERControl.InstallBioPawnMERControl(target);
+            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer");
+
+            // Handle sliders
+
             return true;
         }
     }

@@ -14,6 +14,7 @@ using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Misc.ME3Tweaks;
 using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.ME3Tweaks.M3Merge;
 using ME3TweaksCore.Misc;
@@ -552,13 +553,13 @@ namespace Randomizer.Randomizers.Game1
                         Description = "Completely rewrites the entire galaxy map (names and descriptions) with new stories, adding images for every single planet. Makes for a fresh exploration of the Galaxy Map.",
                         PerformSpecificRandomizationDelegate = GalaxyMapRandomizer.RewriteGalaxyMap,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe,
-                        OptionIsSelected = true,
+                        // OptionIsSelected = true,
                         RequiresTLK = true,
                         SubOptions = new ObservableCollectionExtended<RandomizationOption>()
                         {
                             new RandomizationOption()
                             {
-                                OptionIsSelected = true,
+                                // OptionIsSelected = true,
                                 IsOptionOnly = true,
                                 SubOptionKey = GalaxyMapRandomizer.RANDSETTING_KEEP_PLOT_PLANET_NAMES,
                                 HumanName = "Keep plot planet names",
@@ -673,11 +674,16 @@ namespace Randomizer.Randomizers.Game1
 #endif
 
 
-                    },
+                    },*/
+
                     new RandomizationOption()
                     {
-                        // CHANGE TO ENEMY TALENT 2DA
-                        HumanName = "Enemy powers", Description = "Gives enemies different powers", PerformRandomizationOnExportDelegate = EnemyPowerChanger.RandomizeExport, PerformSpecificRandomizationDelegate = EnemyPowerChanger.Init, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, IsRecommended = true,
+                        HumanName = "Enemy powers", Description = "Gives enemies random powers. Can greatly increase difficulty", 
+                        PerformSpecificRandomizationDelegate = RBioPawn.InstallEnemyPowerRandomizer, 
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, 
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true
                         // Debug stuff.
 #if DEBUG
                         //HasSliderOption = true,
@@ -691,7 +697,7 @@ namespace Randomizer.Randomizers.Game1
                         //},
                         //SliderValue = -1, // End debug stuff
 #endif
-                    },*/
+                    },
                 }
             });
 
