@@ -20,6 +20,7 @@ using ME3TweaksCore.NativeMods;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game1._2DA;
 using Randomizer.Randomizers.Game1.ExportTypes;
+using Randomizer.Randomizers.Game1.Framework;
 using Randomizer.Randomizers.Game1.GalaxyMap;
 using Randomizer.Randomizers.Game1.Levels;
 using Randomizer.Randomizers.Game1.Misc;
@@ -898,6 +899,14 @@ namespace Randomizer.Randomizers.Game1
                         Description = "Changes pawn roles in conversations",
                         IsRecommended = false,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_RIP
+                    },
+                    new RandomizationOption()
+                    {
+                        HumanName = "NPCs (requires LE1 framework)",
+                        PerformSpecificRandomizationDelegate = RNPCFramework.RandomizeNPCs,
+                        Description = "Swaps pawns in the NPC framework, so different characters appear in different places",
+                        IsRecommended = true,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning
                     },
                     // Due to how stage placement works this doesn't really work very well in this game.
                     //new RandomizationOption() {

@@ -11,44 +11,42 @@ using ME3TweaksCore.GameFilesystem;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 
-namespace Randomizer.Randomizers.Game3.Framework
+namespace Randomizer.Randomizers.Game1.Framework
 {
-    internal class RNPC
+    internal class RNPCFramework
     {
         public static bool RandomizeNPCs(GameTarget target, RandomizationOption option)
         {
-            var npcFolder = Path.Combine(M3Directories.GetDLCPath(target), "DLC_MOD_Framework", "CookedPCConsole", "NPC");
+            var npcFolder = Path.Combine(M3Directories.GetDLCPath(target), "DLC_MOD_Framework", "CookedPCConsole");
             var vanillaPackageToTagNameMap = new Dictionary<string, NameReference>();
             var vanillaTagNameToPackage = new Dictionary<NameReference, string>();
             if (Directory.Exists(npcFolder))
             {
                 // Step 1: Inventory all packages to build tag map
-                var npcFiles = Directory.GetFiles(npcFolder, "*.pcc", SearchOption.TopDirectoryOnly);
+                var npcFiles = Directory.GetFiles(npcFolder, "BIONPC_*.pcc", SearchOption.TopDirectoryOnly);
                 option.ProgressIndeterminate = false;
                 option.ProgressValue = 0;
                 option.ProgressMax = npcFiles.Length;
                 option.CurrentOperation = "Randomizing NPCs (Inventory)";
-                foreach (var npcFile in npcFiles.Where(x=>x.GetUnrealLocalization() == MELocalization.None))
+                foreach (var npcFile in npcFiles)
                 {
                     var packageName = Path.GetFileName(npcFile);
                     var npcPackagePath = MERFileSystem.GetPackageFile(target, packageName, false);
-                    using var package = MEPackageHandler.UnsafePartialLoad(npcPackagePath, x => x.ClassName == "SFXStuntActor" || x.ClassName == "Level" 
-                                                                                                                               || x.IsA("SFXPawn") || x.InheritsFrom("SFXPawn")); // Pawns will reference instances and classes
+                    using var package = MEPackageHandler.UnsafePartialLoad(npcPackagePath, x => x.IsA("BioPawn") || x.ClassName == "Level"); // Pawns will reference instances and classes
 
                     List<ExportEntry> randomizableActors = new List<ExportEntry>();
-                    var actors = ObjectBinary.From<Level>(package.FindExport("TheWorld.PersistentLevel")).Actors;
+                    var actors = package.GetLevelBinary().Actors;
                     foreach (var actor in actors.Where(x => x > 0).Select(x => package.GetUExport(x)))
                     {
-                        if (actor.ClassName == "BioWorldInfo") continue;
-                        if (actor.ClassName == "BlockingVolume") continue;
-                        randomizableActors.Add(actor);
+                        if (actor.IsA("BioPawn"))
+                        {
+                            randomizableActors.Add(actor);
+                        }
                     }
 
                     // Currently we only support 1 swap
                     if (randomizableActors.Count == 1)
                     {
-                        if (randomizableActors[0].ClassName != "SFXStuntActor" && !randomizableActors[0].IsA("SFXPawn"))
-                            Debugger.Break();
                         // var props = randomizableActors[0].GetProperties();
                         var tag = randomizableActors[0].GetProperty<NameProperty>("Tag");
 
@@ -107,10 +105,8 @@ namespace Randomizer.Randomizers.Game3.Framework
                     // Step 5: Update the tag
                     var newPackageF = MERFileSystem.GetPackageFile(target, originalFilename, false);
                     var newPackage = MEPackageHandler.OpenMEPackage(newPackageF);
-                    var stuntActor = newPackage.Exports.FirstOrDefault(x => x.ClassName == "SFXStuntActor" && x.Parent.InstancedFullPath == "TheWorld.PersistentLevel");
-                    if (stuntActor == null)
-                        stuntActor  = newPackage.Exports.FirstOrDefault(x => x.IsA("SFXPawn") && x.Parent.InstancedFullPath == "TheWorld.PersistentLevel");
-                    stuntActor.WriteProperty(new NameProperty(newTag, "Tag"));
+                    var bioPawn = newPackage.GetUExport(newPackage.GetLevelBinary().Actors.FirstOrDefault(x => x > 0 && newPackage.GetUExport(x).IsA("BioPawn")));
+                    bioPawn.WriteProperty(new NameProperty(newTag, "Tag"));
 
                     // Update the sequencing
                     var mainSeq = newPackage.FindExport("TheWorld.PersistentLevel.Main_Sequence");
@@ -147,7 +143,7 @@ namespace Randomizer.Randomizers.Game3.Framework
             }
             else
             {
-                MERLog.Warning(@"LE3 Framework not found, skipping NPC randomizer");
+                MERLog.Warning(@"LE1 Framework not found, skipping NPC randomizer");
                 return false;
             }
         }
