@@ -63,7 +63,7 @@ namespace Randomizer.Randomizers.Game2.ExportTypes
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        private static bool CanLinkBeRandomized(SeqTools.VarLinkInfo info)
+        private static bool CanLinkBeRandomized(VarLinkInfo info)
         {
             if (info.LinkedNodes.Count != 1) return false;
             if (info.LinkDesc.Contains("owner", StringComparison.InvariantCultureIgnoreCase)) return true;

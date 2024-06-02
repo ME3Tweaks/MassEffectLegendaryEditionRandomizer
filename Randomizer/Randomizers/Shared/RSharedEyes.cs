@@ -36,7 +36,7 @@ namespace Randomizer.Randomizers.Shared
         {
             RSharedMERControl.InstallBioPawnMERControl(target);
 #if __GAME2__
-            MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
+            Game2.MERControl.InstallSFXSkeletalMeshActorMATMERControl(target);
 #elif __GAME3__
             // Stunt actor?
 #endif

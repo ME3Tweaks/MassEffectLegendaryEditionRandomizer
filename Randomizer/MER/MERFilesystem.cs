@@ -361,7 +361,7 @@ namespace Randomizer.MER
                 ModInternalTLKID = 34108000,
                 OutputFolderOverride = dlcFolder, // Do not create a mod folder - just create the DLC component
 #if __GAME2__
-                ModModuleNumber = XXX FIX ME
+                ModModuleNumber = 39200
 #endif
             };
             DLCModGenerator.CreateStarterKitMod(target.GetDLCPath(), options, null, out var _);

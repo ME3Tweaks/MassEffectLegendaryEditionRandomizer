@@ -699,11 +699,11 @@ namespace Randomizer.Shared
         public static ExportEntry CreatePawnList(GameTarget target, ExportEntry sequence, string[] allowedPawns)
         {
             var bioPawnTypes = new List<ExportEntry>();
-            foreach (var v in PawnPorting.PortablePawns)
+            foreach (var v in Randomizers.Game2.Enemy.PawnPorting.PortablePawns)
             {
                 if (allowedPawns.Contains(v.BioPawnTypeIFP))
                 {
-                    PawnPorting.PortPawnIntoPackage(target, v, sequence.FileRef);
+                    Randomizers.Game2.Enemy.PawnPorting.PortPawnIntoPackage(target, v, sequence.FileRef);
                     var bpt = sequence.FileRef.FindExport(v.BioPawnTypeIFP);
                     if (bpt == null)
                         Debugger.Break();

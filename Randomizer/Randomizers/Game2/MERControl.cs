@@ -4,6 +4,7 @@ using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
+using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Utility;
@@ -100,11 +101,11 @@ namespace Randomizer.Randomizers.Game2
             if (!InstalledMERControl)
             {
                 // Engine class
-                var engine = Engine.GetEngine(target);
+                var engine = RSharedEngine.GetEngine(target);
                 ScriptTools.InstallClassToPackageFromEmbedded(target, engine, "MERControlEngine", useCache: true);
                 MERFileSystem.SavePackage(engine);
 
-                var sfxgame = SFXGame.GetSFXGame(target);
+                var sfxgame = RSharedSFXGame.GetSFXGame(target);
                 ScriptTools.InstallClassToPackageFromEmbedded(target, sfxgame, "MERControl");
                 // MERFileSystem.SavePackage(sfxgame);
 

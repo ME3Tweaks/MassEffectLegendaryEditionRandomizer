@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using LegendaryExplorerCore.GameFilesystem;
@@ -597,7 +598,7 @@ namespace Randomizer.MER
             RandomizationOption option = (RandomizationOption)e.Argument;
             var game = MEGame.LE2;
             var target = new GameTarget(game, MEDirectories.GetDefaultGamePath(game), true);
-            GestureManager.Init(target, false);
+            Randomizers.Shared.Classes.GestureManager.Init(target, false);
 
 
             // PackageName -> GesturePackage
@@ -622,7 +623,7 @@ namespace Randomizer.MER
                 var p = MEPackageHandler.OpenMEPackage(f);
                 var gesturesPackageExports = p.Exports.Where(
                         x => x.idxLink == 0 && x.ClassName == "Package"
-                                            && GestureManager.IsGestureGroupPackage(x.InstancedFullPath))
+                                            && Randomizers.Shared.Classes.GestureManager.IsGestureGroupPackage(x.InstancedFullPath))
                     .Select(x => x.UIndex).ToList();
 
                 // Get list of exports under these packages
@@ -650,7 +651,7 @@ namespace Randomizer.MER
                 v.Value.Save();
             }
 
-            MERCaches.Cleanup();
+            MERCaches.Cleanup(false);
 #endif
         }
 

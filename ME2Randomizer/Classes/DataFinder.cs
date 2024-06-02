@@ -33,7 +33,7 @@ namespace RandomizerUI.Classes
             RandomizationOption option = new RandomizationOption();
             option.OnOperationUpdate += srUpdate;
 #if __GAME1__
-            dataworker.DoWork += GalaxyMapRandomizerDebug.BuildSWFPackage;
+            dataworker.DoWork += Randomizer.Randomizers.Game1.GalaxyMap.GalaxyMapRandomizerDebug.BuildSWFPackage;
 #endif
             //dataworker.DoWork += MERDebug.BuildTFCs;
             //dataworker.DoWork += MERDebug.BuildHenchPowers;

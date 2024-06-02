@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -13,27 +12,22 @@ using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
-using LegendaryExplorerCore.Misc.ME3Tweaks;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
 using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.Misc;
-using Microsoft.WindowsAPICodePack.Win32Native.NamedPipe;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Game2.Enemy;
 using Randomizer.Randomizers.Game2.ExportTypes;
 using Randomizer.Randomizers.Game2.Levels;
 using Randomizer.Randomizers.Game2.Misc;
-using Randomizer.Randomizers.Game2.TextureAssets;
 using Randomizer.Randomizers.Game2.TextureAssets.LE2;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Shared.Classes;
-using Randomizer.Randomizers.Utility;
-using Serilog;
 using File = System.IO.File;
 
 namespace Randomizer.Randomizers.Game2
@@ -115,7 +109,7 @@ namespace Randomizer.Randomizers.Game2
         private void PerformRandomization(object sender, DoWorkEventArgs e)
         {
             MemoryManager.SetUsePooledMemory(true, false, false, (int)FileSize.KibiByte * 8, 4, 2048, false);
-            ResetClasses();
+            ResetClasses(false);
             SelectedOptions.SetRandomizationInProgress?.Invoke(true);
             SelectedOptions.SetCurrentOperationText?.Invoke("Initializing randomizer");
             SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
@@ -352,7 +346,7 @@ namespace Randomizer.Randomizers.Game2
             CoalescedHandler.EndHandler();
             TLKBuilder.EndHandler();
             MERFileSystem.Finalize(SelectedOptions);
-            ResetClasses();
+            ResetClasses(true);
             CleanupInstallTimeOnlyFiles(installTimeOnlyPackages);
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
@@ -386,14 +380,14 @@ namespace Randomizer.Randomizers.Game2
         /// <summary>
         /// Ensures things are set back to normal before first run
         /// </summary>
-        private void ResetClasses()
+        private void ResetClasses(bool endOfRandomizationRun)
         {
             RSharedMorphTarget.ResetClass();
             SquadmateHead.ResetClass();
             PawnPorting.ResetClass();
             MERControl.ResetClass();
             SharedLE2Fixes.ResetClass();
-            MERCaches.Cleanup();
+            MERCaches.Cleanup(endOfRandomizationRun);
         }
 
 

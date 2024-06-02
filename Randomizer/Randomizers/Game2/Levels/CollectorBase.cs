@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
 using ME3TweaksCore.Targets;
-using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
 using Randomizer.MER;
 using Randomizer.Randomizers.Game2.Enemy;
 using Randomizer.Randomizers.Game2.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 using Randomizer.Shared;
-using Windows.UI.Popups;
 
 namespace Randomizer.Randomizers.Game2.Levels
 {

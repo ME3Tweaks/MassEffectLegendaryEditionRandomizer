@@ -257,7 +257,7 @@ namespace Randomizer.Randomizers.Game2.Levels
                 {
                     var ifp = baseIFP + i;
                     var setObj = topFloorP.FindExport(ifp);
-                    KismetHelper.ChangeOutlink(setObj, 0, 0, creepySeq.UIndex);
+                    KismetHelper.ChangeOutputLink(setObj, 0, 0, creepySeq.UIndex);
                 }
 
                 // CreepySeq -> Start Conversation

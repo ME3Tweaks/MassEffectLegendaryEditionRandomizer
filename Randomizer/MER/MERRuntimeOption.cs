@@ -80,10 +80,10 @@ namespace Randomizer.MER
             switch (PropertyName)
             {
 #if __GAME1__
-                case REnemyWeapon.OPTIONKEY_EnemyWeaponsRandomizer:
+                case Randomizers.Game1.Misc.REnemyWeapon.OPTIONKEY_EnemyWeaponsRandomizer:
                     DisplayString = RTO_TITLE_ENEMYWEAPONS;
                     break;
-                case REnemyWeapon.OPTIONKEY_EnemyWeaponModsRandomizer:
+                case Randomizers.Game1.Misc.REnemyWeapon.OPTIONKEY_EnemyWeaponModsRandomizer:
                     DisplayString = RTO_TITLE_ENEMYWEAPONMODS;
                     break;
 #endif

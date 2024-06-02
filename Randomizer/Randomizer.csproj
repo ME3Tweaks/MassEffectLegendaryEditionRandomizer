@@ -6,7 +6,7 @@
 		<Configurations>Game1Debug;Game1Release;Game2Debug;Game2Release;Game3Debug;Game3Release</Configurations>
 		<Authors>Mgamerz</Authors>
 		<Company>ME3Tweaks</Company>
-		<Copyright>2017-2023 ME3Tweaks</Copyright>
+		<Copyright>2017-2024 ME3Tweaks</Copyright>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Game1Debug' Or '$(Configuration)'=='Game1Release'">
@@ -215,11 +215,5 @@
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCoreWPF\ME3TweaksCoreWPF.csproj" />
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\ME3TweaksCore.csproj" />
 		<ProjectReference Include="..\ME3TweaksCore\ME3TweaksCore\submodules\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Randomizers\Game1\Assets\Binary\Packages\LE1\InstallSessionOnly\" />
-	  <Folder Include="Randomizers\Game1\Assets\Textures\" />
-	  <Folder Include="Randomizers\Game1\Assets\Text\GalaxyMap\" />
 	</ItemGroup>
 </Project>
