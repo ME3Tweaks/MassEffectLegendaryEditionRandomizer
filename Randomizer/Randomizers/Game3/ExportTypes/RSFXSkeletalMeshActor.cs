@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using LegendaryExplorerCore.Kismet;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Packages;
 using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
 using LegendaryExplorerCore.Unreal;
 using LegendaryExplorerCore.Unreal.BinaryConverters;
-using LegendaryExplorerCore.Unreal.ObjectInfo;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Shared.Classes;
 using Randomizer.Randomizers.Utility;
-using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Game3.ExportTypes
 {
@@ -137,7 +135,7 @@ namespace Randomizer.Randomizers.Game3.ExportTypes
 
                         var isPlayerTrack = track.TrackTitle.Contains("Player");
 
-                        var randGesture = GestureManager.GetRandomMERGesture();
+                        var randGesture = GestureManager.GetRandomLoopingGesture();
                         EntryExporter.ExportExportToPackage(randGesture.GestureAnimSequence, bioConv.FileRef, out var portedRandGestureSeq, MERCaches.GlobalCommonLookupCache);
                         if (!dynAnimSetMap.TryGetValue(randGesture.GestureGroup, out var dynAnimSetToUpdate))
                         {
@@ -259,7 +257,7 @@ namespace Randomizer.Randomizers.Game3.ExportTypes
             var props = gesturesComp.GetProperties();
 
             // Port the gesture animation
-            var randGesture = GestureManager.GetRandomMERGesture();
+            var randGesture = GestureManager.GetRandomLoopingGesture();
             if (randGesture == null)
                 return;
             EntryExporter.ExportExportToPackage(randGesture.GestureAnimSequence, gesturesComp.FileRef, out var portedRandGestureSeq, MERCaches.GlobalCommonLookupCache);
@@ -309,7 +307,7 @@ namespace Randomizer.Randomizers.Game3.ExportTypes
 
 
             // Port the data
-            var randGesture = GestureManager.GetRandomMERGesture();
+            var randGesture = GestureManager.GetRandomLoopingGesture();
             if (randGesture == null)
                 return;
             EntryExporter.ExportExportToPackage(randGesture.GestureAnimSequence, skelMeshComp.FileRef, out var portedRandGestureSeq, MERCaches.GlobalCommonLookupCache);

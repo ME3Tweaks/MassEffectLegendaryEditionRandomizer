@@ -1,25 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Coalesced.Config;
 using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 using MahApps.Metro.Controls;
-using ME3TweaksCore.Config;
 using ME3TweaksCoreWPF.UI;
 using PropertyChanged;
 using Randomizer.MER;
@@ -69,6 +56,8 @@ namespace RandomizerUI.windows
             MERUILog.Information($"OptionToggler: Getting current configuration");
 
             var options = new List<MERRuntimeOption>();
+
+            // Needs custom implementation for LE1 M3CD
             ConfigAssetBundle bundle = ConfigAssetBundle.FromDLCFolder(MERFileSystem.Game, MERFileSystem.GetDLCModCookedPath(TargetHandler.Target), MERFileSystem.DLCModName);
             var engine = bundle.GetAsset("BioEngine.ini", false);
             var section = engine.GetOrAddSection("Engine.MERControlEngine");

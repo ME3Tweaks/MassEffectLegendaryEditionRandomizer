@@ -3,7 +3,6 @@ using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Shared;
-using WinCopies.Util;
 using System.Linq;
 
 namespace Randomizer.Randomizers.Game3.Levels
@@ -33,7 +32,7 @@ namespace Randomizer.Randomizers.Game3.Levels
 
             // Install random switch and point it at the romance log culminations for each
             // Miranda gets 2 as she has a 50/50 of miranda or lonely shep.
-            var randomSwitch = MERSeqTools.InstallRandomSwitchIntoSequence(target, romSeq, 8);
+            var randomSwitch = MERSeqTools.CreateRandSwitch(romSeq, 8);
             var outLinks = KismetHelper.GetOutputLinksOfNode(randomSwitch);
 
             var outOptions = kismetObjects.Where(x => x.ClassName == "BioSeqAct_SetStreamingState").ToList();

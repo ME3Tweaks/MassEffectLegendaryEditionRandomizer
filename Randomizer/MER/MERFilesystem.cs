@@ -51,6 +51,8 @@ namespace Randomizer.MER
         /// </summary>
         public static MEGame Game = MEGame.LE2;
         public static readonly string[] filesToSkip = { "RefShaderCache-PC-D3D-SM5.upk", "IpDrv.pcc", "WwiseAudio.pcc", "SFXOnlineFoundation.pcc", "GFxUI.pcc" };
+
+        // This should add EntryMenu
         public static readonly string[] alwaysBasegameFiles = EntryImporter.FilesSafeToImportFrom(Game).Select(x => Path.GetFileNameWithoutExtension(x).StripUnrealLocalization()).ToArray();
 #elif __GAME3__
         /// <summary>
@@ -58,6 +60,8 @@ namespace Randomizer.MER
         /// </summary>
         public static MEGame Game = MEGame.LE3;
         public static readonly string[] filesToSkip = { "RefShaderCache-PC-D3D-SM5.upk", "IpDrv.pcc", "WwiseAudio.pcc", "SFXOnlineFoundation.pcc", "GFxUI.pcc" };
+
+        public static readonly string[] alwaysBasegameFiles = EntryImporter.FilesSafeToImportFrom(Game).Select(x => Path.GetFileNameWithoutExtension(x).StripUnrealLocalization()).ToArray();
 #endif
 
 
@@ -84,7 +88,7 @@ namespace Randomizer.MER
                 MUtilities.DeleteFilesAndFoldersRecursively(dlcModPath); //Nukes the DLC folder
 
             // Re-extract even if we are on re-roll
-            CreateRandomizerDLCMod(options.RandomizationTarget, dlcModPath);
+            CreateRandomizerDLCMod(options.RandomizationTarget);
             options.RandomizationTarget.InstallBinkBypass(true);
             DLCModCookedPath = Path.Combine(dlcModPath, options.RandomizationTarget.Game.CookedDirName());
 
@@ -334,20 +338,18 @@ namespace Randomizer.MER
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        private static void CreateRandomizerDLCMod(GameTarget target, string dlcpath)
+        private static void CreateRandomizerDLCMod(GameTarget target)
         {
             //Directory.CreateDirectory(dlcpath);
             //var zipMemory = MEREmbedded.GetEmbeddedAsset("StarterKit", $"{target.Game.ToString().ToLower()}starterkit.zip");
             //using ZipArchive archive = new ZipArchive(zipMemory);
             //archive.ExtractToDirectory(dlcpath);
 
-#if __GAME1__
             var dlcFolder = target.GetDLCPath();
             if (!Directory.Exists(dlcFolder))
             {
                 Directory.CreateDirectory(dlcFolder);
             }
-#endif
 
             StarterKitOptions options = new StarterKitOptions()
             {

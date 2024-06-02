@@ -64,15 +64,15 @@ namespace Randomizer.Randomizers.Game3.Misc
             // Setup functions to allow custom enemies
             var sfxGame = ScriptTools.InstallScriptToPackage(target, "SFXGame.pcc", "SFXModule_DamagePlayer.SFXTakeDamage", "PlayerTeamDominate.SFXTakeDamage.uc", false, false);
 
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.AddOrder"), "PlayerTeamDominate.AddOrder.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.CanInstantlyUsePowers"), "PlayerTeamDominate.CanInstantlyUsePowers.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.CanQueueOrder"), "PlayerTeamDominate.CanQueueOrder.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.CanUsePowers"), "PlayerTeamDominate.CanUsePowers.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.HasAnyEnemies"), "PlayerTeamDominate.HasAnyEnemies.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.MoveToCoverNearHoldLocation"), "PlayerTeamDominate.MoveToCoverNearHoldLocation.uc");
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXAI_Henchman.ShouldAttack"), "PlayerTeamDominate.ShouldAttack.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.AddOrder"), "PlayerTeamDominate.AddOrder.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.CanInstantlyUsePowers"), "PlayerTeamDominate.CanInstantlyUsePowers.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.CanQueueOrder"), "PlayerTeamDominate.CanQueueOrder.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.CanUsePowers"), "PlayerTeamDominate.CanUsePowers.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.HasAnyEnemies"), "PlayerTeamDominate.HasAnyEnemies.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.MoveToCoverNearHoldLocation"), "PlayerTeamDominate.MoveToCoverNearHoldLocation.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXAI_Henchman.ShouldAttack"), "PlayerTeamDominate.ShouldAttack.uc");
 
-            ScriptTools.InstallScriptToExport(sfxGame.FindExport("SFXPawn_Henchman.Downed.BeginState"), "PlayerTeamDominate.DownedBeginState.uc");
+            ScriptTools.InstallScriptToExport(target,sfxGame.FindExport("SFXPawn_Henchman.Downed.BeginState"), "PlayerTeamDominate.DownedBeginState.uc");
             // Setup functions to allow teammates to change teams against the player
 
             MERFileSystem.SavePackage(sfxGame);

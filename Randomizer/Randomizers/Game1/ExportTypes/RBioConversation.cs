@@ -45,7 +45,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
                 if (!CanRandomizeConversationStart(convStart))
                     continue;
 
-                var sequence = SeqTools.GetParentSequence(convStart);
+                var sequence = KismetHelper.GetParentSequence(convStart);
 
                 // Add our randomizer node
                 var randNextNode = SequenceObjectCreator.CreateSequenceObject(package, @"MERSeqAct_RandomizePawnsInNextNode");
@@ -53,13 +53,13 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
 
                 MERSeqTools.InsertActionAfter(convStart, "Out", randNextNode, 1, "Reset");
 
-                var sequenceObjects = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
-                var incomingExports = SeqTools.FindOutboundConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
+                var sequenceObjects = KismetHelper.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+                var incomingExports = KismetHelper.FindOutputConnectionsToNode(convStart, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
 
                 foreach (var incoming in incomingExports)
                 {
                     // Repoint to our randomization node -> RandomizeNext input
-                    var outboundsFromPrevNode = SeqTools.GetOutboundLinksOfNode(incoming);
+                    var outboundsFromPrevNode = KismetHelper.GetOutputLinksOfNode(incoming);
                     foreach (var outLink in outboundsFromPrevNode)
                     {
                         foreach (var linkedNode in outLink)
@@ -72,7 +72,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
                         }
                     }
 
-                    SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
+                    KismetHelper.WriteOutputLinksToNode(incoming, outboundsFromPrevNode);
                 }
 
                 KismetHelper.CreateOutputLink(randNextNode, "Randomized", convStart);
@@ -81,7 +81,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
 
                 // Change all dynamic lookups to non-native since native seems unreliable for some reason.
 
-                var varLinks = SeqTools.GetVariableLinksOfNode(convStart);
+                var varLinks = KismetHelper.GetVariableLinksOfNode(convStart);
                 foreach (var v1 in varLinks)
                 {
                     foreach (var v2 in v1.LinkedNodes.OfType<ExportEntry>())

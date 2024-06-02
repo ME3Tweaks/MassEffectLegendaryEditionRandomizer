@@ -108,7 +108,7 @@ namespace Randomizer.Randomizers.Game3
         private void PerformRandomization(object sender, DoWorkEventArgs e)
         {
             MemoryManager.SetUsePooledMemory(true, false, false, (int)FileSize.KibiByte * 8, 4, 2048, false);
-            ResetClasses(); // Cleanup anything that wasn't cleaned up previously for some reason.
+            ResetClasses(false); // Cleanup anything that wasn't cleaned up previously for some reason.
             SelectedOptions.SetRandomizationInProgress?.Invoke(true);
             SelectedOptions.SetCurrentOperationText?.Invoke("Initializing randomizer");
             SelectedOptions.SetOperationProgressBarIndeterminate?.Invoke(true);
@@ -288,11 +288,14 @@ namespace Randomizer.Randomizers.Game3
             toc.WriteToFile(Path.Combine(dlcFolder, "PCConsoleTOC.bin"));
 
             // Close out files and free memory
-            TFCBuilder.EndTFCs(SelectedOptions.RandomizationTarget);
+
+
+            // Todo: fix 
+            //TFCBuilder.EndTFCs(SelectedOptions.RandomizationTarget);
             CoalescedHandler.EndHandler();
             TLKBuilder.EndHandler();
             MERFileSystem.Finalize(SelectedOptions);
-            ResetClasses();
+            ResetClasses(true);
             MemoryManager.ResetMemoryManager();
             MemoryManager.SetUsePooledMemory(false);
 
@@ -304,14 +307,14 @@ namespace Randomizer.Randomizers.Game3
         /// <summary>
         /// Ensures things are set back to normal before first run
         /// </summary>
-        private void ResetClasses()
+        private void ResetClasses(bool isEndOfRandomizationRun)
         {
             //RMorphTarget.ResetClass();
             //SquadmateHead.ResetClass();
             //PawnPorting.ResetClass();
             //NPCHair.ResetClass();
             RPawnStats.ResetClass();
-            MERCaches.Cleanup();
+            MERCaches.Cleanup(isEndOfRandomizationRun);
         }
 
 
@@ -953,7 +956,11 @@ namespace Randomizer.Randomizers.Game3
                 {
                     // Doesn't seem to work
                     //                    new RandomizationOption() {HumanName = "Star colors", IsRecommended = true, PerformRandomizationOnExportDelegate = RBioSun.PerformRandomization},
-                    new RandomizationOption() {HumanName = "Fog colors", Description = "Changes colors of fog", IsRecommended = true, PerformRandomizationOnExportDelegate = RSharedHeightFogComponent.RandomizeExport, Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
+                    new RandomizationOption() {HumanName = "Fog colors",
+                        Description = "Changes colors of fog",
+                        IsRecommended = true,
+                        PerformSpecificRandomizationDelegate = RSharedHeightFogComponent.InstallDynamicHeightFogRandomizer,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Safe},
                     new RandomizationOption() {
                         HumanName = "Post Processing volumes",
                         Description = "Changes postprocessing. Likely will make some areas of game unplayable",

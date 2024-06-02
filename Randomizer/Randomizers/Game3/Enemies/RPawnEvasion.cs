@@ -9,7 +9,6 @@ using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
-using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Game3.Misc
 {

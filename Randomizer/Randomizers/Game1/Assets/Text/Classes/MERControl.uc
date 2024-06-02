@@ -10,13 +10,96 @@ struct MERPowerMapping
 
 // Variables
 var config array<MERPowerMapping> PowerMappings;
+var BioInventoryGuiInterface InventoryLayer;
 
 // Functions
 public static function RandomizeBioPawn(BioPawn BP)
 {
+    BioPawn_RandomizeWeapons(BP);
+    BioPawn_RandomizeWeaponMods(BP);
     BioPawn_RandomizePowers(BP);
     BioPawn_BattleRoyalify(BP);
     BioPawn_RandomizeSpeed(BP);
+}
+
+private static final function BioPawn_RandomizeWeapons(BioPawn BP)
+{
+
+}
+
+private static final function BioPawn_RandomizeWeaponMods(BioPawn BP)
+{
+    local int I;
+    local int J;
+    local int K;
+    local BioInventory Inv;
+    local BioPawnBehavior Behav;
+    local BioItemXMod BI;
+    local BioWeapon BW;
+    local BioItemWeapon BIW;
+    local int ItemId;
+    local bool Res;
+    
+    ItemId = 398;
+    if (TRUE || Class'MERControlEngine'.default.bEnemyWeaponModsRandomizer)
+    {
+        Behav = BP.m_oBehavior;
+        if (Behav == None)
+        {
+            return;
+        }
+        Inv = Behav.GetInventory();
+        if (Inv != None)
+        {
+            BI = BioItemXMod(Class'BioItemImporter'.static.LoadGameItem(ItemId, 9, 'None', Inv, 0));
+            LogInternal("Spawned: " $ BI, );
+            Inv.Add(BI);
+            if (default.InventoryLayer.SetTarget(BP))
+            {
+                for (I = 0; I < 4; I++)
+                {
+                    BW = Behav.m_oEquipment.m_QuickSlotArray[I];
+                    if (BW == None)
+                    {
+                        continue;
+                    }
+                    default.InventoryLayer.SelectQuickslotItem(byte(I));
+                    for (J = 0; J < 21; J++)
+                    {
+                        default.InventoryLayer.BuildEquippableXModList(J);
+                        LogInternal("XmodListEquippable " $ J $ ":" $ default.InventoryLayer.EquippableItemsList.Length, );
+                        for (K = 0; K < default.InventoryLayer.EquippableItemsList.Length; K++)
+                        {
+                            LogInternal("  " $ default.InventoryLayer.EquippableItemsList[K].ItemName, );
+                            if (default.InventoryLayer.EquippableItemsList[K].itemRef.m_nID == ItemId)
+                            {
+                                LogInternal("    Modding item: " $ default.InventoryLayer.m_itemSelection.m_item.m_oAttributes.m_Label, );
+                                BIW = BioItemWeapon(default.InventoryLayer.m_itemSelection.m_item);
+                                LogInternal("    Virtual slot count: " $ BIW.TotalVirtualXModSlots(), );
+                                if (BIW.TotalVirtualXModSlots() == 0)
+                                {
+                                    BIW.m_slotSpecs.Length = 1;
+                                    BIW.m_slotSpecs[0].m_type = J;
+                                    BIW.m_slotSpecs[0].m_xMods.Length = 1;
+                                }
+                                Res = default.InventoryLayer.InstallXMod(default.InventoryLayer.EquippableItemsList[K].InvIndex, J);
+                                LogInternal("    Install result: " $ Res, );
+                                if (Res)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        if (Res)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            default.InventoryLayer.FullReset();
+        }
+    }
 }
 
 private static final function BioPawn_RandomizePowers(BioPawn BP)
@@ -96,6 +179,9 @@ public static function BioPawn_RandomizeSpeed(BioPawn BP)
 //class default properties can be edited in the Properties tab for the class's Default__ object.
 defaultproperties
 {
+    Begin Object Class=BioInventoryGuiInterface Name=oGuiInventoryLayer
+    End Object
+    InventoryLayer = oGuiInventoryLayer
     PowerMappings = ({powerName = 'TK_Throw', HasPowerTalentId = 288}, 
                      {powerName = 'TK_Lift', HasPowerTalentId = 50}, 
                      {powerName = 'SD_Warp', HasPowerTalentId = 56}, 

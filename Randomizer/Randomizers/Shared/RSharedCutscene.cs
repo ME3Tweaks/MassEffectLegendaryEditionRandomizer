@@ -15,7 +15,7 @@ namespace Randomizer.Randomizers.Shared
         private static bool CanRandomize(ExportEntry export, out string cutsceneName)
         {
             cutsceneName = null;
-            if (!export.IsDefaultObject && export.ClassName == "SeqAct_Interp" && SeqTools.GetParentSequence(export)?.ObjectName is { } strp && strp.Instanced.StartsWith("ANIMCUTSCENE_"))
+            if (!export.IsDefaultObject && export.ClassName == "SeqAct_Interp" && KismetHelper.GetParentSequence(export)?.ObjectName is { } strp && strp.Instanced.StartsWith("ANIMCUTSCENE_"))
             {
                 cutsceneName = strp;
                 return true;
@@ -34,18 +34,18 @@ namespace Randomizer.Randomizers.Shared
         public static bool ShuffleCutscenePawns(GameTarget target, ExportEntry export, RandomizationOption option)
         {
             if (!CanRandomize(export, out var cutsceneName)) return false;
-            var sequence = SeqTools.GetParentSequence(export);
+            var sequence = KismetHelper.GetParentSequence(export);
 
             // Add our randomizer node
             var randNextNode = MERSeqTools.CreateAndAddToSequence(sequence, @"MERSeqAct_RandomizePawnsInNextNode");
 
-            var sequenceObjects = SeqTools.GetAllSequenceElements(sequence).OfType<ExportEntry>();
-            var incomingExports = SeqTools.FindOutboundConnectionsToNode(export, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
+            var sequenceObjects = KismetHelper.GetAllSequenceElements(sequence).OfType<ExportEntry>();
+            var incomingExports = KismetHelper.FindOutputConnectionsToNode(export, sequenceObjects, INTERP_PLAY_INPUT_IDXS);
 
             foreach (var incoming in incomingExports)
             {
                 // Repoint to our randomization node
-                var outboundsFromPrevNode = SeqTools.GetOutboundLinksOfNode(incoming);
+                var outboundsFromPrevNode = KismetHelper.GetOutputLinksOfNode(incoming);
                 foreach (var outLink in outboundsFromPrevNode)
                 {
                     foreach (var linkedNode in outLink)
@@ -57,7 +57,7 @@ namespace Randomizer.Randomizers.Shared
                         }
                     }
                 }
-                SeqTools.WriteOutboundLinksToNode(incoming, outboundsFromPrevNode);
+                KismetHelper.WriteOutputLinksToNode(incoming, outboundsFromPrevNode);
             }
 
             KismetHelper.CreateOutputLink(randNextNode, "Randomized", export);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LegendaryExplorerCore.Coalesced;
+﻿using LegendaryExplorerCore.Coalesced;
 using LegendaryExplorerCore.Helpers;
 
 namespace Randomizer.MER
@@ -13,13 +8,19 @@ namespace Randomizer.MER
     /// </summary>
     public class MERRuntimeOption
     {
+#if __GAME1__
+        public const string RTO_TITLE_ENEMYPOWERS = "Enemy Powers";
+        public const string RTO_TITLE_ENEMYWEAPONS = "Enemy Weapons";
+        public const string RTO_TITLE_ENEMYWEAPONMODS = "Enemy Weapon Mods";
+#endif
+
 #if __GAME2__
         public const string RTO_TITLE_ICONICFACES = "Iconic faces";
         public const string RTO_TITLE_LOOKAT_SYSTEM = "LookAt system";
         public const string RTO_TITLE_NPCCOLORS = "NPC colors";
         public const string RTO_TITLE_ROMANCE = "Romance";
         public const string RTO_TITLE_ENEMYPOWERS = "Enemy Powers";
-        public const string RTO_TITLE_ENEMYWEAPONS = "Enemy weapons";
+        public const string RTO_TITLE_ENEMYWEAPONS = "Enemy Weapons";
         public const string RTO_TITLE_EYES = "Eyes";
         public const string RTO_TITLE_NPCFACES = "NPC faces";
         public const string RTO_TITLE_FOGCOLORS = "Fog colors";
@@ -78,6 +79,14 @@ namespace Randomizer.MER
         {
             switch (PropertyName)
             {
+#if __GAME1__
+                case REnemyWeapon.OPTIONKEY_EnemyWeaponsRandomizer:
+                    DisplayString = RTO_TITLE_ENEMYWEAPONS;
+                    break;
+                case REnemyWeapon.OPTIONKEY_EnemyWeaponModsRandomizer:
+                    DisplayString = RTO_TITLE_ENEMYWEAPONMODS;
+                    break;
+#endif
 #if __GAME2__
                 case "fBioMorphFaceRandomization":
                     DisplayString = RTO_TITLE_NPCFACES_AMOUNT;

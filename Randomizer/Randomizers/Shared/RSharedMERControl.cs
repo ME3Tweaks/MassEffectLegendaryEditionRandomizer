@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ME3TweaksCore.Targets;
+﻿using ME3TweaksCore.Targets;
 using Randomizer.MER;
-using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
 

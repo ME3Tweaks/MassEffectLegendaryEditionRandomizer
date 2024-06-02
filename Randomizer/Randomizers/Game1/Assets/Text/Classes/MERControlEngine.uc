@@ -12,6 +12,7 @@ var config bool bEyeRandomizer;
 var config bool bPawnColorsRandomizer;
 var config bool bRandomizeWeaponStats;
 var config bool bEnemyWeaponRandomizer;
+var config bool bEnemyWeaponModsRandomizer;
 var config bool bEnemyWeaponRandomizer_Force;
 var config bool bEnemyWeaponRandomizer_OneTime;
 var config bool bEnemyPowerRandomizer;

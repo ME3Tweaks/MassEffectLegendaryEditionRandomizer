@@ -1,27 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using LegendaryExplorerCore.GameFilesystem;
-using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
-using LegendaryExplorerCore.Helpers;
-using LegendaryExplorerCore.Kismet;
-using LegendaryExplorerCore.Misc;
-using LegendaryExplorerCore.Packages;
-using LegendaryExplorerCore.Packages.CloningImportingAndRelinking;
-using LegendaryExplorerCore.Unreal;
-using LegendaryExplorerCore.Unreal.BinaryConverters;
-using LegendaryExplorerCore.Unreal.ObjectInfo;
-using Newtonsoft.Json;
-using Randomizer.MER;
 using Randomizer.Randomizers;
-using Randomizer.Randomizers.Game1.GalaxyMap;
-using Randomizer.Randomizers.Utility;
 
 namespace RandomizerUI.Classes
 {
@@ -53,7 +32,9 @@ namespace RandomizerUI.Classes
             // For UI binding.
             RandomizationOption option = new RandomizationOption();
             option.OnOperationUpdate += srUpdate;
+#if __GAME1__
             dataworker.DoWork += GalaxyMapRandomizerDebug.BuildSWFPackage;
+#endif
             //dataworker.DoWork += MERDebug.BuildTFCs;
             //dataworker.DoWork += MERDebug.BuildHenchPowers;
             //dataworker.DoWork += MERDebug.BuildPowersBank;

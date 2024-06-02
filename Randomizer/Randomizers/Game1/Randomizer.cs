@@ -7,14 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using LegendaryExplorerCore.GameFilesystem;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Memory;
 using LegendaryExplorerCore.Misc;
 using LegendaryExplorerCore.Misc.ME3Tweaks;
 using LegendaryExplorerCore.Packages;
-using LegendaryExplorerCore.Unreal.BinaryConverters;
 using ME3TweaksCore.Helpers;
 using ME3TweaksCore.ME3Tweaks.M3Merge;
 using ME3TweaksCore.Misc;
@@ -30,8 +28,6 @@ using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Levels;
 using Randomizer.Randomizers.Shared;
 using Randomizer.Randomizers.Shared.Classes;
-using Randomizer.Randomizers.Utility;
-using Serilog;
 
 namespace Randomizer.Randomizers.Game1
 {
@@ -92,25 +88,6 @@ namespace Randomizer.Randomizers.Game1
             // not implemented
             SelectedOptions?.SetRandomizationInProgress?.Invoke(false);
         }
-
-
-        //        private void Randomization_Completed(object sender, RunWorkerCompletedEventArgs e)
-        //        {
-        //            if (e.Error != null)
-        //            {
-        //                MERLog.Exception(e.Error, @"Randomizer thread exited with exception!");
-        //                SelectedOptions.SetCurrentOperationText?.Invoke($"Randomizer failed with error: {e.Error.Message}, please report to Mgamerz");
-        //                TelemetryInterposer.TrackError(new Exception("Randomizer thread exited with exception", e.Error));
-        //            }
-        //            else
-        //            {
-        //                TelemetryInterposer.TrackEvent("Randomization completed");
-        //                SelectedOptions.SetCurrentOperationText?.Invoke("Randomization complete");
-        //            }
-        //            CommandManager.InvalidateRequerySuggested();
-        //            SelectedOptions.SetTaskbarState?.Invoke(MTaskbarState.None);
-        //            SelectedOptions.SetRandomizationInProgress?.Invoke(false);
-        //        }
 
         private void PerformRandomization(object sender, DoWorkEventArgs e)
         {
@@ -651,52 +628,34 @@ namespace Randomizer.Randomizers.Game1
                     /*
                     new RandomizationOption() {HumanName = "Weapon stats", Description = "Attempts to change gun stats in a way that makes game still playable", PerformSpecificRandomizationDelegate = Weapons.RandomizeWeapons, IsRecommended = true},
                     new RandomizationOption() {HumanName = "Usable weapon classes", Description = "Changes what guns the player and squad can use", PerformSpecificRandomizationDelegate = Weapons.RandomizeSquadmateWeapons, IsRecommended = true},
-                    //new RandomizationOption() {HumanName = "Enemy AI", Description = "Changes enemy AI so they behave differently", PerformRandomizationOnExportDelegate = PawnAI.RandomizeExport, IsRecommended = true},
-                    new RandomizationOption() {HumanName = "Enemy weapons",
+                    //new RandomizationOption() {HumanName = "Enemy AI", Description = "Changes enemy AI so they behave differently", PerformRandomizationOnExportDelegate = PawnAI.RandomizeExport, IsRecommended = true},*/
+                    new RandomizationOption() {
+                        HumanName = "Enemy weapons",
                         Description = "Gives enemies different guns",
-                        // CHANGE TO EQUIPMENT 2DA SCAN GENERIC
-                        PerformRandomizationOnExportDelegate = EnemyWeapon.RandomizeExport,
-                        PerformSpecificRandomizationDelegate = EnemyWeaponChanger.Init,
+                        PerformSpecificRandomizationDelegate = REnemyWeapon.InstallWeaponRandomizer,
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
                         IsRecommended = true,
-                        // Debug stuff.
-#if DEBUG
-                        //HasSliderOption = true,
-                        //Ticks = string.Join(",",Enumerable.Range(-1,EnemyWeaponChanger.AllAvailableWeapons.Count + 1)),
-                        //SliderToTextConverter = x =>
-                        //{
-                        //    if (x < 0)
-                        //        return "All weapons";
-                        //    var idx = (int) x;
-                        //    return EnemyWeaponChanger.AllAvailableWeapons[idx].GunName;
-                        //},
-                        //SliderValue = -1, // End debug stuff
-#endif
-
-
-                    },*/
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true,
+                    },
+                    new RandomizationOption() {
+                        HumanName = "Enemy weapon mods",
+                        Description = "Gives enemy weapons weapon mods - will increase game difficulty",
+                        PerformSpecificRandomizationDelegate = REnemyWeapon.InstallWeaponModsRandomizer,
+                        Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning,
+                        IsRecommended = true,
+                        GameplayRandomizer = true,
+                        IsRuntimeRandomizer = true,
+                    },
 
                     new RandomizationOption()
                     {
-                        HumanName = "Enemy powers", Description = "Gives enemies random powers. Can greatly increase difficulty", 
+                        HumanName = "Enemy powers", Description = "Gives enemies random powers. Will significantly increase difficulty due to how powers work", 
                         PerformSpecificRandomizationDelegate = RBioPawn.InstallEnemyPowerRandomizer, 
                         Dangerousness = RandomizationOption.EOptionDangerousness.Danger_Warning, 
                         IsRecommended = true,
                         GameplayRandomizer = true,
                         IsRuntimeRandomizer = true
-                        // Debug stuff.
-#if DEBUG
-                        //HasSliderOption = true,
-                        //Ticks = string.Join(",",Enumerable.Range(-1,EnemyPowerChanger.Powers.Count + 1)),
-                        //SliderToTextConverter = x =>
-                        //{
-                        //    if (x < 0)
-                        //        return "All powers";
-                        //    var idx = (int) x;
-                        //    return EnemyPowerChanger.Powers[idx].PowerName;
-                        //},
-                        //SliderValue = -1, // End debug stuff
-#endif
                     },
                 }
             });

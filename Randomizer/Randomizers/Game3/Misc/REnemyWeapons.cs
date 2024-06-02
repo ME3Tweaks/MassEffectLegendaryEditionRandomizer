@@ -36,7 +36,7 @@ namespace Randomizer.Randomizers.Game3.Misc
             {
                 Clipboard.SetText(scriptText);
             });
-            ScriptTools.InstallScriptTextToExport(targetScriptExport, scriptText, "RandomEnemyWeapon-DYNAMIC", MERCaches.GlobalCommonLookupCache);
+            ScriptTools.InstallScriptTextToExport(target, targetScriptExport, scriptText, "RandomEnemyWeapon-DYNAMIC", MERCaches.GlobalCommonLookupCache);
             MERFileSystem.SavePackage(sfxgame);
             return true;
         }

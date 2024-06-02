@@ -52,8 +52,8 @@ namespace Randomizer.Randomizers.Handlers
             tfcStream.WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, $"{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc")); // Write the embedded TFC out to the DLC folder
 #elif __GAME3__
             throw new Exception("NOT IMPLEMENTED");
-            var tfcStream = MEREmbedded.GetEmbeddedAsset("Binary", $"Textures.{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc");
-            tfcStream.WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, $"{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc")); // Write the embedded TFC out to the DLC folder
+            //var tfcStream = MEREmbedded.GetEmbeddedAsset("Binary", $"Textures.{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc");
+            //tfcStream.WriteToFile(Path.Combine(MERFileSystem.DLCModCookedPath, $"{Randomizer.Randomizers.Game2.TextureAssets.LE2.LE2Textures.PremadeTFCName}.tfc")); // Write the embedded TFC out to the DLC folder
 
 #endif
             PremadeTexturePackage = MEPackageHandler.OpenMEPackageFromStream(MEREmbedded.GetEmbeddedPackage(MERFileSystem.Game, @"Textures.PremadeImages.pcc"), @"PremadeImages.pcc");

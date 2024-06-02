@@ -12,6 +12,9 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
 {
     class RBioPawn
     {
+        public const string OPTION_EnemyPowerRandomizer = "bEnemyPowerRandomizer";
+
+
         // NEEDS VALIDATED AGAINST ME1
         // THIS CODE IS FROM ME2R
 
@@ -58,10 +61,7 @@ namespace Randomizer.Randomizers.Game1.ExportTypes
         public static bool InstallEnemyPowerRandomizer(GameTarget target, RandomizationOption option)
         {
             RSharedMERControl.InstallBioPawnMERControl(target);
-            CoalescedHandler.EnableFeatureFlag("bEnemyPowerRandomizer");
-
-            // Handle sliders
-
+            CoalescedHandler.EnableFeatureFlag(OPTION_EnemyPowerRandomizer);
             return true;
         }
     }

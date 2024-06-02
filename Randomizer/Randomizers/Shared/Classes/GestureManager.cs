@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LegendaryExplorerCore.Unreal.Collections;
-using Randomizer.Randomizers.Game1.Misc;
 using Randomizer.Randomizers.Utility;
 
 namespace Randomizer.Randomizers.Shared.Classes
@@ -448,7 +447,7 @@ namespace Randomizer.Randomizers.Shared.Classes
 #elif __GAME2__
             var bioAnimSet = gesture.GetBioAnimSet(skelMeshComp.FileRef, Game2.Misc.Game2Gestures.GestureSetNameToPackageExportName);
 #elif __GAME3__
-            var bioAnimSet = gesture.GetBioAnimSet(skelMeshComp.FileRef, Game3Gestures.GestureSetNameToPackageExportName);
+            var bioAnimSet = gesture.GetBioAnimSet(skelMeshComp.FileRef, Game3.Misc.Game3Gestures.GestureSetNameToPackageExportName);
 #endif
             if (bioAnimSet != null)
             {

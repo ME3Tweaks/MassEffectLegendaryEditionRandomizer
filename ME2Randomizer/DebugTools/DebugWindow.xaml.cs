@@ -33,7 +33,8 @@ namespace RandomizerUI.DebugTools
 
             Debug.WriteLine(proxy.ToXmlString());
             var o = proxy;
-            */DataFinder df = new DataFinder(mw);
+            */
+            DataFinder df = new DataFinder(mw);
         }
 
         private void CheckProperties_Click(object sender, RoutedEventArgs e)
@@ -59,7 +60,7 @@ namespace RandomizerUI.DebugTools
         private void BuildInventoryPackages_Click(object sender, RoutedEventArgs e)
         {
 #if __GAME3__
-            Randomizer.Randomizers.Game3.FirstRun.Inventory.PerformInventory(Locations.GetTarget(true), @"C:\users\mgame\desktop\Inventory");
+            //            Randomizer.Randomizers.Game3.FirstRun.Inventory.PerformInventory(Locations.GetTarget(true), @"C:\users\mgame\desktop\Inventory");
 #endif
             //ME2Debug.GetExportsInPersistentThatAreAlsoInSub();
         }

@@ -222,7 +222,7 @@ namespace Randomizer.Randomizers.Game3.Levels
             randFloat.WriteProperty(new FloatProperty(2f, "Max"));
             KismetHelper.CreateVariableLink(delay, "Duration", randFloat);
 
-            var randSwitch = MERSeqTools.InstallRandomSwitchIntoSequence(target, sequence, VIClientEffects.Length);
+            var randSwitch = MERSeqTools.CreateRandSwitch(sequence, VIClientEffects.Length);
             KismetHelper.CreateOutputLink(delay, "Finished", randSwitch);
 
             // We do it this way since it's kind of an ambiguous index - for potential future proofing

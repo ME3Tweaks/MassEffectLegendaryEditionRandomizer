@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Windows.Documents;
 using LegendaryExplorerCore.Packages;
 using ME3TweaksCore.Targets;
 using Randomizer.MER;
 using Randomizer.Randomizers.Handlers;
 using Randomizer.Randomizers.Utility;
-using WinCopies.Util;
 
 namespace Randomizer.Randomizers.Game3.Misc
 {
@@ -46,7 +44,7 @@ namespace Randomizer.Randomizers.Game3.Misc
                 PrepareCustomActions(target);
                 if (option.HasSubOptionSelected(MELEE_OPTION))
                 {
-                    PatchMeleeToSyncPartner(sfxgame);
+                    PatchMeleeToSyncPartner(target, sfxgame);
                 }
             }
 
@@ -55,7 +53,7 @@ namespace Randomizer.Randomizers.Game3.Misc
             scriptText = SubOptionSubstitute(scriptText, option, MELEE_OPTION, "MELEERANDOMIZER",
                 generateCAAssignmentScriptText, 133, 3); // 133 is first CA melee
 
-            ScriptTools.InstallScriptTextToExport(sfxgame.FindExport("SFXAI_Core.Initialize"), scriptText,
+            ScriptTools.InstallScriptTextToExport(target, sfxgame.FindExport("SFXAI_Core.Initialize"), scriptText,
                 "SFXAI_Core.Initialize() Pawn Stat Randomizer", MERCaches.GlobalCommonLookupCache);
 
             MERFileSystem.SavePackage(sfxgame);
@@ -71,10 +69,10 @@ namespace Randomizer.Randomizers.Game3.Misc
         /// Makes it so melee attacks pass in the sync partner, so it can be used to sync. this allows things like player heavy melee to be used
         /// </summary>
         /// <param name="sfxgame"></param>
-        private static void PatchMeleeToSyncPartner(IMEPackage sfxgame)
+        private static void PatchMeleeToSyncPartner(GameTarget target, IMEPackage sfxgame)
         {
             var script = "public function DoMeleeAttack() { LastCombatActionTime = WorldInfo.GameTimeSeconds; MyBP.StartCustomAction(133, Pawn(FireTarget)); }";
-            ScriptTools.InstallScriptTextToExport(sfxgame.FindExport("SFXAI_Core.DoMeleeAttack"),script,"StandardMeleeSyncPatch", null);
+            ScriptTools.InstallScriptTextToExport(target, sfxgame.FindExport("SFXAI_Core.DoMeleeAttack"),script,"StandardMeleeSyncPatch", null);
         }
 
         private static string generateCAAssignmentScriptText(int startingCA, int numConsecutiveCAs)
